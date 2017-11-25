@@ -4,11 +4,15 @@
           #pageheader {
               color: blue
           }
+          #image1 {
+              width:70%;
+          }
       </style>
       <script>
           window.onload = function () {  
-            var img1 = new Image();              
-            document.body.appendChild(img1);      
+            var img2 = new Image(); 
+            img2.src = ""  
+            document.body.appendChild(img2);      
           }
       
       
@@ -18,7 +22,7 @@
   <body>
       <h2 id="pageheader">IDE Assignment 1</h2>
       
-      <img src="http://www.nationsonline.org/maps/countries_europe_map.jpg"/>
+      <img id="image1" src="https://www.nasa.gov/sites/default/files/thumbnails/image/spitzer20150603main.jpg"/>
       
   </body>
 
