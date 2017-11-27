@@ -2,23 +2,26 @@
   <head>
       <style>
           #pageheader {
-              color: blue
+              color: blue;
+              text-align: center;
           }
           #image1 {
-              width:50%;
+              width:35%;
           }
           .italic_text{
               font-style: italic;
+          }
+          figure img {
+              width: 35%;
           }
       </style>
       <script>
           window.onload = function () {  
             var img2 = new Image(); 
-            img2.src = "https://thumbs-prod.si-cdn.com/-mhQtjFkxepgBtjUfIUdw20hZDY=/fit-in/1072x0/https://public-media.smithsonianmag.com/filer/3935northernlights715.jpg"  
-            img2.alt = "Aurora Borealis"  
+            img2.src = "https://thumbs-prod.si-cdn.com/-mhQtjFkxepgBtjUfIUdw20hZDY=/fit-in/1072x0/https://public-media.smithsonianmag.com/filer/3935northernlights715.jpg" ; 
+            img2.alt = "Aurora Borealis"  ;  
             document.getElementById('figure2').appendChild(img2);      
           }
-    
       
       </script>
   </head>
@@ -35,12 +38,12 @@
       
       <ol>
           <li> <a href= "http://mvp.columnfivemedia.com/?_ga=2.3369712.1983288366.1511624289-1999001023.1511624289"> First Interactive Visualization: Top 50 Sports Franchises </a> </li>
-        <p>The graph shows the most important teams in several sports, measured by Forbes in terms of : number of years of existence (<span class="italic_text">x</span> axis), and number of championships won (<span class="italic_text">y</span>  axis). </p>
+        <p>The graph shows the most important teams in several sports, measured by Forbes in terms of : number of years of existence (<span class="italic_text">x</span> axis), number of championships won (<span class="italic_text">y</span>  axis), and value in dollars (circle size). </p>
           <p>An advantage of such a representation is that the different colors make it easy to distinguish between different sports.</p>
           <p>The circle size represents the value of the team in dollars. However, it is not an optimal choice; we recall that the human eye tends to underestimate the differences due to area size. According to Stevens' power law, the perception of area size I is proportional to I <sup>0.7</sup>  </p>
           <p>Another advantage is that, if we click on a circle, a small window pops up with the name of the team and detailed information about it. This is an efficient way of compressing a considerable amount of information. </p>
           <p>Then, we have to point out a disadvantage: there is significant overlap between the circles; it becomes difficult to distinguish between several small circles that are nearby (i.e. between teams with similar longevity, success, and monetary value.) </p>
-          <p>Moreover, we have no way to assess the total monetary value of a sport, and no way to compare it between sports. We can only compare teams, by approximately assessing the area of the circles in the global view.</p>
+          <p>Moreover, we have no way to assess the total monetary value of a sport, and thus no way to compare it between sports. We can only compare teams, by approximately assessing the area of the circles in the global view.</p>
           
           <br/>
           <li><a href= "https://www.cloudred.com/labprojects/nyctrees/#about"> Second Interactive Visualization: Types of Street Trees in New York City</a> </li>
@@ -50,14 +53,14 @@
           </p>
           <p>A minor disadvantage is that very small patches are not in scale. Namely, sets containing very few trees (examples: Manhattan, Tulip tree: 13 plants) have approximately the same size as greater sets that are still small compared to the whole (example: Brooklyn, Hackberry, 255 plants.) We do not perceive the small-scale differences properly. <br/>
           On the other hand, this could be considered an advantage: we are able to see and click very small groups that would disappear if represented properly.</p>
-          Another disadvantage is that we are unable to compare individual kinds of trees across the different boroughs. The optimal choice would have been to provide an alternative view, focusing only on 1 species of tree at the time.
+          A disadvantage is that it is not easy to compare the number of trees for a particular species across the different boroughs. The optimal choice would have been to provide an alternative view, focusing only on 1 species of tree at the time.
       </ol>
     
       <h2>Individual part: </h2>
       
       <h4>Andrea Lekkas</h4>
       <p>I would like to be able to build a "news-map" of the world. <br/>
-      The dataset would include a number of online news sites chosen by the user, called the "source sites". From these, an algorithm would read the title of each news article, and recognize its theme and the country it refers to. <br/>
+      The data would be extracted from a number of online news sites chosen by the user, called the "source sites". From these, an algorithm would read the title of each news article, and recognize its theme and the country it refers to. <br/>
       The algorithm would place a small flag on the country in question, with its shape and color depending on the theme. There would also be the option to save and archive a flag, so that it remains visible on the map even after its day of appearance.</p>
       The intended recipient is either a citizen that wishes to look up world news, or a journalist that wishes to compare quickly a vast amount of articles that pertain to a particular country or theme over time.<br/>
       In today's world, we are beset by an overwhelming continuous flow of information. The proposed visualization would help a person focus on a particular place or theme, and effectively apply a filter on the global flow of information in order to extract interesting details.
