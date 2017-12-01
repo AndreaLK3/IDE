@@ -141,11 +141,11 @@
          var yScale = d3.scaleLinear()
               .domain([d3.min(data2, 
                               function(d){
-                                return min(d.D-J-F,d.M-A-M,d.J-J-A,d.S-O-N);
+                                return Math.min(d."D-J-F",d."M-A-M",d."J-J-A",d."S-O-N");
                               }),
                        d3.max(data2, 
                               function(d){
-                                return max(d.D-J-F,d.M-A-M,d.J-J-A,d.S-O-N);
+                                return Math.max(d."D-J-F",d."M-A-M",d."J-J-A",d."S-O-N");
                               })])
               .range([height-padding, padding]);
  
@@ -154,7 +154,7 @@
              .domain(data2.map(function(d) { return d.YEAR; }));
              
              var y = d3.scaleLinear().rangeRound([height, 0])
-             .domain([0, d3.max(data2, function(d) { return max(d.D-J-F,d.M-A-M,d.J-J-A,d.S-O-N) })]);
+             .domain([0, d3.max(data2, function(d) { return max(d."D-J-F",d."M-A-M",d."J-J-A",d."S-O-N") })]);
              
              g.append("g")
              .attr("class", "axis x")
@@ -169,14 +169,15 @@
              .data2(data2)
              .enter().append("rect")
              .attr("x", function(d) { return x(d.YEAR); })
-             .attr("y", function(d) { return y(max(d.D-J-F,d.M-A-M,d.J-J-A,d.S-O-N)); })
+             .attr("y", function(d) { return y(Math.max(d."D-J-F",d."M-A-M",d."J-J-A",d."S-O-N")); })
              .attr("width", x.bandwidth())
-             .attr("height", function(d) { return height - y(max(d.D-J-F,d.M-A-M,d.J-J-A,d.S-O-N)); });
+             .attr("height", function(d) { return height - y(Math.max(d."D-J-F",d."M-A-M",d."J-J-A",d."S-O-N")); });
              
 
      }
       
-      
+      );
+         } 
       
       
 </script>
