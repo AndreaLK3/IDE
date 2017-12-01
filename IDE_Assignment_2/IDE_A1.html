@@ -6,6 +6,9 @@
       #plotarea1 {
         border:1px solid grey;
       }
+      #plotarea2 {
+        border:1px solid blue;
+      }
       #plotarea1 circle {
         fill:red;
       }
@@ -47,7 +50,10 @@
                           .range([ padding , width - padding]);
 
           var yScale = d3.scaleLinear()
-              .domain([0,
+              .domain([d3.min(data, 
+                              function(d){
+                                return d.metANN;
+                              }),
                        d3.max(data, 
                               function(d){
                                 return d.metANN;
@@ -62,8 +68,8 @@
                 .append("circle")
                 .attr("r", "5px")
                 .attr("cx", function(d){
-                              console.log(d.YEAR)
-                              console.log(""+xScale(d.YEAR))
+                              //console.log(d.YEAR)
+                              //console.log(""+xScale(d.YEAR))
                               return ""+xScale(d.YEAR)+"px";
                             })
                 .attr("cy", function(d){
@@ -97,6 +103,48 @@
 }
       
 </script>
+<script>
+      d3.select(window).onload(init2);
+    
+     function init2(){
+         data =[ [1950, 9, 12, 14, 17],
+                   [1951, 10, 13, 15, 18],
+                   [1952, 8, 11, 15, 16]
+                   [1953, 10, 12, 15, 17]]
+         
+        var svg = d3.select('#plotarea1');
+        //svg.style('width','800px'); in HTMl
+        //svg.style('height','400px');
+        var width = +svg.node().getBoundingClientRect().width;
+        var height = +svg.node().getBoundingClientRect().height;  
+         
+         
+        var padding = 30;
+
+        var xScale = d3.scaleLinear()
+                           .domain(d3.extent(data,
+                                            function(d){
+                                              return d[0];
+                                            }))
+                          .range([ padding , width - padding]);
+
+         var yScale = d3.scaleLinear()
+              .domain([d3.min(data, 
+                              function(d){
+                                return min(d[1],d[2],d[3],d[4]);
+                              }),
+                       d3.max(data, 
+                              function(d){
+                                return max(d[1],d[2],d[3],d[4]);
+                              })])
+              .range([height-padding, padding]);
+         
+     }
+      
+      
+      
+      
+</script>
       
   </head>
     
@@ -104,7 +152,11 @@
       <h2>IDE : Assignment 2</h2>
       <h3> How has the weather changed over the past 100 years?</h3>
       
-      <svg width="80%" height=600px id="plotarea1"></svg>
+      <svg width="80%" height="500px" id="plotarea1"></svg>
+      
+      <svg width="80%" height="500px" id="plotarea2"></svg>   
+      
+      
       
   </body>
     
