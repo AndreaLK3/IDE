@@ -104,15 +104,25 @@
       
 </script>
 <script>
-      d3.select(window).onload(init2);
-    
-     function init2(){
-         data =[ [1950, 9, 12, 14, 17],
-                   [1951, 10, 13, 15, 18],
-                   [1952, 8, 11, 15, 16]
-                   [1953, 10, 12, 15, 17]]
+     d3.select(window).on('load',init2);
+         function init2(){
+    d3.csv(
+           'Los Angeles Weather Data.csv',
+           function(error, raw_data) {
+           if (error) throw error;
+           
+           var data2 = raw_data.filter(function(d)
+                                      {
+                                      
+                                      if (( parseInt(d.YEAR) >= 1917 ) && ( d.metANN < 990 ) )
+                                      { 
+                                      return d;
+                                      } 
+                                      
+                                      })
+
          
-        var svg = d3.select('#plotarea1');
+        var svg = d3.select('#plotarea2');
         //svg.style('width','800px'); in HTMl
         //svg.style('height','400px');
         var width = +svg.node().getBoundingClientRect().width;
@@ -122,23 +132,48 @@
         var padding = 30;
 
         var xScale = d3.scaleLinear()
-                           .domain(d3.extent(data,
+                           .domain(d3.extent(data2,
                                             function(d){
-                                              return d[0];
+                                              return d.YEAR;
                                             }))
                           .range([ padding , width - padding]);
 
          var yScale = d3.scaleLinear()
-              .domain([d3.min(data, 
+              .domain([d3.min(data2, 
                               function(d){
-                                return min(d[1],d[2],d[3],d[4]);
+                                return min(d.D-J-F,d.M-A-M,d.J-J-A,d.S-O-N);
                               }),
-                       d3.max(data, 
+                       d3.max(data2, 
                               function(d){
-                                return max(d[1],d[2],d[3],d[4]);
+                                return max(d.D-J-F,d.M-A-M,d.J-J-A,d.S-O-N);
                               })])
               .range([height-padding, padding]);
-         
+ 
+             
+             var x = d3.scaleBand().rangeRound([0, width])
+             .domain(data2.map(function(d) { return d.YEAR; }));
+             
+             var y = d3.scaleLinear().rangeRound([height, 0])
+             .domain([0, d3.max(data2, function(d) { return max(d.D-J-F,d.M-A-M,d.J-J-A,d.S-O-N) })]);
+             
+             g.append("g")
+             .attr("class", "axis x")
+             .attr("transform", "translate(0," + height + ")")
+             .call(d3.axisBottom(x));
+             
+             g.append("g")
+             .attr("class", "axis y")
+             .call(d3.axisLeft(y).ticks(data2.length));
+             
+             g.selectAll(".bar")
+             .data2(data2)
+             .enter().append("rect")
+             .attr("x", function(d) { return x(d.YEAR); })
+             .attr("y", function(d) { return y(max(d.D-J-F,d.M-A-M,d.J-J-A,d.S-O-N)); })
+             .attr("width", x.bandwidth())
+             .attr("height", function(d) { return height - y(max(d.D-J-F,d.M-A-M,d.J-J-A,d.S-O-N)); });
+             
+
      }
       
       
