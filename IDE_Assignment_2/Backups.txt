@@ -1,0 +1,48 @@
+            var padding = 20;
+            
+            var xScale = d3.scaleLinear()
+                           .domain(d3.extent(mydata,
+                                            function(d){
+                                              return d[0];
+                                            }))
+                          .range([ padding , width - padding]);
+            
+             var yScale = d3.scaleLinear()
+                          .domain([d3.min(mydata,
+                                          function(d){
+                                            return d[1];
+                                          }),
+                                   d3.max(mydata, 
+                                          function(d){
+                                            return d[1];
+                                          })])
+                          .range([height-padding, padding]);
+
+            
+            
+            var xAxis = d3.axisBottom(xScale);
+            var yAxis = d3.axisLeft(yScale);
+            
+            d3.select('svg')
+              .append('g')            // grouping makes it easy to specify transform
+              .attr('transform', 'translate(0,' + (height - padding) + ')')
+              .call(xAxis.ticks(mydata.length))           // xAxis will be constructed within selection
+            
+
+            
+            d3.select('svg')
+              .append('g')            // grouping makes it easy to specify transform
+              .attr('transform', 'translate(' +padding + '0)')
+              .call(yAxis)            // xAxis will be constructed within selection
+
+
+
+
+
+/***********************/
+var yScale = d3.scaleLinear().rangeRound([height-padding,0+padding])
+                           .domain([0, d3.max(mydata,
+                                            function(d){
+                                              return d[1];
+                                            })]);
+    

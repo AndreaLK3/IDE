@@ -1,8 +1,85 @@
 <!DOCTYPE html>
 <html>
   <head>
+      <meta charset="utf-8"/>
+    <style>
+      #plotarea1 {
+        border:1px solid grey;
+      }
+      #plotarea1 circle {
+        fill:red;
+      }
+    </style>
     <script src="https://d3js.org/d3.v4.min.js"></script>
-    <!--<script src="csv3.js"></script>-->
+    <script>
+        d3.select(window).on('load',init);
+
+        function init() {
+  
+            console.log("Function init running");
+            
+            var mydata = [[1950, 14], 
+                        [1951, 15], 
+                        [1952, 13.5], 
+                        [1953, 15.5]];
+            
+            console.log(""+mydata);
+
+            var svg = d3.select('#plotarea1');
+            //svg.style('width','800px');
+            //svg.style('height','400px');
+            var width = +svg.node().getBoundingClientRect().width;
+            var height = +svg.node().getBoundingClientRect().height;  
+            
+          var padding = 30;
+
+          var xScale = d3.scaleLinear()
+                           .domain(d3.extent(mydata,
+                                            function(d){
+                                              return d[0];
+                                            }))
+                          .range([ padding , width - padding]);
+
+          var yScale = d3.scaleLinear()
+              .domain([0,
+                       d3.max(mydata, 
+                              function(d){
+                                return d[1];
+                              })])
+              .range([height-padding, padding]);
+
+            
+            d3.select("#plotarea1")
+                .selectAll("circle")
+                .data(mydata)
+                .enter()
+                .append("circle")
+                .attr("r", "5px")
+                .attr("cx", function(d){
+                              console.log(d[0])
+                              console.log(""+xScale(d[0]))
+                              return ""+xScale(d[0])+"px";
+                            })
+                .attr("cy", function(d){
+                              return ""+yScale(d[1])+"px";
+                            })
+            
+            
+            
+            
+            d3.select('#plotarea1')
+              .append('g')            // grouping makes it easy to specify transform
+              .attr('transform', 'translate(0,' + (height - padding) + ')')
+              .call(d3.axisBottom(xScale).ticks(mydata.length))           // xAxis will be constructed within selection
+            
+            d3.select("#plotarea1")
+                .append('g')
+                .attr('transform', 'translate('+padding+', 0)')
+                .call(d3.axisLeft(yScale));
+        }
+      
+      
+</script>
       
   </head>
     
@@ -10,6 +87,7 @@
       <h2>IDE : Assignment 2</h2>
       <h3> How has the weather changed over the past 100 years?</h3>
       
+      <svg width="600px" height="400px" id="plotarea1"></svg>
       
   </body>
     
