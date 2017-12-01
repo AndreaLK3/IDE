@@ -16,79 +16,85 @@
 
         function init() {
   
-            console.log("Function init running");
+  d3.csv(
+    'Los Angeles Weather Data.csv',
+    function(error, raw_data) {
+      if (error) throw error;  
+        
+       var data = raw_data.filter(function(d) 
+                { 
+
+            if (( parseInt(d.YEAR) >= 1917 ) && ( d.metANN < 990 ) )
+            { 
+                return d;
+            } 
+
+    })
             
-            var mydata = [[1950, 14], 
-                        [1951, 15], 
-                        [1952, 13.5], 
-                        [1953, 15.5]];
-            
-            console.log(""+mydata);
-            
-            var svg = d3.select('#plotarea1');
-            //svg.style('width','800px');
-            //svg.style('height','400px');
-            var width = +svg.node().getBoundingClientRect().width;
-            var height = +svg.node().getBoundingClientRect().height;  
+        var svg = d3.select('#plotarea1');
+        //svg.style('width','800px'); in HTMl
+        //svg.style('height','400px');
+        var width = +svg.node().getBoundingClientRect().width;
+        var height = +svg.node().getBoundingClientRect().height;  
             
           var padding = 30;
 
           var xScale = d3.scaleLinear()
-                           .domain(d3.extent(mydata,
+                           .domain(d3.extent(data,
                                             function(d){
-                                              return d[0];
+                                              return d.YEAR;
                                             }))
                           .range([ padding , width - padding]);
 
           var yScale = d3.scaleLinear()
               .domain([0,
-                       d3.max(mydata, 
+                       d3.max(data, 
                               function(d){
-                                return d[1];
+                                return d.metANN;
                               })])
               .range([height-padding, padding]);
 
 
             d3.select("#plotarea1")
                 .selectAll("circle")
-                .data(mydata)
+                .data(data)
                 .enter()
                 .append("circle")
                 .attr("r", "5px")
                 .attr("cx", function(d){
-                              console.log(d[0])
-                              console.log(""+xScale(d[0]))
-                              return ""+xScale(d[0])+"px";
+                              console.log(d.YEAR)
+                              console.log(""+xScale(d.YEAR))
+                              return ""+xScale(d.YEAR)+"px";
                             })
                 .attr("cy", function(d){
-                              return ""+yScale(d[1])+"px";
+                              return ""+yScale(d.metANN)+"px";
                             })
             aggregates = []
-            for (i=0; i < mydata.length-1; i++) {
-                console.log(xScale(mydata[i][0]))
-                console.log(yScale(mydata[i][1]))
+            for (i=0; i < data.length-1; i++) {
+                //console.log(xScale((data[i]).YEAR))
+                //console.log(yScale((data[i]).metANN))
                 svg.append("line")
                 .attr("class", "line")
                 .attr("stroke-width","2")
                 .attr("stroke","black")
-                .attr("x1","" + xScale(mydata[i][0])+"px")
-                .attr("y1","" + yScale(mydata[i][1])+"px")
-                .attr("x2","" + xScale(mydata[i + 1][0])+"px")
-                .attr("y2","" + yScale(mydata[i + 1][1])+"px");
+                .attr("x1","" + xScale((data[i]).YEAR)+"px")
+                .attr("y1","" + yScale((data[i]).metANN)+"px")
+                .attr("x2","" + xScale((data[i+1]).YEAR)+"px")
+                .attr("y2","" + yScale((data[i+1]).metANN)+"px");
             }
             //
             
             d3.select('#plotarea1')
               .append('g')            // grouping makes it easy to specify transform
               .attr('transform', 'translate(0,' + (height - padding) + ')')
-              .call(d3.axisBottom(xScale).ticks(mydata.length))           // xAxis will be constructed within selection
+              .call(d3.axisBottom(xScale).ticks(data.length / 4))           // xAxis will be constructed within selection
             
             d3.select("#plotarea1")
                 .append('g')
                 .attr('transform', 'translate('+padding+', 0)')
                 .call(d3.axisLeft(yScale));
-        }
-      
+        });
+}
       
 </script>
       
@@ -98,7 +104,7 @@
       <h2>IDE : Assignment 2</h2>
       <h3> How has the weather changed over the past 100 years?</h3>
       
-      <svg width="600px" height="400px" id="plotarea1"></svg>
+      <svg width="80%" height=600px id="plotarea1"></svg>
       
   </body>
     
