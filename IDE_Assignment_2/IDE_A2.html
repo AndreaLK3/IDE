@@ -91,20 +91,25 @@ v<!DOCTYPE html>
                               return ""+yScale(d.metANN)+"px";
                             })
             
-            for (i=0; i < data.length-1; i++) {
-                //console.log(xScale((data[i]).YEAR))
-                //console.log(yScale((data[i]).metANN))
-                svg.append("line")
+            svg.selectAll("line")
+                .data(data)
+                .enter()
+                .append("line")
                 .attr("class", "line")
                 .attr("stroke-width","2")
                 .attr("stroke","black")
-                .attr("x1","" + xScale((data[i]).YEAR)+"px")
-                .attr("y1","" + yScale((data[i]).metANN)+"px")
-                .attr("x2","" + xScale((data[i+1]).YEAR)+"px")
-                .attr("y2","" + yScale((data[i+1]).metANN)+"px");
-            }
-            //
-            
+                .attr("x1", function(d,i) {if (i > 0) 
+                                           {return xScale((data[i-1]).YEAR)+"px";} 
+                                           else 
+                                           {return xScale((data[i]).YEAR)+"px"} })
+                .attr("y1", function(d,i) {if (i > 0) 
+                                           {return yScale((data[i-1]).metANN)+"px";} 
+                                           else 
+                                           {return yScale((data[i]).metANN)+"px"} })
+                .attr("x2", function(d,i) {return xScale((data[i]).YEAR)+"px" })
+                .attr("y2", function(d,i) {return yScale((data[i]).metANN)+"px" });
+                
+                    
             d3.select('#plotarea1')
               .append('g')            // grouping makes it easy to specify transform
               .attr('transform', 'translate(0,' + (height - padding) + ')')
