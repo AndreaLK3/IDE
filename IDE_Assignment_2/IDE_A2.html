@@ -3,15 +3,29 @@
   <head>
       <meta charset="utf-8"/>
     <style>
-      #plotarea1 {
-        border:1px solid grey;
-      }
-      #plotarea2 {
-        border:1px solid blue;
-      }
-      #plotarea1 circle {
-        fill:red;
-      }
+        #plotarea1 {
+            border:1px solid grey;
+        }
+        #plotarea2 {
+            border:1px solid blue;
+        }
+        #plotarea1 circle {
+            fill:red;
+        }
+        .ourCode {
+            font-family: Lucida Console;
+            font-size: 0.9rem;
+        }
+        section {
+            border-style: groove;
+            border-width: 1px;
+            border-color: grey;
+            padding: 4px;
+        }
+        #image1{
+            width: 35%;
+        }
+
     </style>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script>
@@ -37,7 +51,7 @@
         var width = +svg.node().getBoundingClientRect().width;
         var height = +svg.node().getBoundingClientRect().height;  
             
-          var padding = 30;
+          var padding = 50;
 
           var xScale = d3.scaleLinear()
                            .domain(d3.extent(data,
@@ -96,6 +110,24 @@
                 .append('g')
                 .attr('transform', 'translate('+padding+', 0)')
                 .call(d3.axisLeft(yScale));
+                    
+            
+            /*** Axis labels and Legenda ***/
+            // text label for the x axis
+            svg.append("text")             
+               .attr("transform", "translate(" + width/2 + " ," + 
+                                       (height- padding + 35) + ")")
+               .style("text-anchor", "middle")
+               .text("Year");
+            
+          // text label for the y axis
+          svg.append("text")
+              .attr("transform", "rotate(-90)")
+              .attr("y", 0 + padding - 50)
+              .attr("x",0 - (height / 2))
+              .attr("dy", "1em")
+              .style("text-anchor", "middle")
+              .text("Average year Temperature (°C)"); 
         });
             
         init2();
@@ -142,12 +174,11 @@
         //svg.style('height','400px');
         var width = +svg_2.node().getBoundingClientRect().width;
         var height = +svg_2.node().getBoundingClientRect().height;  
-         
-         
-        var padding = 30;
+        var our_keys = ["D-J-F", "M-A-M", "J-J-A", "S-O-N"];        
+        var padding = 40;
 
             
-         var xScale = d3.scaleBand().rangeRound([0 + padding, width - padding]).padding(0.03)
+         var xScale = d3.scaleBand().rangeRound([0 + padding, width - padding]).padding(0)
                    .domain(data2.map(function(d) { return d.YEAR; }));
              
          var yScale = d3.scaleLinear().rangeRound([height - padding, 0 + padding])
@@ -166,18 +197,7 @@
               .call(d3.axisLeft(yScale).ticks(0))
               .attr('transform', 'translate('+padding+', 0)');
             
-        
-        //Debug : Equivalent to : d3.stack().keys(keys)(data)
-        var stack = d3.stack()
-                      .keys(["Year", "D-J-F", "M-A-M", "J-J-A", "S-O-N"])
-                      .order(d3.stackOrderNone)
-                      .offset(d3.stackOffsetNone);
-        var series = stack(data2);
-            
-        console.log(stack)
-        console.log(series)
-        // *******************
-            
+                    
         svg_2.append("g")
              .selectAll("g")
              .data(d3.stack().keys(["Year", "D-J-F", "M-A-M", "J-J-A", "S-O-N"])(data2))
@@ -188,13 +208,66 @@
              .data(function(d) { return d; })
              .enter()
              .append("rect")
-             .attr("x", function(d) {/*console.log(d.data.YEAR); console.log(d[0]);console.log(d[1]);*/
-                                     return xScale(d.data.YEAR); })
-             .attr("y", function(d) {console.log(d); return yScale(d[1]); })
+             .attr("x", function(d) {return xScale(d.data.YEAR); })
+             .attr("y", function(d) {return yScale(d[1]); })
              .attr("height", function(d) { return yScale(d[0]) - yScale(d[1]); })
              .attr("width", xScale.bandwidth()); 
-   
+            
+            
+            
+            /*** Axis labels and Legend ***/
+            // text label for the x axis
+            svg_2.append("text")             
+               .attr("transform", "translate(" + width/2 + " ," + 
+                                       (height- padding + 30) + ")")
+               .style("text-anchor", "middle")
+               .text("Year");
+          
+            // text label for the y axis
+            svg_2.append("text")
+                 .attr("transform", "rotate(-90)")
+                 .attr("y", 0 + padding - 30)
+                 .attr("x",0 - (height / 2))
+                 .attr("dy", "1em")
+                 .style("text-anchor", "middle")
+                 .text("Seasonal averages"); 
+            
+            var legend = svg_2.append("g")
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", 12)
+                    .attr("text-anchor", "end")
+                    .selectAll("g")
+                    .data( our_keys.slice().reverse() ) 
+                    .enter().append("g")
+                    .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
+            legend.append("rect")
+                    .attr("x", width - 19)
+                    .attr("width", 19)
+                    .attr("height", 19)
+                    .attr("fill", getColors);
+
+            legend.append("text")
+                    .attr("x", width - 24)
+                    .attr("y", 9.5)
+                    .attr("dy", "0.32em")
+                    .text(function(d) { switch(d) {
+                                            case "D-J-F":
+                                                return "Dec-Jan-Feb";
+                                                break;
+                                            case "M-A-M":
+                                                return "Mar-Apr-May"            
+                                                break;
+                                            case "J-J-A":
+                                                return "Jun-Jul-Aug"
+                                                break;
+                                            case "S-O-N":
+                                                return "Sep-Oct-Nov"
+                                                break;
+                                            default:
+                                                return "";
+                                                break;  }
+        });
  
       }
     );
@@ -209,15 +282,55 @@
       <h2>IDE : Assignment 2</h2>
       <h3> How has the weather changed over the past 100 years?</h3>
       
-      <h4>Los Angeles - average annual temperature</h4>
+      <section>
+       <h4>Los Angeles - average annual temperature</h4>
       <svg width="70%" height="500px" id="plotarea1"></svg>
-      
-      <svg width="70%" height="500px" id="plotarea2"></svg>   
-      
+          
+	  <p>This graph shows the average temperature, for each year, in the station of 'Los Angeles - California', spanning a period from 1917 to 2017.</p>
+          <p>The original dataset file (found <a href="https://data.giss.nasa.gov/tmp/gistemp/STATIONS/tmp_425722950000_14_0/station.txt">here</a>)
+	  contains, separated by tabs, the following columns: <br/>
+	  <span class="ourCode">YEAR &nbsp; JAN &nbsp; FEB &nbsp; ... &nbsp; ...  D-J-F &nbsp; M-A-M ... &nbsp; ... metANN </span><br/>
+	  The columns represent the temperature measurements for each month, for each trimester, and the average of the year.
+      </p>
+	  <p>We produced a version of the file where the columns are separated by commas: <em> Los Angeles Weather Data.csv </em>
+	  </p>
+	  <p>Important note: whenever the station's measurements do not exist, the file uses '999.9' as the temperature value. <br/>
+          In order to ignore these values, we used the D3 <span class="ourCode">filter</span> function. <br/>
+		 If the Year is &lt; 1917 or the temperature is &gt; 990, we do not return the data object <span class="ourCode">d</span> 
+	  </p>
+	  <p>The visualization was built entirely by us. In the first stage, we draw the SVG Circles:<br/>
+	  the <em>x</em> coordinate is given by the scale transformation of the year; the <em>y</em> corresponds to the average temperature for each year. 
+	  The range is irrelevant, and fixed at 5 px. <br/> 
+	  The second phase draws a line between each data point and the next.
+	  </p>
+	  <p>We can observe that warmer and colder years tend to alternate, either every 2 years or every few years.<br/>
+         Nevertheless, we can observe that from 1965 to this day there has been a slow but steady increase in the average temperatures. In the alternating pattern, both the 'colder' and the 'warmer' years get increasingly warmer. <br/>
+         The 2 coldest years are: 1933 and 1944. The 2 hottest years are: 1997 and 2014.
+	  </p>
+      </section>
+      <section>
+    <h4>Los Angeles - Sum of seasonal averages over time</h4>  
+    <svg width="70%" height="500px" id="plotarea2"></svg>   
+    <p> In this graph, we visualize the average seasonal temperatures stacked on the top of each other. This makes it more difficult to recognize the behaviour of the overall temperature during the year; a graph more similar to the previous one could be reconstructed by "zooming in" on the top of the bars. <br/>
+    The purpose of this graph is to explore the seasonal variations over time, and how they contribute to the overall temperature of the year. Due to how the graph is built, on the <span class="ourCode">y</span> axis we visualize the sum of the trimester averages, not the year average.
+    </p>
+    
+    <p> While most of the code was written by us, several lines were taken from Mike Bostock's<a href="https://bl.ocks.org/mbostock/3886208"> Stacked Bar Chart</a> example.<br/>
+    Once again, we filtered out the years that contain an unreasonable temperature value in any of the fields of interest.    
+    </p>
+    <p>We can observe that in the first half of the 20th century the alternating "warmer" and "colder" years had more pronounced seasonal variation. The bar heights for (DEC-JAN-FEB) and (MAR-APR-MAY) have a noticeable difference when we compare a "warm" and a "cold" year. <br/>
+    From 1993 to 2013, the temperature values for Winter and Spring trimesters remain mostly identical from one year to the other. In 2014, the 2 trimesters are noticeably warmer, and cause the whole bar to be higher.<br/>
+    Note: In order to be able to compare clearly and immediately the seasons of different years, it would have been better to create multiple bar plots, one for each trimester, instead of a stacked one. For instance, in this graph we are not able to compare with ease the (JUN-JUL-AUG) trimester, due to the differences of the 2 previous trimesters interfering. </p>
+
+    </section>
+
+          
       <h2>Individual Part</h2>
-      <h4>Jianfan Chen</h2>
+      <h4>Jianfan Chen</h4>
           <p>For the question of weather change spanned over the past 100 years, I would like to use a multi-series line chart and include three different cities from the same latitude yet from three different locations. The data set will be selected from NASA for fairness, since it could be variation in technological advancement or other uncontrollable effects that could potentially influence the data.  Ideally, one is from a developed country, one is from a developing country and one is from a climatically extreme region. By comparing with their average annual temperatures from the same year, we can compare a single year’s temperature vertically. The overall trend will instead be shown in the horizontal lines.</p>
       
+      <img id="image1" src="https://static.skepticalscience.com/graphics/Temperature_Composite_500.jpg"/>
+
       
   </body>
     
