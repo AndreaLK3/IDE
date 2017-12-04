@@ -103,6 +103,25 @@
       
 </script>
 <script>
+    function getColors(season){
+        color = "#000000";
+        switch (season) {
+            case "D-J-F" : 
+                color = "#00FFFF";
+                break;
+            case "M-A-M" : 
+                color = "#008000";
+                break;
+            case "J-J-A" : 
+                color = "#FFA500";
+                break;
+            case "S-O-N" :
+                color = "#A52A2A";
+                break;
+        }
+        return color;
+    }
+    
     function init2(){
         d3.csv(
         'Los Angeles Weather Data.csv',
@@ -111,7 +130,8 @@
 
             var data2 = raw_data.filter(function(d)
                                           {                                      
-                                          if (( parseInt(d.YEAR) >= 1917 ) && ( d.metANN < 990 ) )
+                                          if (( parseInt(d.YEAR) >= 1917 ) && ( d.metANN < 990 ) &&  ( d["D-J-F"] < 990 ) &&
+                                              ( d["M-A-M"] < 990 ) && ( d["J-J-A"] < 990 ) && ( d["S-O-N"] < 990 ) )
                                           { 
                                           return d;
                                           }                                      
@@ -125,40 +145,55 @@
          
          
         var padding = 30;
-            
-        var xScale = d3.scaleLinear()
-                       .domain(d3.extent(data2,
-                                        function(d){
-                                          return d.YEAR;
-                                        }))
-                      .range([ padding , width - padding]);
 
-         var yScale = d3.scaleLinear()
-                        .domain([d3.min(data2, 
-                              function(d){
-                                return Math.min(d["D-J-F"], d["M-A-M"], d["J-J-A"], d["S-O-N"]);
-                              }),
-                      d3.max(data2, 
-                              function(d){
-                                return Math.max(d["D-J-F"], d["M-A-M"], d["J-J-A"], d["S-O-N"]);
-                              })])
-              .range([height-padding, padding]);
             
-         var x = d3.scaleBand().rangeRound([0, width])
+         var xScale = d3.scaleBand().rangeRound([0 + padding, width - padding]).padding(0.03)
                    .domain(data2.map(function(d) { return d.YEAR; }));
              
-         var y = d3.scaleLinear().rangeRound([height, 0])
-                   .domain([0, d3.max(data2, function(d) { 
-                                                return Math.max(d["D-J-F"], d["M-A-M"], d["J-J-A"], d["S-O-N"]) })]);
+         var yScale = d3.scaleLinear().rangeRound([height - padding, 0 + padding])
+                     .domain([0, d3.max(data2, function(d) { 
+                                                return 4 * Math.max(d["D-J-F"], d["M-A-M"], d["J-J-A"], d["S-O-N"]) })]);
             
+         //console.log(xScale.domain())
          svg_2.append("g")
               .attr("class", "axis x")
-              .call(d3.axisBottom(x).ticks(20));
-            //.attr("transform", "translate(0," + height + ")")
-             
+              .attr('transform', 'translate(0,' + (height - padding) + ')')
+              .call(d3.axisBottom(xScale).tickValues(xScale.domain().filter(function(d,i){ return !(i%4)}) ) );
+              
+          console.log(yScale.domain()) 
           svg_2.append("g")
               .attr("class", "axis y")
-              .call(d3.axisLeft(y).ticks(data2.length));
+              .call(d3.axisLeft(yScale).ticks(0))
+              .attr('transform', 'translate('+padding+', 0)');
+            
+        
+        //Debug : Equivalent to : d3.stack().keys(keys)(data)
+        var stack = d3.stack()
+                      .keys(["Year", "D-J-F", "M-A-M", "J-J-A", "S-O-N"])
+                      .order(d3.stackOrderNone)
+                      .offset(d3.stackOffsetNone);
+        var series = stack(data2);
+            
+        console.log(stack)
+        console.log(series)
+        // *******************
+            
+        svg_2.append("g")
+             .selectAll("g")
+             .data(d3.stack().keys(["Year", "D-J-F", "M-A-M", "J-J-A", "S-O-N"])(data2))
+             .enter()
+             .append("g")
+             .attr("fill", function(d) { return getColors(d.key); })
+             .selectAll("rect")
+             .data(function(d) { return d; })
+             .enter()
+             .append("rect")
+             .attr("x", function(d) {/*console.log(d.data.YEAR); console.log(d[0]);console.log(d[1]);*/
+                                     return xScale(d.data.YEAR); })
+             .attr("y", function(d) {console.log(d); return yScale(d[1]); })
+             .attr("height", function(d) { return yScale(d[0]) - yScale(d[1]); })
+             .attr("width", xScale.bandwidth());
+   
 
  
       }
