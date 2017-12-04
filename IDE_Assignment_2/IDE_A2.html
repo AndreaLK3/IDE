@@ -192,7 +192,7 @@
                                      return xScale(d.data.YEAR); })
              .attr("y", function(d) {console.log(d); return yScale(d[1]); })
              .attr("height", function(d) { return yScale(d[0]) - yScale(d[1]); })
-             .attr("width", xScale.bandwidth());
+             .attr("width", xScale.bandwidth()); 
    
 
  
