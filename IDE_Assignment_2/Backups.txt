@@ -46,3 +46,74 @@ var yScale = d3.scaleLinear().rangeRound([height-padding,0+padding])
                                               return d[1];
                                             })]);
     
+/**************************/
+
+
+    d3.csv(
+           'Los Angeles Weather Data.csv',
+           function(error, raw_data) {
+           if (error) throw error;
+           
+           var data2 = raw_data.filter(function(d)
+                                      {
+                                      
+                                      if (( parseInt(d.YEAR) >= 1917 ) && ( d.metANN < 990 ) )
+                                      { 
+                                      return d;
+                                      } 
+                                      
+                                      })
+
+         
+        var svg_2 = d3.select('#plotarea2');
+        //svg.style('width','800px'); in HTMl
+        //svg.style('height','400px');
+        var width = +svg_2.node().getBoundingClientRect().width;
+        var height = +svg_2.node().getBoundingClientRect().height;  
+         
+         
+        var padding = 30;
+
+        var xScale = d3.scaleLinear()
+                           .domain(d3.extent(data2,
+                                            function(d){
+                                              return d.YEAR;
+                                            }))
+                          .range([ padding , width - padding]);
+
+         var yScale = d3.scaleLinear()
+              .domain([d3.min(data2, 
+                              function(d){
+                                return Math.min(d["D-J-F"], d["M-A-M"], d["J-J-A"], d["S-O-N"]);
+                              }),
+                       d3.max(data2, 
+                              function(d){
+                                return Math.max(d["D-J-F"], d["M-A-M"], d["J-J-A"], d["S-O-N"]);
+                              })])
+              .range([height-padding, padding]);
+ 
+             
+             var x = d3.scaleBand().rangeRound([0, width])
+             .domain(data2.map(function(d) { return d.YEAR; }));
+             
+             var y = d3.scaleLinear().rangeRound([height, 0])
+             .domain([0, d3.max(data2, function(d) { return Math.max(d["D-J-F"], d["M-A-M"], d["J-J-A"], d["S-O-N"]) })]);
+             
+             svg_2.append("g")
+             .attr("class", "axis x")
+             .attr("transform", "translate(0," + height + ")")
+             .call(d3.axisBottom(x));
+             
+             svg_2.append("g")
+             .attr("class", "axis y")
+             .call(d3.axisLeft(y).ticks(data2.length));
+             
+             svg_2.selectAll(".bar")
+             .data(data2)
+             .enter().append("rect")
+             .attr("x", function(d) { return x(d.YEAR); })
+             .attr("y", function(d) { return y(Math.max(d["D-J-F"],d["M-A-M"],d["J-J-A"],d["S-O-N"])); })
+             .attr("width", x.bandwidth())
+             
+             
+        

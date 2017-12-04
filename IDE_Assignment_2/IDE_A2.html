@@ -19,20 +19,17 @@
 
         function init() {
   
-  d3.csv(
-    'Los Angeles Weather Data.csv',
-    function(error, raw_data) {
-      if (error) throw error;  
-        
-       var data = raw_data.filter(function(d) 
-                { 
+            d3.csv(
+                'Los Angeles Weather Data.csv',
+                function(error, raw_data) {
+                  if (error) throw error;  
 
-            if (( parseInt(d.YEAR) >= 1917 ) && ( d.metANN < 990 ) )
-            { 
-                return d;
-            } 
-
-    })
+                   var data = raw_data.filter(
+                       function(d) 
+                        { 
+                            if (( parseInt(d.YEAR) >= 1917 ) && ( d.metANN < 990 ) )
+                                { return d; } 
+                   })
             
         var svg = d3.select('#plotarea1');
         //svg.style('width','800px'); in HTMl
@@ -75,7 +72,7 @@
                 .attr("cy", function(d){
                               return ""+yScale(d.metANN)+"px";
                             })
-            aggregates = []
+            
             for (i=0; i < data.length-1; i++) {
                 //console.log(xScale((data[i]).YEAR))
                 //console.log(yScale((data[i]).metANN))
@@ -100,84 +97,73 @@
                 .attr('transform', 'translate('+padding+', 0)')
                 .call(d3.axisLeft(yScale));
         });
+            
+        init2();
 }
       
 </script>
 <script>
-     d3.select(window).on('load',init2);
-         function init2(){
-    d3.csv(
-           'Los Angeles Weather Data.csv',
-           function(error, raw_data) {
-           if (error) throw error;
-           
-           var data2 = raw_data.filter(function(d)
-                                      {
-                                      
-                                      if (( parseInt(d.YEAR) >= 1917 ) && ( d.metANN < 990 ) )
-                                      { 
-                                      return d;
-                                      } 
-                                      
-                                      })
+    function init2(){
+        d3.csv(
+        'Los Angeles Weather Data.csv',
+        function(error, raw_data) {
+            if (error) throw error;
 
-         
-        var svg = d3.select('#plotarea2');
+            var data2 = raw_data.filter(function(d)
+                                          {                                      
+                                          if (( parseInt(d.YEAR) >= 1917 ) && ( d.metANN < 990 ) )
+                                          { 
+                                          return d;
+                                          }                                      
+                                          })
+
+        var svg_2 = d3.select('#plotarea2');
         //svg.style('width','800px'); in HTMl
         //svg.style('height','400px');
-        var width = +svg.node().getBoundingClientRect().width;
-        var height = +svg.node().getBoundingClientRect().height;  
+        var width = +svg_2.node().getBoundingClientRect().width;
+        var height = +svg_2.node().getBoundingClientRect().height;  
          
          
         var padding = 30;
-
+            
         var xScale = d3.scaleLinear()
-                           .domain(d3.extent(data2,
-                                            function(d){
-                                              return d.YEAR;
-                                            }))
-                          .range([ padding , width - padding]);
+                       .domain(d3.extent(data2,
+                                        function(d){
+                                          return d.YEAR;
+                                        }))
+                      .range([ padding , width - padding]);
 
          var yScale = d3.scaleLinear()
-              .domain([d3.min(data2, 
+                        .domain([d3.min(data2, 
                               function(d){
-                                return Math.min(d."D-J-F",d."M-A-M",d."J-J-A",d."S-O-N");
+                                return Math.min(d["D-J-F"], d["M-A-M"], d["J-J-A"], d["S-O-N"]);
                               }),
-                       d3.max(data2, 
+                      d3.max(data2, 
                               function(d){
-                                return Math.max(d."D-J-F",d."M-A-M",d."J-J-A",d."S-O-N");
+                                return Math.max(d["D-J-F"], d["M-A-M"], d["J-J-A"], d["S-O-N"]);
                               })])
               .range([height-padding, padding]);
- 
+            
+         var x = d3.scaleBand().rangeRound([0, width])
+                   .domain(data2.map(function(d) { return d.YEAR; }));
              
-             var x = d3.scaleBand().rangeRound([0, width])
-             .domain(data2.map(function(d) { return d.YEAR; }));
+         var y = d3.scaleLinear().rangeRound([height, 0])
+                   .domain([0, d3.max(data2, function(d) { 
+                                                return Math.max(d["D-J-F"], d["M-A-M"], d["J-J-A"], d["S-O-N"]) })]);
+            
+         svg_2.append("g")
+              .attr("class", "axis x")
+              .call(d3.axisBottom(x).ticks(20));
+            //.attr("transform", "translate(0," + height + ")")
              
-             var y = d3.scaleLinear().rangeRound([height, 0])
-             .domain([0, d3.max(data2, function(d) { return max(d."D-J-F",d."M-A-M",d."J-J-A",d."S-O-N") })]);
-             
-             g.append("g")
-             .attr("class", "axis x")
-             .attr("transform", "translate(0," + height + ")")
-             .call(d3.axisBottom(x));
-             
-             g.append("g")
-             .attr("class", "axis y")
-             .call(d3.axisLeft(y).ticks(data2.length));
-             
-             g.selectAll(".bar")
-             .data2(data2)
-             .enter().append("rect")
-             .attr("x", function(d) { return x(d.YEAR); })
-             .attr("y", function(d) { return y(Math.max(d."D-J-F",d."M-A-M",d."J-J-A",d."S-O-N")); })
-             .attr("width", x.bandwidth())
-             .attr("height", function(d) { return height - y(Math.max(d."D-J-F",d."M-A-M",d."J-J-A",d."S-O-N")); });
-             
+          svg_2.append("g")
+              .attr("class", "axis y")
+              .call(d3.axisLeft(y).ticks(data2.length));
 
-     }
-      
-      );
-         } 
+ 
+      }
+    );
+}
       
       
 </script>
