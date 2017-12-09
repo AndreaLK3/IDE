@@ -1,0 +1,142 @@
+<DOCTYPE html>
+<html>
+  <head>
+      <meta charset="utf-8"/>
+    <style>
+        .node circle {
+            fill: #999;
+        }
+
+        .node text {
+            font: 10px sans-serif;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script>
+    d3.select(window).on('load',init);
+
+    function init() {
+            
+    var data;
+  
+    d3.json(
+            'trump_family.json',
+            function(treeDataRoot) {
+                //in a JSON context, data is the access to the root node (here Donald Trump)
+                //console.log(treeData.partners)
+                                      
+                console.log(treeDataRoot)
+                
+
+                /** Adjust the Trump family graph to a descendant's tree **/
+                
+                array_partners = treeDataRoot.partners.slice()
+                //console.log(array_partners)
+                array_children = []
+                for (p=0; p < array_partners.length; p++) {
+                    partner = array_partners[p]
+                    //console.log(partner)
+                    //console.log(partner.children.slice())
+                    array_children = array_children.concat(partner.children.slice())
+                }
+                treeDataRoot.children = array_children
+                console.log(array_children)
+                
+                for (c=0; c < array_children.length; c++){
+                    currElem = array_children[c]
+                    array_partners = currElem.partners
+                    if (array_partners != undefined){
+                        //console.log(array_partners)
+                        array_grandchildren = []
+                        for (p=0; p < array_partners.length; p++) {
+                            partner = array_partners[p]
+                            //console.log(partner)
+                            //console.log(partner.children)
+                            if (partner.children != undefined)
+                                {array_grandchildren = array_grandchildren.concat(partner.children)}
+                        }
+                        currElem.children = array_grandchildren
+                    }
+                }
+                console.log(treeDataRoot)
+                
+                /*****/
+                
+                /*** The Tree ***/
+
+                d3.json("trump_family.json", function(error, data) {
+                    if (error) throw error;
+                                    
+                    g = d3.select("tree_area");
+                
+                    // declares a tree layout and assigns the size
+                    var tree = d3.tree().nodeSize([170, 170]);
+                    
+                    // Assigns parent, children, height, depth
+                    root = d3.hierarchy(treeDataRoot, function(d) { return d.children; });
+                
+                    //form x and y axis
+                    root.x0 = 0;
+                    root.y0 = 600/2;
+
+                    console.log("The tree heirarchy"); console.log(root)
+                    console.log("The link objects"); console.log(tree(root).links())
+                    var link = g.selectAll(".link")
+                                .data(tree(root).links())
+                                .enter().append("path")
+                                .attr("class", "link")
+                                .attr("stroke-width","2")
+                                .attr("stroke","black")
+                                .attr("d", d3.linkHorizontal()
+                                .x(function(d) { return d.y; })
+                                .y(function(d) { return d.x; }));
+
+                    console.log("The node objects"); console.log(g.selectAll(".node"))
+                    var node = g.selectAll(".node")
+                                .data(root.descendants())
+                                .enter().append("g")
+                                //.attr("class", function(d) { return "node" + (d.children ? " node--internal" : " node--leaf"); })
+                                .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+                    
+                    node.append("circle")
+                        .attr("r", 2.5);
+                })
+
+/*  // Toggle children on click.
+  function click(d) {
+    if (d.children) {
+        d._children = d.children;
+        d.children = null;
+      } else {
+        d.children = d._children;
+        d._children = null;
+      }
+    update(d);
+  }*/
+}
+                
+    
+                
+           )
+        
+            
+                
+            
+            
+        }
+         
+      </script>
+      
+    </head>
+    
+    <body>
+        
+        <svg id="tree_area" width=70% height=600>
+        </svg>
+    
+    
+    </body>
+    
+    
+</html>
+
