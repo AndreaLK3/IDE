@@ -65,10 +65,11 @@
 
 		// Set the dimensions and margins of the diagram
       var margin = {top: 40, right: 90, bottom: 50, left: 90};
-      w = 800 - margin.left - margin.right,
-      h = 600 - margin.top - margin.bottom;
 
-
+      var clientWidth = window.screen.width;
+      w = clientWidth - margin.left - margin.right,
+      h =  800 - margin.top - margin.bottom;
+        
 
 		var canvas = d3.select("body")
 		               .append("svg")
@@ -76,10 +77,12 @@
 		               .attr("height", h + margin.top + margin.bottom)
 		               .append("g")
 		               .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        
+        canvas.attr('transform','translate('+ clientWidth/2 +' , '+(h/3) +')');
 
 		//layout type picked is tree
 		var tree = d3.tree()
-		             .nodeSize([150, 80]);
+		             .nodeSize([100, 120]);
 
 		//reading the json
 		//d3.json("https://wouterboomsma.github.io/ide2017/week49/trump_family.json", function(data) {
@@ -119,16 +122,19 @@
 
 			// adds the circle to the node
 			node.append('circle')
-  				.attr('r', 10)
+  				.attr('r', 30)
   				.attr('fill', 'steelblue');
 
 			// adds the text to the node
 			node.append("text")
-  				.attr("dy", 3)
-  				.attr("y", (d) => d.children ? -20 : 20 )
-                .attr("x", (d) => d.children ? -20 : 20 )
+  				.attr("dy", 1)
+  				.attr("y", (d) => d.children ? 0 : 0 )
+                .attr("x", (d) => d.children ? -5 : -35)
+                .attr("width", 30)
+                .style("font-size", 13)
+                .style("font-weight", 'bold')
   				.style("text-anchor", (d) =>  d.children ? "end" : "start" )
-  				.text((d) => d.data.name );
+  				.text(function(d) { return d.data.name});
 
 		//})
 
