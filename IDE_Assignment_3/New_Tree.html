@@ -64,9 +64,9 @@
 		// var t = 400;
 
 		// Set the dimensions and margins of the diagram
-var margin = {top: 40, right: 90, bottom: 50, left: 90},
-      w = 660 - margin.left - margin.right,
-      h = 500 - margin.top - margin.bottom;
+      var margin = {top: 40, right: 90, bottom: 50, left: 90};
+      w = 800 - margin.left - margin.right,
+      h = 600 - margin.top - margin.bottom;
 
 
 
@@ -79,7 +79,7 @@ var margin = {top: 40, right: 90, bottom: 50, left: 90},
 
 		//layout type picked is tree
 		var tree = d3.tree()
-		             .size([w, h]);
+		             .nodeSize([150, 80]);
 
 		//reading the json
 		//d3.json("https://wouterboomsma.github.io/ide2017/week49/trump_family.json", function(data) {
@@ -114,7 +114,8 @@ var margin = {top: 40, right: 90, bottom: 50, left: 90},
 					    .attr('class', function(d) {
       						return "node" +
         							(d.children ? " node--internal" : " node--leaf"); })
-					    .attr("transform", function(d) { return "translate( " + d.x + "," + d.y + ")" });
+					    .attr("transform", function(d) { return "translate( " + d.x + "," + d.y + ")" })
+                        .attr("y", function(d) { return d.depth * 180;})
 
 			// adds the circle to the node
 			node.append('circle')
@@ -125,6 +126,7 @@ var margin = {top: 40, right: 90, bottom: 50, left: 90},
 			node.append("text")
   				.attr("dy", 3)
   				.attr("y", (d) => d.children ? -20 : 20 )
+                .attr("x", (d) => d.children ? -20 : 20 )
   				.style("text-anchor", (d) =>  d.children ? "end" : "start" )
   				.text((d) => d.data.name );
 
