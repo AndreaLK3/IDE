@@ -1,4 +1,4 @@
-v<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
       <meta charset="utf-8"/>
@@ -38,7 +38,7 @@ v<!DOCTYPE html>
         function init() {
   
             d3.csv(
-                'Los Angeles Weather Data.csv',
+                'Los_Angeles_Weather_Data.csv',
                 function(error, raw_data) {
                   if (error) throw error;  
 
@@ -165,7 +165,7 @@ v<!DOCTYPE html>
     
     function init2(){
         d3.csv(
-        'Los Angeles Weather Data.csv',
+        'Los_Angeles_Weather_Data.csv',
         function(error, raw_data) {
             if (error) throw error;
 
@@ -339,7 +339,42 @@ v<!DOCTYPE html>
           <p>For the question of weather change spanned over the past 100 years, I would like to use a multi-series line chart and include three different cities from the same latitude yet from three different locations. The data set will be selected from NASA for fairness, since it could be variation in technological advancement or other uncontrollable effects that could potentially influence the data.  Ideally, one is from a developed country, one is from a developing country and one is from a climatically extreme region. By comparing with their average annual temperatures from the same year, we can compare a single year’s temperature vertically. The overall trend will instead be shown in the horizontal lines.</p>
       
       <img id="image1" src="https://static.skepticalscience.com/graphics/Temperature_Composite_500.jpg"/>
+      
+      
+      <h4>Andrea Lekkas</h4>
+      There are several factors that can limit the size of the dataset we wish to load in a d3 visualization. In particular:
+      <ul>
+          <li> Each element corresponds to an object in the DOM (for instance, a SVG circle). We must have enough working <em>memory</em> available to the browser to visualize all of them in a page.
+          </li>
+          <li> Rendering millions of elements would not only place a strain over the browser memory, but also take a considerable amount of <em>time</em> to be represented when we load the page.
+          </li>
+          <li> If our visualization is interactive, then we may have to contend with much lower limits: we must mantain the <em>responsiveness</em> of the visualization.
+In other terms, if the user executes an action, such as clicking an object or dragging a group of objects across the graph, we must be able to compute the effect of the action and show the resulting visualization in a reasonable amount of time (possibly less than 1 second).
+          </li>
+          <li> Finally, we must consider that even static visualizations need to deal with <em>cluttering</em> . There is only a finite amount of information that a graph can convey to an human being, and adding too many details may impede the communication of the concepts we wish to express.
+          </li>
+      </ul>
 
+There are ways of dealing with very large data sets and interactivity. Among them:
+<ul>
+    <li> Institute a <em>trade-off between detail and size</em> of the subset that is shown, using zooming.
+An example of this is given by Google Maps; the smaller the area we zoom on, the greater amount of information is given about it.
+    </li>
+    <li> Similarly, we can circumvent the problem of having to deal with a very large dataset if we visualize it using <em>limited views</em>. If we have user records for hundreds of thousands of users, it could be a better option to access them only by category (age, nationality, etc.). 
+    </li>
+    <li> If we wish to examine global information that relates to the entire dataset, then it is opportune to <em>aggregate</em> it into synthetic statistics that do not need a detailed, extended visualization.
+    </li>
+    <li> Lastly, we can reduce the degree of interactivity and implement visualization <em>mechanics</em> that require only a limited amount of computation and modifications. For example, we may be able to access the details pertaining to an element by hovering on it.
+    </li>
+</ul>
+
+
+<p>If we wished to reduce the size of the datasets in this assignment, we should have included only 1 year every K years.<br/> When we wish to explore a trend over time, we can opt to have a rougher granularity in order to deal with less data, as long as we are still able to observe our objective.</p>
+
+      <h4>Dolapo Olunlade</h4>
+      <p>We could incorporate the following interactions within the article.
+		<p>Hovering over a circle within the scatterplot of the first visualization could give the temperature value. This helps the viewer to know the exact value instead of approximating based on axis ticks. Another improvement would be to have legends/keys representing various ranges of average temperatures. Clicking on one of these ranges should show the scatterplot of years with average temperatures matching it. Multiple frames could be added to the visualization where temperatures of individual months in a year are shown interactively as the year is changed by the user.</p> <p>
+		For the second visualization in our article, comparisons between temperatures are difficult to discern. A major improvement would be to have the summary of the year concerned and the seasonal temperature average when the rectangle is clicked.</p></p>
       
   </body>
     
