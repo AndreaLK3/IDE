@@ -2,14 +2,387 @@
 <html>
 
 <head>
-	<title>Trump Family Tree</title>
+	<title>The Trump Family Tree</title>
+    <style>
+        .ourCode {
+            font-family: Courier New, monospace;
+            font-size: 11;
+        }
+    
+    </style>
 	<script src="https://d3js.org/d3.v4.min.js"></script>
+    <script>
+            
+    d3.select(window).on('load', init1)
+            
+    function init1() {
+
+//Modified version of the tree data, to work with the first, simpler visualization
+        var data = {
+  "name": "Donald Trump",
+        "children": [
+        {
+          "name": "Donald Trump Jr.",
+              "children": [
+                {
+                  "name": "Kai Madison"
+                },
+                {
+                  "name": "Donald III"
+                },
+                {
+                  "name": "Chloe Sophia"
+                },
+                {
+                  "name": "Tristan Milos"
+                },
+                {
+                  "name": "Spencer Frederick"
+                }
+              ]
+        },
+        {
+          "name": "Ivanka Trump",
+                "children": [
+                {
+                  "name": "Arabella Rose"
+                },
+                {
+                  "name": "Joseph Frederick"
+                },
+                {
+                  "name": "Theodore James"
+                }
+              ]
+        },          
+        {
+          "name": "Eric Trump",
+        },          
+    
+        {
+          "name": "Tiffany Trump"
+        },
+        {
+          "name": "Baron Trump"
+        }
+  ]
+ };
+   
+        var margin = {top: 40, right: 90, bottom: 50, left: 90};
+        var clientWidth = window.screen.width;
+        w = clientWidth - margin.left - margin.right,
+        h =  400 - margin.top - margin.bottom;
+
+
+        var canvas = d3.select("#treeArea")
+                    .attr("width", w + margin.left + margin.right)
+                    .attr("height", h + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        canvas.attr('transform','translate('+ clientWidth/2 +' , '+(h/3) +')');
+
+        //layout type picked is tree
+        var tree = d3.tree()
+                    .nodeSize([110, 120]);
+
+        // Assigns parent
+        var nodes = d3.hierarchy(data);
+
+        // Assigns the x and y position for the nodes
+        nodes = tree(nodes);
+
+        // adds the links between the nodes
+        var link = canvas.selectAll(".link")
+                        .data(nodes.descendants().slice(1))
+                        .enter()
+                        .append("path")
+                        .attr("class", "link")
+                        .attr("d", function(d) {
+                            return "M" + d.x + "," + d.y
+                            + "C" + d.x + "," + (d.y + d.parent.y) / 2
+                            + " " + d.parent.x + "," +  (d.y + d.parent.y) / 2
+                            + " " + d.parent.x + "," + d.parent.y;
+                        })
+                        .attr('fill', 'none')
+                        .attr('stroke', '#ccc')
+                        .attr('stroke-width', 2);
+
+        // adds each node as a group
+        var node = canvas.selectAll('.node')
+                        .data(nodes.descendants())
+                        .enter()
+                        .append('g')
+                        .attr('class', function(d) {
+                            return "node" +
+                                    (d.children ? " node--internal" : " node--leaf"); })
+                        .attr("transform", function(d) { return "translate( " + d.x + "," + d.y + ")" })
+                        .attr("y", function(d) { return d.depth * 180;})
+
+        // adds the circle to the node
+        node.append('circle')
+            .attr('r', 30)
+            .attr('fill', 'steelblue');
+
+        // adds the text to the node
+        node.append("text")
+            .attr("dy", 1)
+            .attr("y", (d) => d.children ? 0 : 0 )
+            .attr("x", (d) => d.children ? -5 : -35)
+            .attr("width", 30)
+            .style("font-size", 12)
+            .style("font-weight", 'bold')
+            .style("text-anchor", (d) =>  d.children ? "end" : "start" )
+            .text(function(d) { return d.data.name});
+    
+
+        init2() //run next visualization
+}
+        
+    
+    function exploreGraph(currElements, nodes, edges) {
+        cur_depth = 0
+        rootElement = currElements.pop()
+        nodes.push({"id" : rootElement.name, depth : cur_depth})
+        do {                            
+                    //console.log(currElements)
+                    if (currElements.length > 0) {
+                        currElement = currElements.pop();
+                        //console.log("Should be Current : "); console.log(currElement)
+                        currElementNodeIndex = nodes.findIndex(
+                            function (n) {  
+                                return n.id == currElement.name})
+                        cur_depth = 2
+                    }
+                    else {currElement = rootElement; 
+                          currElementNodeIndex = 0}
+
+
+                    partners = currElement.partners
+                    //console.log(partners)
+            
+                    if ( (partners != undefined) && (partners.length > 0) ) {
+                    for (i=0; i< partners.length; i++){
+                        p = partners[i]
+                        nodes.push({"id" : p.name, depth : (cur_depth + 1)})
+                        partnerNodeIndex = nodes.length -1
+                        //console.log("Partner : ")
+                        //console.log(nodes[partnerNodeIndex])
+                        edges.push({"source": currElementNodeIndex , "target": partnerNodeIndex, "className" : "Marriage"})
+                        
+                        children = p.children
+                        
+                        if ( (children != undefined) && (children.length > 0) ) {
+                            for (j=0; j<children.length; j++) {
+                                c = children[j]                
+                                nodes.push({"id" : c.name, depth :  cur_depth + 2})
+                                childNodeIndex = nodes.length -1
+                                //console.log("Child : ")
+                                //console.log(nodes[childNodeIndex])
+                                edges.push({"source": partnerNodeIndex , "target": childNodeIndex, "className" : "Child"})
+                                currElements.push(c)
+                            }
+                        }
+                    
+                        //console.log(nodes); console.log(edges)
+                        
+                    }
+                    }
+        
+        } while (currElements.length > 0)
+            
+        return [nodes, edges];
+        }
+
+    function init2() {
+        // Set the dimensions and margins of the diagram
+        var margin = {top: 40, right: 90, bottom: 50, left: 90};
+
+        var clientWidth = window.screen.width;
+        w = clientWidth - margin.left - margin.right,
+        h =  window.screen.height - margin.top - margin.bottom;
+
+
+        var svg = d3.select("#graphArea")
+                   .attr("width", w + margin.left + margin.right)
+                   .attr("height", h + margin.top + margin.bottom)
+                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        //svg.attr('transform','translate('+ clientWidth/2 +' , '+(h/3) +')');
+
+        nodes = []
+
+        edges = []
+
+        d3.json("trump_family.json", function(error, rootDataNode){
+            if(error) {throw error;}
+
+            console.log(rootDataNode);
+            currElements = [rootDataNode];
+
+            nodesEdgesArray = exploreGraph(currElements, nodes, edges)
+
+            nodes = nodesEdgesArray[0]
+
+            edges = nodesEdgesArray[1]
+
+            console.log("Final result:");
+               
+            console.log(nodes); console.log(edges)
+
+            /* Modified from Bostock's example at https://bl.ocks.org/mbostock/4062045 */
+            
+           var simulation = d3.forceSimulation()
+                            .force("link", 
+                                   d3.forceLink().id(function(d) { return d.index; })
+                                                 .distance(function(d) { if (d.className == "Marriage")
+                                                                            {return 30}
+                                                                         else //className == "Child"
+                                                                            {return 250}}))
+                            //.force("charge", d3.forceCollide().radius(300))
+                            .force("charge", d3.forceManyBody().strength(function(d,i) {
+                                                                //console.log(d);
+                                                                the_name = d.id;
+                                                                p_elem = rootDataNode.partners.find(function (elem) {return elem.name ==        the_name})
+                                                                //console.log(typeof p_elem)
+                                                                if (d.id="Donald Trump") //root node repulsive charge
+                                                                    {return -500}    
+                                                                if (typeof p_elem != undefined) {
+                                                                    return -2500 //1st-gen. partners node repulsive charge
+                                                                }
+                                                                return -1000;
+                            }))//;d3.forceCollide().radius(50)
+                            .force("r", d3.forceRadial(function(d) { console.log(d.depth);return d.depth * 165; })
+                                          .strength(1.2))
+                            .force("center", d3.forceCenter(w / 3, 0.5 * h ))
+                            //.force("r2", d3.forceCollide().radius(14).strength(1400))
+                            
+
+
+            var link = svg.append("g")
+                        .attr("class", "links")
+                        .selectAll("line")
+                        .data(edges)
+                        .enter().append("line")
+                        .style("stroke-width", 2)
+                        .style("stroke", function(d) {
+                            if (d.className == "Marriage") 
+                                {return "magenta";} 
+                            else {
+                                return "black";} });
+
+            // adds each node as a group
+			var node = svg.selectAll('.node')
+  						.data(nodes)
+  						.enter()
+						.append("g")
+                        .attr("class", "node")
+                        .call(d3.drag()
+                        .on("start", dragstarted)
+                        .on("drag", dragged)
+                        .on("end", dragended));;
+
+
+            node.append("circle")
+                .attr("r", 10)
+                .attr("fill", "lightblue")
+                .attr("stroke", "steelblue")
+
+            
+			// adds the text to the node
+			node.append("text")
+  				.attr("dy", 1)
+                .attr("width", 30)
+                .style("font-size", 15)
+                .style("font-weight", 'bold')
+  				.style("text-anchor", function(d) {return d.depth >= 2 ? "start" : "end"} )//
+  				.text(function(d) { return d.id});
+
+                simulation
+                  .nodes(nodes)
+                  .on("tick", ticked);
+
+                simulation.force("link")
+                  .links(edges);
+
+
+              function ticked() {
+                link
+                    .attr("x1", function(d) { return d.source.x; })
+                    .attr("y1", function(d) { return d.source.y; })
+                    .attr("x2", function(d) { return d.target.x; })
+                    .attr("y2", function(d) { return d.target.y; });
+
+                node
+                    .attr("cx", function(d) { return d.x; })
+                    .attr("cy", function(d) { return d.y; });
+                  
+                node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+                  
+              }
+            
+        function dragstarted(d) {
+            if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+        
+        function dragged(d) {
+            d.fx = d3.event.x;
+            d.fy = d3.event.y;
+        }
+        
+        function dragended(d) {
+            if (!d3.event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        } 
+
+            
+            });
+        
+        
+        
+}
+ 
+    </script>
+
 </head>
 
 <body>
-	<script>
-
-	</script>
+    <h2 style="text-align: center">The Trump Family Tree</h2>
+    <h3> A Tree of descendants</h3>
+    <p> We created 2 visualizations for the Trump Family Tree. <br/>
+        The first one is simple to obtain: we modified the data from the JSON, so that it contains only <em>children</em> relationships and not <em>partners</em>. 
+    </p>
+    <p>We create a tree area with <tspan class="ourCode">d3.tree().nodeSize([110, 120])</tspan>. This way, we defined a node size that is appropriate to prevent overlaps. The overall size of the tree is determined as a consequence of the node size.</p>
+    <p>Since the data has already been modified manually, we can invoke directly <tspan class="ourCode">d3.hierarchy(data)</tspan> to build the node structure.</p>
+    <p>Observation : nodes are defined as groups, <tspan class="ourCode">&lt;g&gt;</tspan> of class <tspan class="ourCode">node</tspan>.Then, in this group we append the subelements <tspan class="ourCode">&lt;circle&gt;</tspan> and <tspan class="ourCode">&lt;text&gt;</tspan>. This structure is necessary because we can not insert text inside a <tspan class="ourCode">&lt;circle&gt;</tspan> element of SVG.</p>
+    Possible improvements: Node collapse ; Node dragging ; adding face images to the nodes.
+    <svg id="treeArea">
+    </svg>
+    
+    <h3>A Force Layout of family connections</h3>
+    <p>The second visualization is more complex; the Javascript code reads the JSON file, and visits the graph depth-first to determine the nodes and the edges.<br/>
+    The edges between partners are colored in magenta. The edges related to children are left in black. <br/>
+    The children are connected to the partners.
+    </p>
+    We hoped to achieve a radial layout, with Donald Trump in the middle, and the various partner-child connections spreading out in a circle.<br/>
+    The current visualization is quite tidy, but it is not radial. The specifications we used are:
+    <ul>
+        <li> <em>Link distance</em>: 30 for marriage links, 250 for child links. This specification interacts with the forces in the graph, and thus gets mostly overridden.
+        </li>
+        <li><em>The repulsive force between nodes</em>, defined with <tspan class="ourCode">d3.forceManyBody()</tspan>. Its strength varies depending on the node: for the root node, -500. For the nodes of the 1st generation partners, -2500. For the other nodes, -1000.</li>
+        <li> A <em>radial force</em> that pushes the nodes to be displayed on the perimeter of a circle, obtained with <tspan class="ourCode">d3.forceRadial</tspan>. <br/>
+            As we traversed the graph, we added to each node a <tspan class="ourCode">depth</tspan> attribute. The range of the circle where each element goes is <tspan class="ourCode">d.depth * 165</tspan>
+        </li>
+        <li> Finally, the force that pushes the whole layout towards the <em>center</em>, making it visible. The center of gravity is at: (1/3 width, 1/2 height)
+        </li>
+    </ul>
+    It is possible to drag the nodes around and eliminate any link overlap.<br/>
+    Possible improvements: Node collapse ; Achieving a radial layout ; adding face images to the nodes.
+    <svg id="graphArea">
+    </svg>
 
 </body>
 
