@@ -73,7 +73,7 @@
         var svg = d3.select("#graphArea")
                    .attr("width", w + margin.left + margin.right)
                    .attr("height", h + margin.top + margin.bottom)
-                   //.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
         //svg.attr('transform','translate('+ clientWidth/2 +' , '+(h/3) +')');
 
@@ -103,25 +103,25 @@
                             .force("link", 
                                    d3.forceLink().id(function(d) { return d.index; })
                                                  .distance(function(d) { if (d.className == "Marriage")
-                                                                            {return 75}
+                                                                            {return 30}
                                                                          else //className == "Child"
-                                                                            {return 150}}))
+                                                                            {return 160}}))
                             //.force("charge", d3.forceCollide().radius(300))
                             .force("charge", d3.forceManyBody().strength(function(d,i) {
                                                                 //console.log(d);
                                                                 the_name = d.id;
                                                                 p_elem = rootDataNode.partners.find(function (elem) {return elem.name == the_name})
                                                                 if (i==0) //root node repulsive charge
-                                                                    {return -800}
+                                                                    {return -1500}
                                                                 if (typeof p_elem != undefined) {
-                                                                    return -400 //1st-gen. partners node repulsive charge
+                                                                    return -1000 //1st-gen. partners node repulsive charge
                                                                 }
-                                                                return -50;
+                                                                return -200;
                             }))//;d3.forceCollide().radius(50)
                             .force("r", d3.forceRadial(function(d) { console.log(d.depth);return d.depth * 150; })
-                                          .strength(1))
-                            .force("center", d3.forceCenter(w / 2, h / 2))
-                            //.force("r2", d3.forceCollide().radius(20))
+                                          .strength(1.1))
+                            .force("center", d3.forceCenter(w / 3, 0.5 * h ))
+                            //.force("r2", d3.forceCollide().radius(14).strength(1400))
                             
 
 
@@ -131,7 +131,11 @@
                         .data(edges)
                         .enter().append("line")
                         .style("stroke-width", 2)
-                        .style("stroke", "black");
+                        .style("stroke", function(d) {
+                            if (d.className == "Marriage") 
+                                {return "magenta";} 
+                            else {
+                                return "black";} });
 
 //           var node = svg.append("g")
 //                        .attr("class", "nodes")
@@ -146,18 +150,24 @@
   						.data(nodes)
   						.enter()
 						.append("g")
-                        .attr("class", "node");
+                        .attr("class", "node")
+                        .call(d3.drag()
+                        .on("start", dragstarted)
+                        .on("drag", dragged)
+                        .on("end", dragended));;
 
 
             node.append("circle")
-                .attr("r", 5)
-                .attr("fill", "blue")
+                .attr("r", 10)
+                .attr("fill", "lightblue")
+                .attr("stroke", "steelblue")
+
             
 			// adds the text to the node
 			node.append("text")
   				.attr("dy", 1)
                 .attr("width", 30)
-                .style("font-size", 13)
+                .style("font-size", 15)
                 .style("font-weight", 'bold')
   				.style("text-anchor", (d) =>  d.children ? "end" : "start" )
   				.text(function(d) { return d.id});
@@ -184,8 +194,29 @@
                 node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
                   
               }
-            });
+            
+        function dragstarted(d) {
+            if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+        
+        function dragged(d) {
+            d.fx = d3.event.x;
+            d.fy = d3.event.y;
+        }
+        
+        function dragended(d) {
+            if (!d3.event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        } 
 
+            
+            });
+        
+        
+        
 }
  
 
