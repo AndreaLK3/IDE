@@ -47,9 +47,9 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="39" />
-    <option name="y" value="23" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="33" />
+    <option name="y" value="183" />
     <option name="width" value="1241" />
     <option name="height" value="777" />
   </component>
@@ -101,7 +101,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JavaScript Debug.sd.html">
+  <component name="RunManager" selected="JavaScript Debug.ForceGraph.html">
     <configuration name="ForceGraph.html" type="JavascriptDebugType" factoryName="JavaScript Debug" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/IDE_Assignment_3/ForceGraph.html" />
     <configuration name="sd.html" type="JavascriptDebugType" factoryName="JavaScript Debug" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/IDE_Assignment_3/sd.html" />
     <configuration name="test.html" type="JavascriptDebugType" factoryName="JavaScript Debug" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/IDE_Assignment_3/test.html" />
@@ -112,8 +112,8 @@
     </list>
     <recent_temporary>
       <list size="3">
-        <item index="0" class="java.lang.String" itemvalue="JavaScript Debug.sd.html" />
-        <item index="1" class="java.lang.String" itemvalue="JavaScript Debug.ForceGraph.html" />
+        <item index="0" class="java.lang.String" itemvalue="JavaScript Debug.ForceGraph.html" />
+        <item index="1" class="java.lang.String" itemvalue="JavaScript Debug.sd.html" />
         <item index="2" class="java.lang.String" itemvalue="JavaScript Debug.test.html" />
       </list>
     </recent_temporary>
@@ -131,18 +131,17 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1513073889966</updated>
-      <workItem from="1513073891476" duration="4188000" />
+      <workItem from="1513073891476" duration="4990000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4188000" />
+    <option name="totallyTimeSpent" value="4990000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="36" y="23" width="1241" height="777" extended-state="6" />
-    <editor active="true" />
+    <frame x="33" y="183" width="1241" height="777" extended-state="0" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24979855" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24979855" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
