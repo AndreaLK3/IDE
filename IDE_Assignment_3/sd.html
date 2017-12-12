@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang='en'>
+<meta charset="utf-8">
+
+<head>
+    <!-- load the d3.js library -->
+    <script src="/Project_2.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <link href="style.css" rel="stylesheet">
+
+    <title>Project 2: Temperature data/title>
+        </head>
+
+<body onload="load_charts()">
+<div id="project_2">
+    <h1 class="title">Project 2: Temperature data</h1>
+    <h3>Visualizations</h3>
+    <p><a href="https://data.giss.nasa.gov/cgi-bin/gistemp/show_station.cgi?id=425002520200&dt=1&ds=14">GISS Surface Temperature Analysis</a>
+    </p>
+    <h3>Temperature average (1917-2017) in Crete</h3>
+    <div id="graph_1"></div>
+
+
+
+    <h2>Motivation</h2>
+    <ul>
+        <li>According to the <a href="http://www.sciencedirect.com/science/article/pii/S0022169412010347?via%3Dihub">last scientific reports</a>, the <b>island of Crete</b> is expected to be among the areas in Greece that will be hardest hit by climate change and flooding in the coming years.</li>
+        <li>We are interested in looking at the trend change in yearly average global surface temperature (ºC) through the last century in Crete (Greece) and the monthly fluctuation in temperature through 2016</li>
+
+    </ul>
+
+    <h2>Method</h2>
+    <h3>Data set description and preparation</h3>
+    <ul>
+        <li>The data set for <b>Crete</b> was obtained from <a href="https://data.giss.nasa.gov/gistemp/station_data/">The National Aeronautics and Space Administration (NASA)</a></li>
+        <li>We built a line chart order to visualize the yearly average temperatures</li>
+    </ul>
+
+    <h2>Result, Discussion</h2>
+    <ul>
+        <li>The line chart from <b>Crete</b> shows that the change in average temperature over the last 100 years.</li>
+        <li>Even if we account with the highest historical temperatures in the last three years,  there is not enough data as for justifying a statistically significant raise in temperature over the last century.</li>
+    </ul>
+
+    <h2>Conclusions</h2>
+    <ul>
+        <li>Climate change is not as visible as expected only accounting on the change of surface-temperature, but further analysis is required.
+        <li>For example: looking for temperature changes concerning specific seasons (winters getting warmer), temperature anomalies' analysis etc.</li>
+        <li>The devastating consequences of climate change are not only related to the raise in local surface temperatures.</li>
+        <li>Furthermore, the ice-melting of the glaciers leading to rising sea-levels have major effects on islands' biospheres.</li>
+        <li>As many other islands, <b>Crete</b> is particularly susceptible to rising seas. </li>
+        <li>An interactive visualization would make the data more understandable and therefore easier to interpret</li>
+    </ul>
+
+
+    <h2>Individual Part</h2>
+
+    <h3>Miren</h3>
+    <h5>Which data set (that is realistically possible for you to obtain) and visualization would you include to give a more confident answer to the articles main question? A mockup is welcome. </h5>
+    <ul>
+        <li>
+            I would include temperature anomalies in addition to the absolute temperatures, where a positive anomaly would indicate a warmer temperature than a certain baseline and a negative anomaly would indicate a cooler temperature than a given baseline.
+            When calculating averages of absolute temperatures, we have to take into account many factors that influece the data; such as station location or elevation.<br>
+            Example: <a href="https://data.giss.nasa.gov/gistemp/graphs/graph_data/Temperature_Anomalies_over_Land_and_over_Ocean/graph.html">Temperature anomalies over land & ocean (NASA)</a>
+        </li>
+
+        <li>An interactive visualization of global temperature change (which we could relate to ice-melting) would be very interesting for further consequences' analysis too. </li>
+
+    </ul>
+
+
+    <h3>Toni</h3>
+    <h5>So far we've only taught static visualizations. Which dynamic elements or interactions could improve your article?</h5>
+    <ul>
+        <li>Taking into consideration the massive amounts of data that are to be represented in the weather graphic, static visualization such as the one we have tried to present are hard to represent.</li>
+        <li>One of the possibilities would be to have individual yearly visualization that can show individual year by year data and then have the dynamic element giving the possibility to go through all the years.</li>
+        <li>One good mockup/example of this could be the  <a href=http://charts.animateddata.co.uk/uktemperaturelines/>following </a></li>
+    </ul>
+
+    <h3>Toni</h3>
+    <h5>How big data sets are reasonable to load in d3 visualizations?</h5>
+    <ul>
+        <li>It depends on what you are trying to visualize.
+        <li>If the richness of data is required, then only a small set should be visualized.</li>
+        <li>If the desired visualization should contain a large amount of data, there are types of visualizations such as stream graphs.</li>
+        <li>For multiple dimensions, one can choose to go for the trees type visualization such as bundling edges and treemaps.</li>
+    </ul>
+</div>
+</body>
+</html>

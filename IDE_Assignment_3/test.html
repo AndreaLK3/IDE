@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><!doctype html>
+        <html>
+
+        <head>
+            <title>Trump Family Tree</title>
+            <script src="https://d3js.org/d3.v4.min.js"></script>
+            <script>
+                d3.select(window).on('load',init)
+
+                function exploreGraph(currElements, nodes, edges) {
+                    cur_depth = 0
+                    rootElement = currElements.pop()
+                    nodes.push({"id" : rootElement.name, depth : cur_depth})
+                    do {
+                        if (currElements.length > 0) {
+                            currElement = currElements.pop();
+                            cur_depth = 2
+                        }
+                        else {currElement = rootElement}
+                        currElementNodeIndex = nodes.length -1
+
+                        partners = currElement.partners
+                        //console.log(partners)
+
+                        if ( (partners != undefined) && (partners.length > 0) ) {
+                            for (i=0; i< partners.length; i++){
+                                p = partners[i]
+                                nodes.push({"id" : p.name, depth : cur_depth + 1})
+                                partnerNodeIndex = nodes.length -1
+                                //console.log(currElementNodeIndex); console.log(partnerNodeIndex); console.log(marriageNodeIndex)
+                                edges.push({"source": currElementNodeIndex , "target": partnerNodeIndex, "className" : "Marriage"})
+
+                                children = p.children
+
+                                if ( (children != undefined) && (children.length > 0) ) {
+                                    for (j=0; j<children.length; j++) {
+                                        c = children[j]
+                                        nodes.push({"id" : c.name, depth : cur_depth + 2})
+                                        childNodeIndex = nodes.length -1
+                                        edges.push({"source": partnerNodeIndex , "target": childNodeIndex, "className" : "Child"})
+                                        currElements.push(c)
+                                    }
+                                }
+
+                                //console.log(nodes); console.log(edges)
+
+                            }
+                        }
+
+                    } while (currElements.length > 0)
+
+                    return [nodes, edges];
+                }
+
+                function init() {
+                    // Set the dimensions and margins of the diagram
+                    var margin = {top: 40, right: 90, bottom: 50, left: 90};
+
+                    var clientWidth = window.screen.width;
+                    w = clientWidth - margin.left - margin.right,
+                        h =  window.screen.height - margin.top - margin.bottom;
+
+
+                    var svg = d3.select("#graphArea")
+                        .attr("width", w + margin.left + margin.right)
+                        .attr("height", h + margin.top + margin.bottom)
+                    //.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                    //svg.attr('transform','translate('+ clientWidth/2 +' , '+(h/3) +')');
+
+                    nodes = []
+
+                    edges = []
+
+                    d3.json("trump_family.json", function(error, rootDataNode){
+                        if(error) {throw error;}
+
+                        console.log(rootDataNode);
+                        currElements = [rootDataNode];
+
+                        nodesEdgesArray = exploreGraph(currElements, nodes, edges)
+
+                        nodes = nodesEdgesArray[0]
+
+                        edges = nodesEdgesArray[1]
+
+                        console.log("Final result:");
+
+                        console.log(nodes); console.log(edges)
+
+                        /* Modified from Bostock's example at https://bl.ocks.org/mbostock/4062045 */
+
+                        var simulation = d3.forceSimulation()
+                            .force("link",
+                                d3.forceLink().id(function(d) { return d.index; })
+                                    .distance(function(d) { if (d.className == "Marriage")
+                                    {return 100}
+                                    else //className == "Child"
+                                    {return 200}}))
+                            .force("charge", d3.forceManyBody().strength(function(d,i) {
+                                //console.log(d);
+                                the_name = d.id;
+                                p_elem = rootDataNode.partners.find(function (elem) {return elem.name == name})
+                                if (i==0) //root node repulsive charge
+                                {return -800}
+                                if (typeof p_elem != undefined) {
+                                    return -400 //1st-gen. partners node repulsive charge
+                                }
+                                return -50;
+                            }))//;d3.forceCollide().radius(50)
+                            .force("r", d3.forceRadial(20))
+                            .force("center", d3.forceCenter(w / 2, h / 2))
+                            .force("r2", d3.forceCollide().radius(20))
+
+
+
+                        var link = svg.append("g")
+                            .attr("class", "links")
+                            .selectAll("line")
+                            .data(edges)
+                            .enter().append("line")
+                            .style("stroke-width", 2)
+                            .style("stroke", "black");
+
+//           var node = svg.append("g")
+//                        .attr("class", "nodes")
+//                        .selectAll("circle")
+//                        .data(nodes)
+//                        .enter().append("circle")
+//                        .attr("r", 5)
+//                        .attr("fill", "blue")
+
+                        // adds each node as a group
+                        var node = svg.selectAll('.node')
+                            .data(nodes)
+                            .enter()
+                            .append("g")
+                            .attr("class", "node");
+
+
+                        node.append("circle")
+                            .attr("r", 5)
+                            .attr("fill", "blue")
+
+                        // adds the text to the node
+                        node.append("text")
+                            .attr("dy", 1)
+                            .attr("width", 30)
+                            .style("font-size", 13)
+                            .style("font-weight", 'bold')
+                            .style("text-anchor", (d) =>  d.children ? "end" : "start" )
+                    .text(function(d)
+                        { return d.id;});
+
+                        simulation
+                            .nodes(nodes)
+                            .on("tick", ticked);
+
+                        simulation.force("link")
+                            .links(edges);
+
+
+                        function ticked() {
+                            link
+                                .attr("x1", function(d) { return d.source.x; })
+                                .attr("y1", function(d) { return d.source.y; })
+                                .attr("x2", function(d) { return d.target.x; })
+                                .attr("y2", function(d) { return d.target.y; });
+
+                            node
+                                .attr("cx", function(d) { return d.x; })
+                                .attr("cy", function(d) { return d.y; });
+
+                            node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+
+                        }
+                    });
+
+                }
+
+
+            </script>
+        </head>
+
+<body>
+<svg id="graphArea">
+</svg>
+</body>
+
+</html>
