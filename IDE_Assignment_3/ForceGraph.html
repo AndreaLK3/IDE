@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>D3 Tutorial</title>
+	<title>Trump Family Tree</title>
 	<script src="https://d3js.org/d3.v4.min.js"></script>
     <script>
     d3.select(window).on('load',init)
@@ -92,9 +92,27 @@
             /* Modified from Bostock's example at https://bl.ocks.org/mbostock/4062045 */
             
            var simulation = d3.forceSimulation()
-                            .force("link", d3.forceLink().id(function(d) { return d.index; }))
-                            .force("charge", d3.forceManyBody())
-                            .force("center", d3.forceCenter(w / 2, h / 2));
+                            .force("link", 
+                                   d3.forceLink().id(function(d) { return d.index; })
+                                                 .distance(function(d) { if (d.className == "Marriage")
+                                                                            {return 100}
+                                                                         else //className == "Child"
+                                                                            {return 200}}))
+                            .force("charge", d3.forceManyBody().strength(function(d,i) {
+                                                                //console.log(d);
+                                                                name = d.id;
+                                                                p_elem = rootDataNode.partners.find(function (elem) {return elem.name == name})
+                                                                if (i==0) //root node repulsive charge
+                                                                    {return -800}
+                                                                if (typeof p_elem != undefined) {
+                                                                    return -400 //1st-gen. partners node repulsive charge
+                                                                }
+                                                                return -50;
+                            }))//;d3.forceCollide().radius(50)
+                            .force("r", d3.forceRadial(20))
+                            .force("center", d3.forceCenter(w / 2, h / 2))
+                            .force("r2", d3.forceCollide().radius(20))
+                            
 
 
             var link = svg.append("g")
@@ -102,7 +120,8 @@
                         .selectAll("line")
                         .data(edges)
                         .enter().append("line")
-                        .attr("stroke-width", 1);
+                        .style("stroke-width", 2)
+                        .style("stroke", "black");
 
 //           var node = svg.append("g")
 //                        .attr("class", "nodes")
