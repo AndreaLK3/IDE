@@ -1,0 +1,206 @@
+
+    function exploreGraph(currElements, nodes, edges) {
+        cur_depth = 0
+        rootElement = currElements.pop()
+        nodes.push({"id" : rootElement.name, depth : cur_depth})
+        do {                            
+                    //console.log(currElements)
+                    if (currElements.length > 0) {
+                        currElement = currElements.pop();
+                        //console.log("Should be Current : "); console.log(currElement)
+                        currElementNodeIndex = nodes.findIndex(
+                            function (n) {  
+                                return n.id == currElement.name})
+                        cur_depth = 2
+                    }
+                    else {currElement = rootElement; 
+                          currElementNodeIndex = 0}
+
+
+                    partners = currElement.partners
+                    //console.log(partners)
+            
+                    if ( (partners != undefined) && (partners.length > 0) ) {
+                    for (i=0; i< partners.length; i++){
+                        p = partners[i]
+                        nodes.push({"id" : p.name, depth : (cur_depth + 1)})
+                        partnerNodeIndex = nodes.length -1
+                        //console.log("Partner : ")
+                        //console.log(nodes[partnerNodeIndex])
+                        edges.push({"source": currElementNodeIndex , "target": partnerNodeIndex, "className" : "Marriage"})
+                        
+                        children = p.children
+                        
+                        if ( (children != undefined) && (children.length > 0) ) {
+                            for (j=0; j<children.length; j++) {
+                                c = children[j]                
+                                nodes.push({"id" : c.name, depth :  cur_depth + 2})
+                                childNodeIndex = nodes.length -1
+                                //console.log("Child : ")
+                                //console.log(nodes[childNodeIndex])
+                                edges.push({"source": partnerNodeIndex , "target": childNodeIndex, "className" : "Child"})
+                                currElements.push(c)
+                            }
+                        }
+                    
+                        //console.log(nodes); console.log(edges)
+                        
+                    }
+                    }
+        
+        } while (currElements.length > 0)
+            
+        return [nodes, edges];
+        }
+
+    function init2() {
+        // Set the dimensions and margins of the diagram
+        var margin = {top: 40, right: 90, bottom: 50, left: 90};
+
+        var clientWidth = window.screen.width;
+        w = clientWidth - margin.left - margin.right,
+        h =  window.screen.height - margin.top - margin.bottom;
+
+
+        var svg = d3.select("#graphArea")
+                   .attr("width", w + margin.left + margin.right)
+                   .attr("height", h + margin.top + margin.bottom)
+                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        //svg.attr('transform','translate('+ clientWidth/2 +' , '+(h/3) +')');
+
+        nodes = []
+
+        edges = []
+
+        d3.json("trump_family.json", function(error, rootDataNode){
+            if(error) {throw error;}
+
+            console.log(rootDataNode);
+            currElements = [rootDataNode];
+
+            nodesEdgesArray = exploreGraph(currElements, nodes, edges)
+
+            nodes = nodesEdgesArray[0]
+
+            edges = nodesEdgesArray[1]
+
+            console.log("Final result:");
+               
+            console.log(nodes); console.log(edges)
+
+            /* Modified from Bostock's example at https://bl.ocks.org/mbostock/4062045 */
+            
+           var simulation = d3.forceSimulation()
+                            .force("link", 
+                                   d3.forceLink().id(function(d) { return d.index; })
+                                                 .distance(function(d) { if (d.className == "Marriage")
+                                                                            {return 30}
+                                                                         else //className == "Child"
+                                                                            {return 250}}))
+                            //.force("charge", d3.forceCollide().radius(300))
+                            .force("charge", d3.forceManyBody().strength(function(d,i) {
+                                                                //console.log(d);
+                                                                the_name = d.id;
+                                                                p_elem = rootDataNode.partners.find(function (elem) {return elem.name ==        the_name})
+                                                                //console.log(typeof p_elem)
+                                                                if (d.id="Donald Trump") //root node repulsive charge
+                                                                    {return -500}    
+                                                                if (typeof p_elem != undefined) {
+                                                                    return -2500 //1st-gen. partners node repulsive charge
+                                                                }
+                                                                return -1000;
+                            }))//;d3.forceCollide().radius(50)
+                            .force("r", d3.forceRadial(function(d) { console.log(d.depth);return d.depth * 165; })
+                                          .strength(1.2))
+                            .force("center", d3.forceCenter(w / 3, 0.5 * h ))
+                            //.force("r2", d3.forceCollide().radius(14).strength(1400))
+                            
+
+
+            var link = svg.append("g")
+                        .attr("class", "links")
+                        .selectAll("line")
+                        .data(edges)
+                        .enter().append("line")
+                        .style("stroke-width", 2)
+                        .style("stroke", function(d) {
+                            if (d.className == "Marriage") 
+                                {return "magenta";} 
+                            else {
+                                return "black";} });
+
+            // adds each node as a group
+			var node = svg.selectAll('.node')
+  						.data(nodes)
+  						.enter()
+						.append("g")
+                        .attr("class", "node")
+                        .call(d3.drag()
+                        .on("start", dragstarted)
+                        .on("drag", dragged)
+                        .on("end", dragended));;
+
+
+            node.append("circle")
+                .attr("r", 10)
+                .attr("fill", "lightblue")
+                .attr("stroke", "steelblue")
+
+            
+			// adds the text to the node
+			node.append("text")
+  				.attr("dy", 1)
+                .attr("width", 30)
+                .style("font-size", 15)
+                .style("font-weight", 'bold')
+  				.style("text-anchor", function(d) {return d.depth >= 2 ? "start" : "end"} )//
+  				.text(function(d) { return d.id});
+
+                simulation
+                  .nodes(nodes)
+                  .on("tick", ticked);
+
+                simulation.force("link")
+                  .links(edges);
+
+
+              function ticked() {
+                link
+                    .attr("x1", function(d) { return d.source.x; })
+                    .attr("y1", function(d) { return d.source.y; })
+                    .attr("x2", function(d) { return d.target.x; })
+                    .attr("y2", function(d) { return d.target.y; });
+
+                node
+                    .attr("cx", function(d) { return d.x; })
+                    .attr("cy", function(d) { return d.y; });
+                  
+                node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+                  
+              }
+            
+        function dragstarted(d) {
+            if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+        
+        function dragged(d) {
+            d.fx = d3.event.x;
+            d.fy = d3.event.y;
+        }
+        
+        function dragended(d) {
+            if (!d3.event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        } 
+
+            
+            });
+        
+        
+        
+}
+ 
