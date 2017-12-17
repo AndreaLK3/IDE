@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset="utf-8"/>
+    <style>
+        svg {
+            border-color: grey;
+            border-width: 2px;
+            border-style: solid;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script>
+        d3.select(window).on('load',init);
+        
+        function create_hand_coords(hand_csv, keys){
+                
+                hand_lol = []
+                n_of_points = 56//Math.floor(keys.length / 2)
+                for (i=0; i< n_of_points; i++){
+                        j = i + n_of_points;
+                        px = parseFloat(hand_csv[keys[i]])
+                        py = parseFloat(hand_csv[keys[j]])
+                        hand_lol.push([px,py])
+                    }
+                 
+                return hand_lol;
+            }
+        
+        function create_keys(){
+            keys_string = ""
+            n_of_points= 56
+            start_ascii_code = 97
+            alphabet_codes = 26
+            code_add = 0
+            key_length = 1
+            for (i=0; i < n_of_points*2; i++){
+                key = (String.fromCharCode(start_ascii_code + code_add)).repeat(key_length)
+                code_add = code_add + 1
+                if (code_add == 25){
+                    code_add = 0
+                    key_length = key_length + 1
+                }
+                if (keys_string != "") {
+                    keys_string += ","
+                }               
+                keys_string += key
+            }
+            keys_string = keys_string + "\n"
+            return keys_string
+        }
+        
+        function selectHand(hands_csv, index){
+            console.log(hands_csv)
+            hand_csv = hands_csv[index]
+            console.log(hand_csv)
+            return hand_csv
+        }
+        
+        
+        function displayHand(hand_coords, width, height) {
+             // Create scales
+            var xScale = d3.scaleLinear()
+                            .domain(d3.extent(hand_coords, 
+                                function(d){
+                                    return d[0]; }))
+                            .range([0,width]);
+
+            var yScale = d3.scaleLinear()
+                    .domain(d3.extent(hand_coords, 
+                            function(d){
+                                return d[1]; }))
+                    .range([height,0]);
+
+
+            // Create line generator
+            var line = d3.line()
+                    .y(function(d){return xScale(d[0]);})
+                    .x(function(d){return yScale(d[1]);})
+
+            // Create actual path element
+            handSvg.append('path')
+                .attr('d', line(hand_coords))
+                .attr("stroke", "blue")
+                .attr("stroke-width", 2)
+                .attr("fill", "none");	
+
+            }
+        
+            
+        
+    
+        function init() {
+            
+        
+        d3.text("hands.csv", function(text_hands_csv) {
+            
+            keys = create_keys();
+            
+            //Initialize the input dataset
+            new_csv_text = keys + text_hands_csv
+            var hands_csv = d3.csvParse(new_csv_text) 
+
+            //Choose the hand and extract its list of coordinates
+            //console.log(hands_csv)
+            //console.log(keys)
+            keys = d3.keys(hands_csv[0])
+            hand = selectHand(hands_csv, 0)
+
+            //Create the list of lists with the coordinates of a hand
+            hand_coords = create_hand_coords(hand_csv, keys)
+            console.log("Hand coordinates: ")
+            console.log(hand_coords)
+
+
+            //Adjust width and height 
+            handSvg = d3.select("#handSvg")
+            var width = +handSvg.node().getBoundingClientRect().width;
+            var height = +handSvg.node().getBoundingClientRect().height;  
+            
+            displayHand(hand_coords,width, height)
+            
+            pcaSvg = d3.select("#PCA_XY")
+            
+            //Temporary part: must insert here the scatter plot of the data
+            point = pcaSvg.append("circle")
+                  .attr("id", "24")
+                  .attr("cx", "10")
+                  .attr("cy", 20)
+                  .attr("fill", "blue")
+                  .attr("r", 10)
+            
+            
+            point.on("click", function() {
+                handSvg.selectAll("*").remove()
+                console.log(this)
+                the_id = this.id
+                hand_csv = selectHand(hands_csv, the_id)
+                //console.log(hand_csv)
+                displayHand(create_hand_coords(hand_csv, keys), width, height)            
+            })
+            
+            
+           
+        })
+    
+        }
+            
+            
+            
+            
+
+        
+        	
+
+        
+      </script>
+    </head>
+    <body>
+    <svg id="handSvg" style="width : 512px; height: 400px;">
+    </svg>
+    <svg id="PCA_XY" style="width : 512px; height: 400px;">
+    </svg>
+    
+    
+    </body>
