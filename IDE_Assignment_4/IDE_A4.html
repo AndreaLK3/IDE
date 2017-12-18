@@ -137,6 +137,11 @@
             displayHand(hand_coords,width, height)
             
             d3.text("hands_pca.csv", function(text_handsPca_csv) {
+                
+                //Adjust width and height 
+                var width = +pcaSvg.node().getBoundingClientRect().width;
+                var height = +pcaSvg.node().getBoundingClientRect().height; 
+                var padding = 15
             
                 var keys = create_keys();
 
@@ -144,14 +149,43 @@
                 new_csvPca_text = keys + text_handsPca_csv
                 //console.log(new_csvPca_text)
                 handsPca_csv = d3.csvParse(new_csvPca_text) 
-                console.log(handsPca_csv)
+                //console.log(handsPca_csv)
                 var keys = d3.keys(handsPca_csv[0])
             
                 first_dimension = selectCsvColumn(handsPca_csv, keys, 0)
                 second_dimension = selectCsvColumn(handsPca_csv, keys, 1)
                 
-                console.log(zip([first_dimension, second_dimension]))
-            
+                pcaXY_coords = zip([first_dimension, second_dimension])
+                console.log(pcaXY_coords)
+                
+                var X = d3.scaleLinear()
+                           .domain(d3.extent(pcaXY_coords,
+                                            function(d){
+                                              return d[0];
+                                            }))
+                          .range([ padding , (width - padding) /2]);
+
+                var Y = d3.scaleLinear()
+                        .domain(d3.extent(pcaXY_coords,
+                                            function(d){
+                                              return d[1];
+                                            }))
+                        .range([(height-padding )/2, padding]);
+
+
+                pcaSvg.selectAll("circle")
+                    .data(pcaXY_coords)
+                    .enter()
+                    .append("circle")
+                    .attr("r", "2px")
+                    .attr("cx", function(d){
+                                  return ""+X(d[0])+"px";
+                                })
+                    .attr("cy", function(d){
+                                  return ""+Y(d[1])+"px";
+                                })
+                    .attr("fill", "steelblue")
+
             });
             
             
