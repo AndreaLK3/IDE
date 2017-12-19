@@ -116,11 +116,25 @@
                           .filter(function() { //console.log(the_id); console.log(d3.select(this).attr("id"));
                                               return d3.select(this).attr("id") == the_id})
                           .attr("r", "7px")
+                          .attr("stroke", "red")
+                          .attr("stroke-width", "4px")
+                    
                     pcaSvg.selectAll("circle")
                           .filter(function() { //console.log(the_id); console.log(d3.select(this).attr("id"));
                                               return d3.select(this).attr("id") != the_id})
 
                     .attr("r", "5px")
+                    .attr("stroke", "black")
+                    .attr("stroke-width", function() {
+                        console.log(d3.select(this).style("fill"))
+                        if (d3.select(this).style("fill") == "steelblue"){
+                            return  "1px";
+                        }
+                        if (d3.select(this).style("fill") == "yellow"){
+                            return  "2px";
+                        }
+                                      
+                    })
                     
                     handSvg.selectAll("path")
                            .filter(function() {return d3.select(this).id != the_id})
@@ -172,7 +186,7 @@
             //var width = +handSvg.node().getBoundingClientRect().width;
             //var height = +handSvg.node().getBoundingClientRect().height;  
             
-            displayHand(hand_coords,width, height)
+            //displayHand(hand_coords,width, height)
             
             d3.text("hands_pca.csv", function(text_handsPca_csv) {
                 
@@ -241,17 +255,17 @@
                                 pcaSvg.selectAll("circle")
                                       .style("fill", "steelblue")
                                       .attr("stroke-width", "1px") }
-                        d3.select(this).style("fill", "orange")
+                        d3.select(this).style("fill", "yellow")
                                        .attr("stroke-width", "2px")
                     
                         }  
                        )                    
                     .on("mouseover", function(d) {
-                        if ((d3.select(this).style("fill") != "orange")){
+                        if ((d3.select(this).style("fill") != "yellow")){
                                 d3.select(this).style("fill", "green");}
                         })                     
                        .on("mouseout", function(d) {
-                        if  ((d3.select(this).style("fill") != "orange")){
+                        if  ((d3.select(this).style("fill") != "yellow")){
                                 d3.select(this).style("fill", "steelblue")
                                                 ;}
                         }) 
@@ -293,6 +307,7 @@
                     .on("click", function(){
                                     handSvg.attr("displaymode", "one");
                                     d3.select("input").style("border", "1px black solid")
+                                    d3.select("#buttonMulti").style("border", "1px black solid")
                                     d3.select("#button1")
                                         .style("border", "3px black groove")
                                     handSvg.selectAll("*").remove()
