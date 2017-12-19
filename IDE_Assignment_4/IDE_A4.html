@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset="utf-8"/>
+      <title>Show of hands</title>
+    <style>
+        svg {
+            border-color: grey;
+            border-width: 2px;
+            border-style: solid;
+        }
+        .ourCode {
+            font-family: Courier New, monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script>
+        d3.select(window).on('load',init);
+        
+        //Set the panels' dimensions and paddig
+        width = 0.4 * window.screen.width
+        height = 0.9 * width
+        padding = 50
+        
+        
+        
+        function create_hand_coords(hand_csv, keys){
+                
+                hand_lol = []
+                n_of_points = 56//Math.floor(keys.length / 2)
+                for (i=0; i< n_of_points; i++){
+                        j = i + n_of_points;
+                        px = parseFloat(hand_csv[keys[i]])
+                        py = parseFloat(hand_csv[keys[j]])
+                        hand_lol.push([px,py])
+                    }
+                 
+                return hand_lol;
+        }
+        
+        function zip(arrays) {
+            return arrays[0].map(function(_,i){
+                return arrays.map(function(array){return array[i]})
+            });
+        }
+        
+        
+        function create_keys(){
+            keys_string = ""
+            n_of_points= 56
+            start_ascii_code = 97
+            alphabet_codes = 26
+            code_add = 0
+            key_length = 1
+            for (i=0; i < n_of_points*2; i++){
+                key = (String.fromCharCode(start_ascii_code + code_add)).repeat(key_length)
+                code_add = code_add + 1
+                if (code_add == 25){
+                    code_add = 0
+                    key_length = key_length + 1
+                }
+                if (keys_string != "") {
+                    keys_string += ","
+                }               
+                keys_string += key
+            }
+            keys_string = keys_string + "\n"
+            return keys_string
+        }
+        
+        function selectCsvRow(data_csv, index){
+    
+            row_csv = data_csv[index]        
+            return row_csv
+        }
+        
+        function selectCsvColumn(data_csv, keys, index){
+            column_csv = []
+            for (i=0; i < data_csv.length; i++){
+                object = data_csv[i]
+                
+                column_csv.push(object[keys[index]])
+            } 
+            
+            return column_csv
+        }
+        
+        
+        
+        function displayHand(hand_coords, width, height, the_id) {
+             // Create scales
+            var xScale = d3.scaleLinear()
+                            .domain(d3.extent(hand_coords, 
+                                function(d){
+                                    return d[0]; }))
+                            .range([0,width]);
+
+            var yScale = d3.scaleLinear()
+                    .domain(d3.extent(hand_coords, 
+                            function(d){
+                                return d[1]; }))
+                    .range([height,0]);
+
+
+            // Create line generator
+            var line = d3.line()
+                    .y(function(d){return xScale(d[0]);})
+                    .x(function(d){return yScale(d[1]);})
+
+            // Create actual path element
+            var path = handSvg.append('path')
+                .attr("id", the_id)
+                .attr('d', line(hand_coords))
+                .attr("stroke", "blue")//d3.rgb(Math.floor(Math.random()*255), Math.floor(Math.random()*255) ,Math.floor(Math.random()*255)) )
+                .attr("stroke-width", 3)
+                .attr("fill", "none")
+                .on("click", function() {
+                    
+                    pcaSvg.selectAll("circle")
+                          .filter(function() {
+                                              return d3.select(this).attr("id") == the_id})
+                          .attr("r", "6px")
+                          .attr("stroke", "red")
+                          .attr("stroke-width", "4px")
+                    
+                    pcaSvg.selectAll("circle")
+                          .filter(function() { 
+                                              return d3.select(this).attr("id") != the_id})
+
+                    .attr("r", "5px") 
+                    .attr("stroke", "black")
+                    .attr("stroke-width", function() {
+                        console.log(d3.select(this).style("fill"))
+                        if (d3.select(this).style("fill") == "steelblue"){
+                            return  "1px";
+                        }
+                        if (d3.select(this).style("fill") == "yellow"){
+                            return  "2px";
+                        }
+                                      
+                    })
+                    
+                    handSvg.selectAll("path")
+                           .filter(function() {return d3.select(this).id != the_id})
+                           .attr("stroke", "blue")
+                    
+                    d3.select(this)
+                      .attr("stroke", "red")
+                    
+                    
+                    
+                    
+                    
+                })
+            }
+            
+        
+    
+        function init() {
+            
+        pcaSvg = d3.select("#PCA_XY")
+                     .attr("width", width)
+                     .attr("height", height)
+        handSvg = d3.select("#handSvg")
+                     .attr("width", width)
+                     .attr("height", height)
+                    
+            
+        d3.select("#button1")
+          .style("border", "3px black groove")
+        
+        d3.text("hands.csv", function(text_hands_csv) { 
+            
+            keys = create_keys();
+            
+            //Initialize the input dataset
+            new_csv_text = keys + text_hands_csv
+            var hands_csv = d3.csvParse(new_csv_text) 
+
+            //Choose the hand and extract its list of coordinates
+            keys = d3.keys(hands_csv[0])
+            hand = selectCsvRow(hands_csv, 0)
+
+            //Create the list of lists with the coordinates of a hand
+            hand_coords = create_hand_coords(hand, keys)
+            console.log("Hand coordinates: ")
+            console.log(hand_coords)
+
+
+            //Adjust width and height 
+            //var width = +handSvg.node().getBoundingClientRect().width;
+            //var height = +handSvg.node().getBoundingClientRect().height;  
+            
+            //displayHand(hand_coords,width, height)
+            
+            d3.text("hands_pca.csv", function(text_handsPca_csv) {
+                
+                //Adjust width and height 
+                //var width = +pcaSvg.node().getBoundingClientRect().width;
+                //var height = +pcaSvg.node().getBoundingClientRect().height; 
+        
+                var keys = create_keys();
+
+                //Initialize the PCA dataset
+                new_csvPca_text = keys + text_handsPca_csv
+                //console.log(new_csvPca_text)
+                handsPca_csv = d3.csvParse(new_csvPca_text) 
+                //console.log(handsPca_csv)
+                var keys = d3.keys(handsPca_csv[0])
+            
+                first_dimension = selectCsvColumn(handsPca_csv, keys, 0)
+                second_dimension = selectCsvColumn(handsPca_csv, keys, 1)
+                
+                pcaXY_coords_strings = zip([first_dimension, second_dimension])
+                pcaXY_coords = pcaXY_coords_strings.map(elem => [parseFloat(elem[0]), parseFloat(elem[1])])
+
+                
+                var X = d3.scaleLinear()
+                                .domain(d3.extent(pcaXY_coords, 
+                                    function(d){
+                                        return d[0]; }))
+                                .range([padding,width - padding]);
+
+                var Y = d3.scaleLinear()
+                                .domain(d3.extent(pcaXY_coords, 
+                                        function(d){
+                                            return d[1]; }))
+                                .range([height - padding, padding]);
+
+                pcaSvg.selectAll("circle")
+                    .data(pcaXY_coords)
+                    .enter()
+                    .append("circle")
+                    .attr("r", "5px")
+                    .attr("cx", function(d){
+                                  return ""+X(d[0])+"px";
+                                })
+                    .attr("cy", function(d){
+                                  return ""+Y(d[1])+"px";
+                                })
+                    .style("fill", "steelblue")
+                    .attr("id", function(d, i) {return i})
+                    .attr("stroke-width", "1px")
+                    .attr("stroke", "black")
+                    .on("click", function() {
+                        console.log(handSvg.attr("displaymode"))
+                        d3.selectAll("circle")
+                          .attr("r", "5px")
+                          .attr("stroke", "black")
+                          .attr("stroke-width", "1px")
+                        
+                        if (handSvg.attr("displaymode") == "one"){
+                            handSvg.selectAll("*").remove()}
+                        the_id = this.id
+                        hand_csv = selectCsvRow(hands_csv, the_id)
+
+                        displayHand(create_hand_coords(hand_csv, keys), width, height,  the_id)   
+                        if (handSvg.attr("displaymode") == "one"){
+                                pcaSvg.selectAll("circle")
+                                      .style("fill", "steelblue")
+                                      .attr("stroke-width", "1px") }
+                        d3.select(this).style("fill", "yellow")
+                                       .attr("stroke-width", "2px")
+                    
+                        }  
+                       )                    
+                    .on("mouseover", function(d) {
+                        if ((d3.select(this).style("fill") != "yellow")){
+                                d3.select(this).style("fill", "green");}
+                        })                     
+                       .on("mouseout", function(d) {
+                        if  ((d3.select(this).style("fill") != "yellow")){
+                                d3.select(this).style("fill", "steelblue")
+                                                ;}
+                        }) 
+                    .append("title")
+                    .text(function (d, i){ return i})	
+                    
+                
+                
+                //Axes for the PCA graph
+                pcaSvg.append('g')            // grouping makes it easy to specify transform
+                        .attr('transform', 'translate(0,' + (height - padding ) + ')')
+                        .call(d3.axisBottom(X).ticks(pcaXY_coords.length / 4))        
+            
+                pcaSvg.append('g')
+                    .attr('transform', 'translate('+padding +', 0)')
+                    .call(d3.axisLeft(Y));
+                    
+            
+                /*** Axis labels and Legenda ***/
+                // text label for the x axis
+                pcaSvg.append("text")             
+                    .attr("transform", "translate(" + width/2 + " ," + 
+                                            (height- padding + 40) + ")")
+                    .style("text-anchor", "middle")
+                    .text("PCA Dimension 1");
+            
+                // text label for the y axis
+                pcaSvg.append("text")
+                      .attr("transform", "rotate(-90)")
+                      .attr("y", 0 + padding - 50)
+                      .attr("x",0 - (height / 2))
+                      .attr("dy", "1em")
+                      .style("text-anchor", "middle")
+                      .text("PCA Dimension 2"); 
+                
+                
+                //Dynamic feature: visualize 1 or more hands at a time
+                d3.select("#button1")
+                    .on("click", function(){
+                                    handSvg.attr("displaymode", "one");
+                                    d3.select("input").style("border", "1px black solid")
+                                    d3.select("#buttonMulti").style("border", "1px black solid")
+                                    d3.select("#button1")
+                                        .style("border", "3px black groove")
+                                    handSvg.selectAll("*").remove()
+                                    pcaSvg.selectAll("circle")
+                                      .style("fill", "steelblue")
+                                      .attr("stroke-width", "1px") 
+                                      .attr("stroke", "black")
+                                    })
+            
+            
+                d3.select("#buttonMulti")
+                    .on("click", function(){
+                                    handSvg.attr("displaymode", "multi");
+                                    d3.select("input").style("border", "1px black solid")
+                                    d3.select("#buttonMulti")
+                                        .style("border", "3px black groove")
+                                    
+                                    });
+                
+
+
+
+            })
+        });
+            
+    }
+        
+
+        
+      </script>
+    </head>
+    <body>
+        <h2 style="text-align: center">Show of hands</h2>
+        <h3>Introduction</h3>
+        <p>We are working on a dataset that describes hands outlines, using the X and Y coordinates of 56 points.<br/>
+        Since there are <em>n</em> = 112 dimensions, a direct representation of the elements in a <em>n</em>-dimensional space is impossible.
+        </p>
+        <p>We have to employ <em>Principal Component Analysis</em>. This method creates a new set of orthogonal basis vectors, that act as the new dimensions of the data points. Each time we add a vector, it is chosen in such a way as to maximize the captured variance. (eg : The first basis vector is the direction that maximizes variance in the dataset). <br/>
+        The amount of variance expressed by each vector is proportional to its corresponding eigenvector in the empirical covariance matrix.
+            (variance = eigenvalue / sum_of_eigenvalues)</p>
+        <p>
+        This way, it is possible to obtain a representation in few dimensions (eg 2,3) that tries to capture the most important differences between the elements of the data set.
+        </p>
+        <h3>Instructions for the visualization</h3>
+        <p>This visualization can work in 2 modes:<br/>
+        - <em>One hand at a time.</em> &nbsp;&nbsp; It is self-explanatory; clicking on a circle in the PCA graph draws the corresponding hand-path in the second Svg window. <br/>
+        - <em>Multiple hands.</em> &nbsp;&nbsp; Clicking multiple circles draws multiple hands. If we click on a hand-path, we highlight it together with the corresponding circle. <br/>
+        At the start, we are in the "1 hand at a time" mode, and no hand is drawn.<br/>
+        Hovering over a circle displays as a tooltip the hand's ID (the row number in the dataset file)
+        </p>
+        
+    <div>    
+    <svg id="PCA_XY">
+    </svg>
+    <svg id="handSvg" displaymode="one"><!--style="width : 512px; height: 400px;-->
+    </svg>
+    </div>
+    <form>
+        <input type="button" name="button" id="button1" value="Visualize one hand at a time"/>
+        <input type=button name="button" id="buttonMulti" value="Visualize multiple hands"/>
+    </form>
+    
+    <h3>Results and conclusions</h3>
+    By observing the hands at the maximum and minimum along the 2 first dimensions of PCA, we can understand what these dimensions represent:
+    <ul>
+        <li><strong>Dim. 1 : </strong> How thin or thick is the hand. <br/>
+        If the fingers and palm are very thick, we have a high value for Dimension 1 (example: hand 35). <br/>
+        If the hand is thinner, we have a low value for Dim.1 (example: hand 30, hand 20 and neighbours)
+        </li>
+        <li><strong>Dim. 2 : </strong> How the fingers are spread out :<br/>
+        if the first fingers (thumb, index, middle) are spread out widely, and the subsequent ones are tightly together, we have a low value of Dimension 2. (example: hand 39) <br/>
+        If instead the last fingers are spread out (middle, ringfinger, little finger) and the first ones are close, we have a high value for Dimension 2 (example : hand 37)
+        </li>
+    </ul>
+        
+        
+        
+    <h3>Individual parts</h3>
+        
+    
+    <h4>Andrea Lekkas</h4>
+    <p>I implemented the part corresponding to the following point:</p>
+    <p><em>Display multiple hand-outlines and highlight the corresponding PCA-coordinates when one is selected</em>
+    </p>    
+    <p>Displaying multiple hand-paths can be achieved by avoiding to remove the previous paths from the graph if we are in the <em>"multiple"</em> mode.</p>
+    <p>When we create circles and lines, we have to give to each of them an ID, corresponding to the row in the dataset file.<br/>  
+    I have defined the appropriate responses to the click event with &nbsp; <tspan class="ourCode"> <em>selection</em>.on("click", function() { ...} </tspan><br/>
+    The mechanism is: &nbsp; Click on circle &nbsp;&rarr;&nbsp; Display path  &nbsp;&rarr;&nbsp; Click on path  &nbsp;&rarr;&nbsp; Highlight this path, and the circle with the corresponding ID
+    </p>
+    <p>At times, we have to select the graphical elements that we wish to modify. <br/>
+       We can use either the filter function : &emsp;<tspan class="ourCode">pcaSvg.selectAll("circle").filter(function() {...}</tspan><br/>
+       or a check on the current element : &emsp; <tspan class="ourCode">if ( d3.select(this).style("fill") == ... ) {...}</tspan>
+    </p>
+    <p>
+    Observation : since hand outlines are complicated and with multiple overlapping points, this instrument is only good to compare 2 or 3 hands at a time; any more and it starts to become confused.
+    </p>    
+        
+    </body>
