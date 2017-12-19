@@ -13,6 +13,13 @@
     <script>
         d3.select(window).on('load',init);
         
+        //Set the panels' dimensions and paddig
+        width = 0.4 * window.screen.width
+        height = 0.9 * width
+        padding = 50
+        
+        
+        
         function create_hand_coords(hand_csv, keys){
                 
                 hand_lol = []
@@ -76,7 +83,7 @@
         
         
         
-        function displayHand(hand_coords, width, height) {
+        function displayHand(hand_coords, width, height, the_id) {
              // Create scales
             var xScale = d3.scaleLinear()
                             .domain(d3.extent(hand_coords, 
@@ -97,12 +104,36 @@
                     .x(function(d){return yScale(d[1]);})
 
             // Create actual path element
-            handSvg.append('path')
+            var path = handSvg.append('path')
+                .attr("id", the_id)
                 .attr('d', line(hand_coords))
-                .attr("stroke", "blue")
-                .attr("stroke-width", 2)
-                .attr("fill", "none");	
+                .attr("stroke", "blue")//d3.rgb(Math.floor(Math.random()*255), Math.floor(Math.random()*255) ,Math.floor(Math.random()*255)) )
+                .attr("stroke-width", 3)
+                .attr("fill", "none")
+                .on("click", function() {
+                    
+                    pcaSvg.selectAll("circle")
+                          .filter(function() { //console.log(the_id); console.log(d3.select(this).attr("id"));
+                                              return d3.select(this).attr("id") == the_id})
+                          .attr("r", "7px")
+                    pcaSvg.selectAll("circle")
+                          .filter(function() { //console.log(the_id); console.log(d3.select(this).attr("id"));
+                                              return d3.select(this).attr("id") != the_id})
 
+                    .attr("r", "5px")
+                    
+                    handSvg.selectAll("path")
+                           .filter(function() {return d3.select(this).id != the_id})
+                           .attr("stroke", "blue")
+                    
+                    d3.select(this)
+                      .attr("stroke", "red")
+                    
+                    
+                    
+                    
+                    
+                })
             }
             
         
@@ -110,7 +141,14 @@
         function init() {
             
         pcaSvg = d3.select("#PCA_XY")
+                     .attr("width", width)
+                     .attr("height", height)
         handSvg = d3.select("#handSvg")
+                     .attr("width", width)
+                     .attr("height", height)
+                    
+            
+
         
         d3.text("hands.csv", function(text_hands_csv) { 
             
@@ -131,18 +169,17 @@
 
 
             //Adjust width and height 
-            var width = +handSvg.node().getBoundingClientRect().width;
-            var height = +handSvg.node().getBoundingClientRect().height;  
+            //var width = +handSvg.node().getBoundingClientRect().width;
+            //var height = +handSvg.node().getBoundingClientRect().height;  
             
             displayHand(hand_coords,width, height)
             
             d3.text("hands_pca.csv", function(text_handsPca_csv) {
                 
                 //Adjust width and height 
-                var width = +pcaSvg.node().getBoundingClientRect().width;
-                var height = +pcaSvg.node().getBoundingClientRect().height; 
-                var padding = 15
-            
+                //var width = +pcaSvg.node().getBoundingClientRect().width;
+                //var height = +pcaSvg.node().getBoundingClientRect().height; 
+        
                 var keys = create_keys();
 
                 //Initialize the PCA dataset
@@ -155,72 +192,146 @@
                 first_dimension = selectCsvColumn(handsPca_csv, keys, 0)
                 second_dimension = selectCsvColumn(handsPca_csv, keys, 1)
                 
-                pcaXY_coords = zip([first_dimension, second_dimension])
-                console.log(pcaXY_coords)
+                pcaXY_coords_strings = zip([first_dimension, second_dimension])
+                pcaXY_coords = pcaXY_coords_strings.map(elem => [parseFloat(elem[0]), parseFloat(elem[1])])
+                //console.log(pcaXY_coords)
+            
+                //console.log(d3.min(first_dimension))
+                //console.log(d3.max(first_dimension))
                 
                 var X = d3.scaleLinear()
-                           .domain(d3.extent(pcaXY_coords,
-                                            function(d){
-                                              return d[0];
-                                            }))
-                          .range([ padding , (width - padding) /2]);
+                                .domain(d3.extent(pcaXY_coords, 
+                                    function(d){
+                                        return d[0]; }))
+                                .range([padding,width - padding]);
 
                 var Y = d3.scaleLinear()
-                        .domain(d3.extent(pcaXY_coords,
-                                            function(d){
-                                              return d[1];
-                                            }))
-                        .range([(height-padding )/2, padding]);
-
+                                .domain(d3.extent(pcaXY_coords, 
+                                        function(d){
+                                            return d[1]; }))
+                                .range([height - padding, padding]);
 
                 pcaSvg.selectAll("circle")
                     .data(pcaXY_coords)
                     .enter()
                     .append("circle")
-                    .attr("r", "2px")
+                    .attr("r", "5px")
                     .attr("cx", function(d){
                                   return ""+X(d[0])+"px";
                                 })
                     .attr("cy", function(d){
                                   return ""+Y(d[1])+"px";
                                 })
-                    .attr("fill", "steelblue")
+                    .style("fill", "steelblue")
+                    .attr("id", function(d, i) {return i})
+                    .attr("stroke-width", "1px")
+                    .attr("stroke", "black")
+                    .on("click", function() {
+                        console.log(handSvg.attr("displaymode"))
+                        d3.selectAll("circle")
+                          .attr("r", "5px")
+                        
+                        if (handSvg.attr("displaymode") == "one"){
+                            handSvg.selectAll("*").remove()}
+                        the_id = this.id
+                        hand_csv = selectCsvRow(hands_csv, the_id)
 
-            });
+                        displayHand(create_hand_coords(hand_csv, keys), width, height,  the_id)   
+                        if (handSvg.attr("displaymode") == "one"){
+                                pcaSvg.selectAll("circle")
+                                      .style("fill", "steelblue")
+                                      .attr("stroke-width", "1px") }
+                        d3.select(this).style("fill", "orange")
+                                       .attr("stroke-width", "2px")
+                    
+                        }  
+                       )                    
+                    .on("mouseover", function(d) {
+                        if ((d3.select(this).style("fill") != "orange")){
+                                d3.select(this).style("fill", "green");}
+                        })                     
+                       .on("mouseout", function(d) {
+                        if  ((d3.select(this).style("fill") != "orange")){
+                                d3.select(this).style("fill", "steelblue")
+                                                ;}
+                        }) 
+                    .append("title")
+                    .text(function (d, i){ return i})	
+                    
+                
+                
+                //Axes for the PCA graph
+                pcaSvg.append('g')            // grouping makes it easy to specify transform
+                        .attr('transform', 'translate(0,' + (height - padding ) + ')')
+                        .call(d3.axisBottom(X).ticks(pcaXY_coords.length / 4))        
+            
+                pcaSvg.append('g')
+                    .attr('transform', 'translate('+padding +', 0)')
+                    .call(d3.axisLeft(Y));
+                    
+            
+                /*** Axis labels and Legenda ***/
+                // text label for the x axis
+                pcaSvg.append("text")             
+                    .attr("transform", "translate(" + width/2 + " ," + 
+                                            (height- padding + 40) + ")")
+                    .style("text-anchor", "middle")
+                    .text("PCA Dimension 2");
+            
+                // text label for the y axis
+                pcaSvg.append("text")
+                      .attr("transform", "rotate(-90)")
+                      .attr("y", 0 + padding - 50)
+                      .attr("x",0 - (height / 2))
+                      .attr("dy", "1em")
+                      .style("text-anchor", "middle")
+                      .text("PCA Dimension 1"); 
+                
+                
+                //Dynamic feature: visualize 1 or more hands at a time
+                d3.select("#button1")
+                    .on("click", function(){
+                                    handSvg.attr("displaymode", "one");
+                                    d3.select("input").style("border", "1px black solid")
+                                    d3.select("#button1")
+                                        .style("border", "3px black groove")
+                                    handSvg.selectAll("*").remove()
+                                    pcaSvg.selectAll("circle")
+                                      .style("fill", "steelblue")
+                                      .attr("stroke-width", "1px") 
+                                    })
             
             
-            //Temporary part: must insert here the scatter plot of the data
-//            point = pcaSvg.append("circle")
-//                  .attr("id", "24")
-//                  .attr("cx", "10")
-//                  .attr("cy", 20)
-//                  .attr("fill", "blue")
-//                  .attr("r", 10)
-//            
-//            
-//            point.on("click", function() {
-//                handSvg.selectAll("*").remove()
-//                console.log(this)
-//                the_id = this.id
-//                hand_csv = selectCsvRow(hands_csv, the_id)
-//                //console.log(hand_csv)
-//                displayHand(create_hand_coords(hand_csv, keys), width, height)            
+                d3.select("#buttonMulti")
+                    .on("click", function(){
+                                    handSvg.attr("displaymode", "multi");
+                                    d3.select("input").style("border", "1px black solid")
+                                    d3.select("#buttonMulti")
+                                        .style("border", "3px black groove")
+                                    
+                                    });
+                
+
+
+
             })
+        });
             
-            
-            
-
-        }
+    }
         
 
         
       </script>
     </head>
     <body>
-    <svg id="handSvg" style="width : 512px; height: 400px;">
+    <svg id="PCA_XY">
     </svg>
-    <svg id="PCA_XY" style="width : 512px; height: 400px;">
+    <svg id="handSvg" displaymode="one"><!--style="width : 512px; height: 400px;-->
     </svg>
+    <form>
+        <input type="button" name="button" id="button1" value="Visualize one hand at a time"/>
+        <input type=button name="button" id="buttonMulti" value="Visualize multiple hands"/>
+    </form>
     
     
     </body>
