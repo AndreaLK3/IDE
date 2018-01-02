@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+</head>
+<body>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+
+<script>
+
+                var jsonData = new Array();
+                $(function () {
+                    $.getJSON('sf_crime.geojson', function (data) {
+                        jsonData = data.features;
+                        console.log('json loaded successfully');
+                    }).error(function () {
+                        console.log('error: json not loaded');
+                    });
+                    console.log(jsonData);
+                });
+
+
+</script>
+</body>
+</html>
