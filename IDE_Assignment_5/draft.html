@@ -9,47 +9,14 @@
 <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 
 <script>
-//    function filterCrimesCatArray(cca){
-//        new_cca = []
-//        for (i=0; i < cca.length ; i++){
-//            
-//        }
-//    }
-    
-    
-    d3.select(window).on('load', init);
-    function init() {
-        d3.text('sf_crime.csv', function(error, raw_data){
-            var crimeTable = d3.csvParse(raw_data);
-            console.log(crimeTable);
 
-            console.log(crimeTable[0]);
+function updatePieChart(districtName, crimesByDistrictAndCategory) {
+           
+            chosenDistrict = crimesByDistrictAndCategory.find(function (elem) { 
+                                                             //console.log(elem.key) ; 
+                                                             return elem.key === districtName })
 
-
-            //Creates a multi-level array object, that stores the count of the crimes, per district and per category
-            //At the 1st level : [ {key: "INGLESIDE", value: Array(30)}, {key: "BAYVIEW", value: Array(30)} ... ]
-            //At the 2nd level, opening up the array associated with each district:
-            //[{key: "OTHER OFFENSES", value: 157}, {key: "LARCENY/THEFT", value: 100} , ...]            
-            var crimesByDistrictAndCategory = d3.nest()
-                                                .key(function(d) { return d.PdDistrict; })
-                                                .rollup(function(arr) {
-                                                            cc =
-                                                            d3.nest()
-                                                              .key(function(d) { return d.Category; })
-                                                              .rollup(function (crimesArr) { return crimesArr.length })
-                                                              .entries(arr);
-                                                            return cc})
-                                                .entries(crimeTable);
-
-            console.log(crimesByDistrictAndCategory)
-            
-            //Here we choose a district; we should be able to choose one using buttons, later
-            chosenDistrict = crimesByDistrictAndCategory[0]
-            console.log(crimesByDistrictAndCategory[0])
-
-            CDName = chosenDistrict.key
             CDcrimeNumbersArray = chosenDistrict.value
-            console.log(CDName)
             
             /////// This part of the code sort the array of crime categories, and 
             /////// selects the most frequent 6 categories, for the pie visualization
@@ -65,7 +32,7 @@
             mainCrimesNumbersArray = CDcrimeNumbersArray.slice(0,7)            
             console.log(mainCrimesNumbersArray)
             ///////
-
+        
             var margin = {top: 50, right: 50, bottom: 50, left: 50};
             var pie_width =  0.4 * window.screen.width//+svg.node().getBoundingClientRect().width - margin.left - margin.right;
             var pie_height = 0.9 * pie_width//+svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
@@ -90,7 +57,6 @@
             arcsdata = []
             for (i=0; i < mainCrimesNumbersArray.length; i++) {
                 c = mainCrimesNumbersArray[i]
-                //console.log(c)
                 arcsdata.push(c.value)
             }
             console.log(arcsdata)
@@ -126,6 +92,55 @@
                 .text(function(d,i) { return d.data})
             ////////
 
+   
+    }
+    
+    
+    d3.select(window).on('load', init);
+    function init() {
+        d3.text('sf_crime.csv', function(error, raw_data){
+            var crimeTable = d3.csvParse(raw_data);
+            console.log(crimeTable);
+
+            console.log(crimeTable[0]);
+
+
+            //Creates a multi-level array object, that stores the count of the crimes, per district and per category
+            //At the 1st level : [ {key: "INGLESIDE", value: Array(30)}, {key: "BAYVIEW", value: Array(30)} ... ]
+            //At the 2nd level, opening up the array associated with each district:
+            //[{key: "OTHER OFFENSES", value: 157}, {key: "LARCENY/THEFT", value: 100} , ...]            
+            var crimesByDistrictAndCategory = d3.nest()
+                                                .key(function(d) { return d.PdDistrict; })
+                                                .rollup(function(arr) {
+                                                            cc =
+                                                            d3.nest()
+                                                              .key(function(d) { return d.Category; })
+                                                              .rollup(function (crimesArr) { return crimesArr.length })
+                                                              .entries(arr);
+                                                            return cc})
+                                                .entries(crimeTable);
+
+            console.log(crimesByDistrictAndCategory)
+            
+            
+            /////Create one button for each district. 
+            /////When a button is pressed, we update accordingly the pie chart
+            for (i=0; i < crimesByDistrictAndCategory.length ; i++){
+                //<input type="button" name="button" id="button1" value="Button text"/>
+                c = crimesByDistrictAndCategory[i]
+                d3.select("#districtButtons")
+                  .append('input')
+                  .attr('type', 'button')
+                  .attr('name', c.key)
+                  .attr('id',  c.key)
+                  .attr('value',  c.key)
+                  .attr('border', '1px solid gray')
+                  .on("click", function(){
+                                    d3.select("pieVisualization").selectAll("*").remove()
+                                    updatePieChart(this.id, crimesByDistrictAndCategory)
+                                    });
+            }
+            
 
         });
 
@@ -135,8 +150,10 @@
 </head>
 
 <body>
+    <div id="districtButtons"></div>
+    <div>
     <svg id="pieVisualization">
-    </svg>
+    </svg></div>
     
     
     
