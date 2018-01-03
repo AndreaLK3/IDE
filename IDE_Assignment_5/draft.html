@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    
+    
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+
+<script>
+    d3.select(window).on('load', init);
+    function init() {
+        d3.text('sf_crime.csv', function(error, raw_data){
+            var crimeTable = d3.csvParse(raw_data);
+            console.log(crimeTable);
+            
+            console.log(crimeTable[0]);
+            
+            var crimesByDistrict = d3.nest()
+                                     .key(function(d) { return d.PdDistrict; })
+                                     .entries(crimeTable);
+            
+            
+            console.log(crimesByDistrict)
+            
+            
+            var crimesByDistrictAndCategory = d3.nest()
+                                                .key(function(d) { return d.PdDistrict; })
+                                                .rollup(function(arr) { 
+                                                            cc = 
+                                                            d3.nest()
+                                                              .key(function(d) { return d.Category; })
+                                                              .entries(arr); 
+                                                            return cc})
+                                                .entries(crimeTable);
+            
+             console.log(crimesByDistrictAndCategory)   
+            
+        });
+    }
+</script>
+</head>
+
+<body>
+    <svg id="pieVisualization">
+    </svg>
+    
+    
+    
+    
+    
+</body>
+</html>
