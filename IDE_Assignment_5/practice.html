@@ -9,19 +9,13 @@
 <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 
 <script>
-
-                var jsonData = new Array();
-                $(function () {
-                    $.getJSON('sf_crime.geojson', function (data) {
-                        jsonData = data.features;
-                        console.log('json loaded successfully');
-                    }).error(function () {
-                        console.log('error: json not loaded');
-                    });
-                    console.log(jsonData);
-                });
-
-
+    d3.select(window).on('load', init);
+    function init() {
+        d3.text('sf_crime.csv', function(error, raw_data){
+            var table = d3.csvParseRows(raw_data);
+            console.log(table);
+        });
+    }
 </script>
 </body>
 </html>
