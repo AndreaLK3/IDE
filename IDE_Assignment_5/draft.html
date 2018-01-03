@@ -14,30 +14,78 @@
         d3.text('sf_crime.csv', function(error, raw_data){
             var crimeTable = d3.csvParse(raw_data);
             console.log(crimeTable);
-            
+
             console.log(crimeTable[0]);
-            
+
             var crimesByDistrict = d3.nest()
                                      .key(function(d) { return d.PdDistrict; })
                                      .entries(crimeTable);
-            
-            
+
+
             console.log(crimesByDistrict)
-            
-            
+
+
             var crimesByDistrictAndCategory = d3.nest()
                                                 .key(function(d) { return d.PdDistrict; })
-                                                .rollup(function(arr) { 
-                                                            cc = 
+                                                .rollup(function(arr) {
+                                                            cc =
                                                             d3.nest()
                                                               .key(function(d) { return d.Category; })
-                                                              .entries(arr); 
+                                                              .entries(arr);
                                                             return cc})
                                                 .entries(crimeTable);
-            
-             console.log(crimesByDistrictAndCategory)   
-            
+
+             console.log(crimesByDistrictAndCategory)
+
+            var crimeNum = 0;
+            var totalCrimes = 0;
+            for(var i = 0; i < crimesByDistrictAndCategory[0].length; i++){
+                 crimeNum = crimesByDistrictAndCategory[0][i].length;
+                 totalCrimes = totalCrimes + crimeNum;
+            }
+
+            var svg = d3.select('svg')
+            var margin = {top: 50, right: 50, bottom: 200, left: 50};
+            var width = +svg.node().getBoundingClientRect().width - margin.left - margin.right;
+            var height = +svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+
+            var g = svg.append("g")
+                .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+            // Create arc-data generator
+            var arcs = d3.pie();
+
+            // Create arc path generator
+            var arc = d3.arc()
+                .innerRadius(10)
+                .outerRadius(100);
+
+            // Create group element for each data point
+            var gInner = g.selectAll('g')
+                .data(arcs(crimesByDistrictAndCategory[i].length))
+                .enter()
+                .append('g')
+                .attr('transform', 'translate(100, 100)')
+
+            // Add arc to group elements
+            gInner.append('path')
+                .attr('d', function(d){return arc(d);})
+                .attr("stroke", "blue")
+                .attr("stroke-width", 2)
+                .attr("fill", "#ccc")
+
+            // Add text to group elements
+            gInner.append('text')
+                .text(function(d){return d.value;})
+                // Note use of arc.centroid to find midpoint of arc
+                .attr('transform',
+                    function(d){return 'translate(' + arc.centroid(d) + ')';})
+                .attr('text-anchor', 'middle')
+
         });
+
+
     }
 </script>
 </head>
