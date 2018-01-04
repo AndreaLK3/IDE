@@ -3,12 +3,24 @@
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title>SAN Francisco CRIME</title>
+	<title>San Francisco CRIME</title>
 
 
 	<link rel="stylesheet" type="text/css" href="libs/full-page/jquery.fullPage.css" />
 	<link rel="stylesheet" type="text/css" href="libs/font-awesome-4.7.0/css/font-awesome.min.css" />
 	<link rel="stylesheet" type="text/css" href="css/style.css" />
+    
+    <style>
+    #barPlotSection {
+        padding = 30px;
+        margin = 10px;
+    }
+    .bar {
+        fill: coral;
+    }
+    .bar:hover {
+        fill: crimson;    }
+    </style>
     
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="js/A5PieChart.js"></script>
@@ -22,7 +34,8 @@
 		<li data-menuanchor="intro"><a href="#intro">Introduction</a></li>
 		<li data-menuanchor="visualization1"><a href="#visualization1">Visualization 1</a></li>
 		<li data-menuanchor="visualization2"><a href="#visualization2">Visualization 2</a></li>
-        <li data-menuanchor="visualization2"><a href="#visualization3">Visualization 3</a></li>
+        <li data-menuanchor="visualization3"><a href="#visualization3">Visualization 3</a></li>
+        <li data-menuanchor="visualization4"><a href="#visualization4">Visualization 4</a></li>
 		
 	</ul>
 
@@ -107,7 +120,7 @@
         
     <div class="section" id="section3">
         <div id="districtButtonsDiv">
-            <h3> District exploration </h3>
+            <h2> District exploration </h2>
             <p>Click on a button to display information about the district of your choosing.</p>
             <p>A pie-chart will appear, with the first 7 more frequent categories of crime for a district</p>
         </div>
@@ -124,9 +137,16 @@
         </div>
         <svg id="pieVisualization">
         </svg>
-        </div>
+    </div>  
     
+     <div class="section" id="section4">
+        <div id="#barPlotSection">
+        <h2>Comparison: the total number of crimes per district</h2>
+        <svg id="barPlot"></svg>
+        </div> 
+    </div>    
     </div>	
+   
 </body>
 
 
