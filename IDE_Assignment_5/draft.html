@@ -91,6 +91,16 @@ function updatePieChart(districtName, crimesByDistrictAndCategory) {
                 .attr('x', 0)
                 .text(function(d,i) { return d.data})
             ////////
+    
+            /////// Updating the fields' text in the HTML
+            totCrimes = arcsdata.reduce(function(a,b) {return a+b}, 0)
+            d3.select("#totCrimesField")
+              .attr("value", totCrimes)
+    
+            mainCrime = mainCrimesNumbersArray[0].key
+            
+            d3.select("#mainCatField")
+              .attr("value", )
 
    
     }
@@ -136,7 +146,8 @@ function updatePieChart(districtName, crimesByDistrictAndCategory) {
                   .attr('value',  c.key)
                   .attr('border', '1px solid gray')
                   .on("click", function(){
-                                    d3.select("pieVisualization").selectAll("*").remove()
+                                    d3.select("pieVisualization").selectAll("*").remove();
+                                    d3.select('#currentDistrictField').attr('value', this.id);
                                     updatePieChart(this.id, crimesByDistrictAndCategory)
                                     });
             }
@@ -152,8 +163,18 @@ function updatePieChart(districtName, crimesByDistrictAndCategory) {
 <body>
     <div id="districtButtons"></div>
     <div>
+    <div>    
+        District currently displayed : &nbsp; <input type="text" id="currentDistrictField" value="" readonly>
+    </div>
+    <div>    
+        Total number of crimes : &nbsp; <input type="text" id="totCrimesField" value="" readonly>
+    </div>
+        <div>    
+        Most frequent category : &nbsp; <input type="text" id="mainCatField" value="" readonly>
+    </div>
     <svg id="pieVisualization">
-    </svg></div>
+    </svg>
+    </div>
     
     
     
