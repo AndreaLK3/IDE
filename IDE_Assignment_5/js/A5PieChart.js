@@ -1,41 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-    <meta content="utf-8" http-equiv="encoding">
-    <style>
-    input{
-        min-width:50px;
-        max-width:99.99%;
-        text-align:center;
-    }
-    .infoDiv {
-        font-size: 1.05rem;
-        font-weight: bold; 
-        padding : 5px;
-        border: 1px solid gray;
-    }
-    .infoDiv input{
-        margin-left : 20px;  
-        border: 2px dotted gray;
-    }
-    #buttonsPanel {
-        margin: 0px;
-        padding: 15px;
-        border: 1px solid gray;
-    }
-    #buttonsPanel input{
-        display: inline-block;
-        margin : 5px;
-        border : 2px blue groove;
-        background-color: lightblue;
-    }
-    </style>
-    
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-
-<script>
 
     //Imported from https://codepen.io/w3core/pen/DjLml to have input fields that dinamycally resize depending on the text
     function resizable (el, factor) {
@@ -198,34 +160,3 @@ function updatePieChart(districtName, crimesByDistrictAndCategory) {
 
 
     }
-</script>
-</head>
-
-<body>
-    <div id="districtButtonsDiv">
-    <h3> District exploration </h3>
-    <p>Click on a button to display information about the district of your choosing.</p>
-    <p>A pie-chart will appear, with the first 7 more frequent categories of crime for a district</p>
-    </div>
-    <div id="buttonsPanel">
-    </div>
-    <div>
-    <div class="infoDiv">    
-        District currently displayed : <input type="text" id="currentDistrictField" value="" readonly>
-    </div>
-    <div class="infoDiv">    
-        Total number of crimes : <input type="text" id="totCrimesField" value="" readonly>
-    </div>
-    <div class="infoDiv">    
-        Most frequent category : <input type="text" id="mainCatField" value="" readonly>
-    </div>
-    <svg id="pieVisualization">
-    </svg>
-    </div>
-    
-    
-    
-    
-    
-</body>
-</html>

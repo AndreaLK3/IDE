@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>SAN Francisco CRIME</title>
+
+
+	<link rel="stylesheet" type="text/css" href="libs/full-page/jquery.fullPage.css" />
+	<link rel="stylesheet" type="text/css" href="libs/font-awesome-4.7.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+    
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="js/A5PieChart.js"></script>
+    <script type="text/javascript" src="libs/jQuery/jquery.js"></script>
+    <script type="text/javascript" src="libs/full-page/jquery.fullPage.min.js"></script>
+    <script type="text/javascript" src="js/script.js"></script>
+    
+</head>
+<body>
+	<ul id="menu">
+		<li data-menuanchor="intro"><a href="#intro">Introduction</a></li>
+		<li data-menuanchor="visualization1"><a href="#visualization1">Visualization 1</a></li>
+		<li data-menuanchor="visualization2"><a href="#visualization2">Visualization 2</a></li>
+        <li data-menuanchor="visualization2"><a href="#visualization3">Visualization 3</a></li>
+		
+	</ul>
+
+	<div id="fullpage">
+
+		<div class="section " id="section0">
+			<div>
+				<h1>Crime in San Francisco</h1>
+				<div class="text-editor-wrap" style="opacity: 0">
+					<div class="text-body">
+						<div id="being_typed_intro" class="inner-text">
+							<p>
+								San Francisco is a city in the West Coast of the United States. It is the financial, cultural and commercial centre of Northern California. It is the 13th most populous city in the US. Due to its closeness to Silicon Valley, it has experienced an influx of people over the years. Thinking about moving or visiting San Franscisco on your next vacation, check its crime staistics below.
+							</p>
+							<br/>
+							<p>
+								In this article, we have created visualizations on information of crime committed in the San Francisco area. The information used in the visualizations are gotten from sf_crime.geojson, that contains 10000 randomly sampled,geocoded crimes in San Francisco. Also, we have a visualization gotten from sfpd_districts.geojson that contains the police districts that make up the city.							</p>
+							<br/>
+							<p>
+								To see the first visualization scroll down or click on the bouncing arrow below.
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="scroll-indicator" id="sc_ind"><div class="fa fa-chevron-down"></div></div>
+		</div>
+		<div class="section" id="section1">
+			<section>
+			    <div class="one">
+
+					
+					<iframe width="100%" height="520" frameborder="0" src="https://dolapoo.carto.com/builder/d463609d-817c-43a2-8d45-2f9d44a75479/embed" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>
+			    	
+			    </div>
+			    <div class="two">
+			    	<div class="text-editor-wrap vis_wrap_right" style="opacity: 0">
+						<div class="text-body" style="height: 520px;">
+							<div class="inner-text">
+								<h2>Crimes Committed in San Francisco
+
+								:</h2>
+								<br/>
+
+								<p>
+									This visualization shows the crimes committed in the San Francisco area within a period of time. These 10000 different crimes were committed during a period of time, on separate days and different locations around the city. The visualization shows them all at the same time. This visualization also contains interactive elements such that hovering over a point gives the user the basic information such as the address of where the crime was committed, the description of the crime and the police district the area falls under. 
+									From this visualization, we can find out the crimes committed based on the days of the week, the category of the crime and the police district where it falls. There are also histograms of these selection criteria which gives the user the required information in summary.
+								</p> 
+							</div>
+						</div>
+					</div>
+			    </div>
+			</section>
+			<div class="scroll-indicator"><div class="fa fa-chevron-down"></div></div>
+		</div>
+		<div class="section" id="section2">
+			<section>
+			    <div class="one">
+			    	<div class="text-editor-wrap vis_wrap" style="opacity: 0">
+						<div class="text-body" style="height: 520px;">
+							<div class="inner-text">
+								<h2>Police Districts:</h2>
+								<br/>
+								<p>
+									This visualization shows the land area of the 10 police districts in San Francisco.
+								</p>
+								<br/>
+								<p>
+								The police districts are each in the shape of polygons. Hovering over each polygon reveals the name of the corresponding police district. From the visualization, we are able to discover that the smallest police district based on land size is Tenderloin.
+								</p>
+								
+							</div>
+						</div>
+					</div>
+			    </div>
+			    <div class="two">
+			    	<iframe width="100%" height="520" frameborder="0" src="https://dolapoo.carto.com/builder/b506a743-3d74-4097-96f5-e62025b09a55/embed" allowfullscreen webkitallowfullscreen mozallowfullscreen oallowfullscreen msallowfullscreen></iframe>
+			    </div>
+			</section>
+		
+		</div>
+        
+    <div class="section" id="section3">
+        <div id="districtButtonsDiv">
+            <h3> District exploration </h3>
+            <p>Click on a button to display information about the district of your choosing.</p>
+            <p>A pie-chart will appear, with the first 7 more frequent categories of crime for a district</p>
+        </div>
+        <div id="buttonsPanel">
+        </div>
+        <div class="infoDiv">    
+            District currently displayed : <input type="text" id="currentDistrictField" value="" readonly>
+        </div>
+        <div class="infoDiv">    
+            Total number of crimes : <input type="text" id="totCrimesField" value="" readonly>
+        </div>
+        <div class="infoDiv">    
+            Most frequent category : <input type="text" id="mainCatField" value="" readonly>
+        </div>
+        <svg id="pieVisualization">
+        </svg>
+        </div>
+    
+    </div>	
+</body>
+
+
+
+</html>
