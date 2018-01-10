@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Graph2 : Parallel coordinates</title>
+    <style>
+
+    </style>
+    
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    
+    <script>
+    d3.select(window).on('load', init)
+
+    function extractDateTime(timestamp){
+        dt = timestamp.split(" ")
+        return dt
+    }
+        
+    function getAverageOfProperty(arr, property){
+        sum = 0;
+        counter = 0;
+        for (i=0; i < arr.length; i++){
+            if (arr[i][property] != "") {
+                //console.log("i=" + i + " ; property = " + property + " : " +arr[i][property])
+                sum = sum + parseFloat( arr[i][property] )
+                counter++;
+            }
+        }
+        //console.log(sum)
+        avg = sum / counter;
+        return avg
+    }
+        
+    ////////// Preprocessing : Read the dataset, and split the Timestamp into Date and Time
+    function addDateAndTime(dataset){
+        dataset_new = []
+        d3.select('#parallCoord')
+          .selectAll('g')
+          .data(dataset)
+          .enter()
+          .append('g')
+          .attr('preprocessingDone', function(d){
+                                        dateAndTime = extractDateTime(d.Timestamp);
+                                        d["Date"] = dateAndTime[0]; 
+                                        d["Time"] = dateAndTime[1];
+                                        //console.log(d)
+                                        dataset_new.push(d);
+                                        return true;})
+
+        d3.select("#parallCoord").selectAll("*").remove();
+        console.log(dataset_new)
+        return dataset_new
+    }
+    ////////////////////
+        
+        
+ ////////// Data aggregation by day (we compute the averages)        
+    function aggregateByDay(old_dataset){       
+        datasetByDay = d3.nest()
+            .key(function(d) { return d.Date; })
+            .rollup(function(measurements_arr) { 
+                var keysAndAverages = []
+                var keys = Object.keys(measurements_arr[0])
+                var ind_rm1 = keys.indexOf("Date"); keys.splice(ind_rm1, ind_rm1+1); 
+                var ind_rm2 = keys.indexOf("Time"); keys.splice(ind_rm2, ind_rm2+1);
+                var ind_rm3 = keys.indexOf("Timestamp"); keys.splice(ind_rm3, ind_rm3+1);
+                //console.log(measurements_arr)
+                for (var i=0; i < keys.length; i++){
+                    var key = keys[i];
+                    keysAndAverages.push({key: key, value: getAverageOfProperty(measurements_arr, key)})
+                }
+                return keysAndAverages})
+            .entries(old_dataset);
+
+        console.log(datasetByDay)
+        return datasetByDay
+    }
+////////////////////
+        
+        
+    function init(){
+    
+        d3.csv("AndersenBoulevard.csv", function(error, raw_stationdata) {
+            if (error) throw error;  
+            
+            stationdata = addDateAndTime(raw_stationdata)
+            stationDataByDay = aggregateByDay(stationdata)
+            
+        d3.csv("WeatherDataset.csv", function(error, raw_weatherdata) {
+            if (error) throw error;
+            
+            weatherdata = addDateAndTime(raw_weatherdata)
+            weatherDataByDay = aggregateByDay(weatherdata)
+            
+            console.log(weatherDataByDay[0])
+            
+        })
+            
+            
+              
+            
+            
+        })
+        
+    }
+    </script>
+    
+</head>
+<body>
+    
+    <svg id="parallCoord">
+    </svg>
+</body>
+
+</html>
