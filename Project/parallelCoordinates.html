@@ -16,288 +16,11 @@
     </style>
     
     <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="ParallelCoordinates.js"></script>
+    <script src="Utilities.js"></script>
     
     <script>
     d3.select(window).on('load', init)
-
-    //Utility functions
-        
-    //Replicates the behaviour of 'range(start, stop, step)' in Python
-    function pRange(start, stop, step) {
-        if (typeof stop == 'undefined') {
-            // one param defined
-            stop = start;
-            start = 0;  }
-
-        if (typeof step == 'undefined') {
-            step = 1;   }
-
-        if ((step > 0 && start >= stop) || (step < 0 && start <= stop)) {
-            return [];   }
-
-        var result = [];
-        for (var i = start; step > 0 ? i < stop : i > stop; i += step) {
-            result.push(i);    }
-
-        return result;
-    };
-        
-        
-    function extractDateTime(timestamp){
-        dt = timestamp.split(" ")
-        return dt
-    }
-        
-    function getAverageOfProperty(arr, property){
-        sum = 0;
-        counter = 0;
-        for (i=0; i < arr.length; i++){
-            x = arr[i][property]
-            if (x != "") {
-                //console.log("i=" + i + " ; property = " + property + " : " +arr[i][property])
-                sum = sum + parseFloat( arr[i][property] )
-                counter++;
-            }
-        }
-        //console.log(sum)
-        avg = sum / counter;
-        return avg
-    }
-        
-    function getExtentOfProperty(arr, property){
-        //console.log(property)
-        var min = Number.POSITIVE_INFINITY; 
-        var max = Number.NEGATIVE_INFINITY;
-        for (i=0; i < arr.length; i++){
-            //console.log(arr[i].value)
-            x = arr[i].value[property]
-            //console.log(x)
-            if (x != "") {
-                if (x < min){
-                    min = x
-                }
-                if (x > max){
-                    max = x
-                    //console.log("New maximum found at " + i + "  for " + property + " : " + max)
-                }
-            }
-        }
-        //console.log([min,max])
-        return [min,max]
-    }
-        
-        
-    function brushstart() {
-        d3.event.sourceEvent.stopPropagation();
-    }
-
-
-    ////////// Preprocessing : Read the dataset, and split the Timestamp into Date and Time
-    function addDateAndTime(dataset){
-        dataset_new = []
-        d3.select('#parallCoord')
-          .selectAll('g')
-          .data(dataset)
-          .enter()
-          .append('g')
-          .attr('preprocessingDone', function(d){
-                                        dateAndTime = extractDateTime(d.Timestamp);
-                                        d["Date"] = dateAndTime[0]; 
-                                        d["Time"] = dateAndTime[1];
-                                        //console.log(d)
-                                        dataset_new.push(d);
-                                        return true;})
-
-        d3.select("#parallCoord").selectAll("*").remove();
-        //console.log(dataset_new)
-        return dataset_new
-    }
-    ////////////////////
-        
-    ////////// Preprocessing : Read the weather dataset,
-    ////////// replace "Ukendt" string values with 0s, and remove the measurements that have all values == 0
-    function filterWeatherDataset(wDataset){
-        var weather_keys = Object.keys(wDataset[0]);
-        
-        wDataset_new = []
-        d3.select('#parallCoord')
-          .selectAll('g')
-          .data(wDataset)
-          .enter()
-          .append('g')
-          .attr('weatherFilteringDone', function(d,i){
-                                        for (var j=0; j < weather_keys.length; j++){
-                                            var key = weather_keys[j];
-                                            if (key!= "Timestamp" && key != "Date" && key != "Time") {
-                                            if (Number.isNaN( parseFloat(wDataset[i][key])) ){
-                                                wDataset[i][key] = 0
-                                            }}
-                                        }
-                                        allZeros = true;
-                                        for (var j=0; j < weather_keys.length; j++){
-                                            var key = weather_keys[j];
-                                            if (key!= "Timestamp" && key != "Date" && key != "Time"){
-                                                if (parseFloat(wDataset[i][key]) != 0 ){
-                                                    allZeros = false
-                                            }}
-                                        }
-                                        if (! allZeros) {
-                                            wDataset_new.push(d);
-                                        }
-                                        return true;
-                                        } )
-
-        d3.select("#parallCoord").selectAll("*").remove();
-        return wDataset_new
-        
-    }
-    ////////////////////
-                        
-            
-    ////////// Join 2 datasets using a specified property as 'key'
-    function joinDatasets(ds1, ds2, keyName){
-        joined_ds = ds1
-        joined_ds.forEach( function( ds1Elem) {
-            join_elemKey = ds1Elem[keyName]
-            corresponding_ds2Elem = ds2.filter(function (ds2Elem){ return ds2Elem[keyName] == join_elemKey })[0]
-
-        if ( !(ds1Elem === undefined) && !(corresponding_ds2Elem === undefined) ){
-            Object.assign(ds1Elem.value, corresponding_ds2Elem.value)   
-            }
-        })
-        return joined_ds
-    }
-    ////////////////////
-        
- ////////// Data aggregation by day (we compute the averages)        
-    function aggregateByDay(old_dataset){       
-        var datasetByDay = d3.nest()
-            .key(function(d) { return d.Date; })
-            .rollup(function(measurements_arr) { 
-                var keysAndAverages = []
-                var keys = Object.keys(measurements_arr[0])
-                var ind_rm1 = keys.indexOf("Date"); keys.splice(ind_rm1, ind_rm1+1); 
-                var ind_rm2 = keys.indexOf("Time"); keys.splice(ind_rm2, ind_rm2+1);
-                var ind_rm3 = keys.indexOf("Timestamp"); keys.splice(ind_rm3, ind_rm3+1);
-                    
-                avgs_obj = {};
-                for (var i=0; i < keys.length; i++){
-                    var key = keys[i];
-                    avgs_obj[key] = getAverageOfProperty(measurements_arr, key)
-                }
-                return avgs_obj})
-            .entries(old_dataset);
-
-        //console.log(datasetByDay)
-        return datasetByDay
-    }
-////////////////////
-        
-///////// Updates the list of weather dimensions, depending on the modifications on a checkbox button        
-    function examineCheckbox(thisCheckbox, variableName, dimensions){
-                v_index = dimensions.indexOf(variableName) 
-                if (thisCheckbox.checked == true){
-                    if (v_index == -1){
-                    dimensions.push(variableName)
-                    }
-                }
-                else {
-                    if (v_index != -1){
-                        dimensions.splice(v_index, 1)
-                    }
-                }
-                //console.log(dimensions)
-            }
-        
-///////// Creates and/or updates the graph of parallel coordinates, given a list of dimensions
-function updatePC(width, height, dataset, dimensions) {
-    
-    console.log("Dimensions:" + dimensions)
-    
-    var side_padding = 50
-
-    // Create a scale for each dimension.
-    var xScale = d3.scaleOrdinal()
-    xScale.domain(dimensions); 
-    var interColumnSpace =  width / ( (dimensions.length - 1) ) - (5 / dimensions.length )*side_padding
-    
-    //console.log(interColumnSpace)
-    xScale.range(pRange(0 + side_padding, width + interColumnSpace - side_padding, interColumnSpace) );
-
-    var yScales = {}
-    dimensions.map(function (dim) { 
-                        yScales[dim] = d3.scaleLinear().range([height,0])
-                                        .domain( getExtentOfProperty(dataset, dim) ); 
-                                  return undefined;})
-    ///////// Line generator
-    line = d3.line()
-
-    
-    
-  // DATA JOIN
-  // Join new data with old elements, if any.
-  //var text = g.selectAll("text")
-  //   .data(data);
-    var gDims = pcSvg.selectAll(".dimension")
-                 .data(dimensions, function(d) {return d})
-    
-    console.log(gDims)
-
-  // EXIT
-  // Remove old elements as needed.
-  console.log(gDims.exit())
-  gDims.exit().remove();
-
-  // ENTER + UPDATE
-
-    var newDimensions = gDims.enter()
-         .append("g")
-         .attr("class", "dimension")
-    
-    var allDimensions = newDimensions.merge(gDims)
-         .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
-    
-    //console.log(newDimensions)
-    //console.log(allDimensions)
-     
-    newDimensions.append('text')
-                 .style("text-anchor", "middle")
-                 .attr("y", -9)
-                 .style("font-size", "1rem")
-                 .text(function(d) { return d; })
-    
-    newDimensions.append('g')
-                 .attr("class", "axis")
-                .each(function(d) { d3.select(this).call(d3.axisLeft(yScales[d])) ; })
-                .attr("fill", "black")
-                .attr("stroke-width", 1)
-    
-    // Returns the path for a given data point.
-    function pcPath(d, dimensions) {
-      return line(dimensions.map(function(p) { if (Number.isNaN(yScales[p](d.value[p])) ) 
-                                                {   console.log(d); console.log(yScales[p](d.value[p]))   } 
-                                                 return [ xScale(p), yScales[p](d.value[p]) ] 
-                                              } )                         
-                 )
-    }
-
-    paths = pcSvg.selectAll(".day")
-        .data(dataset)
-    
-    paths.exit().remove()
-    
-    paths.enter()
-        .append("path")
-        .attr("class", "day")
-        .attr("stroke", "blue")
-        .attr("stroke-width", 2)
-        .attr("fill", "none")
-     .merge(paths)
-        .attr("d", function(d) { return pcPath(d, dimensions) })
-
-}
-
-        
         
     function init(){
     
@@ -305,6 +28,7 @@ function updatePC(width, height, dataset, dimensions) {
             if (error) throw error;  
             
             stationdata = addDateAndTime(raw_stationdata)
+            stationdata = filterDataset(stationdata)
             stationDataByDay = aggregateByDay(stationdata)
             console.log(stationDataByDay)
             
@@ -312,7 +36,7 @@ function updatePC(width, height, dataset, dimensions) {
             if (error) throw error;
             
             weatherdata = addDateAndTime(raw_weatherdata)
-            weatherdata = filterWeatherDataset(weatherdata)
+            weatherdata = filterDataset(weatherdata)
             
             weatherDataByDay = aggregateByDay(weatherdata)
             console.log(weatherDataByDay)
@@ -324,7 +48,14 @@ function updatePC(width, height, dataset, dimensions) {
             var height = 0.8 * width - margin.top - margin.bottom;
             console.log("Width : " + width)
             
-            pcSvg = d3.select("#parallCoord")
+            pcSvg1 = d3.select("#parallCoord1")
+                            .attr("width", width + margin.left + margin.right)
+                            .attr("height", height + margin.top + margin.bottom)
+                            .style("border", "1px solid gray")
+                            .append("g")
+                                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            
+             pcSvg2 = d3.select("#parallCoord2")
                             .attr("width", width + margin.left + margin.right)
                             .attr("height", height + margin.top + margin.bottom)
                             .style("border", "1px solid gray")
@@ -333,6 +64,7 @@ function updatePC(width, height, dataset, dimensions) {
             ////////////////////
             
             var weather_dimensions = Object.keys(weatherDataByDay[0].value);
+            console.log(weather_dimensions)
             var air_dimensions = Object.keys(stationDataByDay[0].value);
             
             //var index = weather_dimensions.indexOf("Wind Speed");
@@ -341,7 +73,7 @@ function updatePC(width, height, dataset, dimensions) {
             //console.log(weather_dimensions)
             
             ////////// This function creates a parallel coordinates' graph
-            updatePC(width, height, weatherDataByDay, weather_dimensions)
+            updatePC(width, height, pcSvg1, weatherDataByDay, weather_dimensions)
             
             weatherAndStation_data = joinDatasets(weatherDataByDay, stationDataByDay, "key")
             console.log(weatherAndStation_data)
@@ -358,12 +90,39 @@ function updatePC(width, height, dataset, dimensions) {
                         .attr('checked', 'true')
                         .on('click', function(d){ 
                                         examineCheckbox(d3.select(this).node(), d, weather_dimensions)
-                                        updatePC(width, height, weatherDataByDay, weather_dimensions.slice())})
+                                        updatePC(width, height, pcSvg1, weatherDataByDay, weather_dimensions)})
             weatherBoxes.append('label')
                         .text(function(d) { return d})
 
             
-            airRadio = d3.select('#pcPanel2')
+            
+            
+            /////// The next PC graph allows us to visualize one weather variable and one air pollutant variable.
+            
+            weather_variable = "Wind Speed"
+            air_variable = "NO2"
+           
+            
+            weatherRadio = d3.select('#pcPanel2')
+                    .selectAll('.weatherButtonsSpan')
+                    .data(weather_dimensions)
+                    .enter()
+                    .append('tspan')
+                    .attr("class", "weatherButtonsSpan")
+            
+            weatherRadio.append('input')
+                        .attr('type', 'radio')
+                        .attr('name', "weatherPollutant")
+                        .attr('value', function(d) {return d})
+                        .on('click', function(d){ weather_variable = d
+                                                  updatePC(width, height, pcSvg2, weatherAndStation_data, [weather_variable , air_variable])
+                                        })
+            
+            weatherRadio.append('label')
+                        .text(function(d) { return d})
+            
+            
+            airRadio = d3.select('#pcPanel3')
                     .selectAll('.airButtonsSpan')
                     .data(air_dimensions)
                     .enter()
@@ -374,12 +133,14 @@ function updatePC(width, height, dataset, dimensions) {
                         .attr('type', 'radio')
                         .attr('name', "airPollutant")
                         .attr('value', function(d) {return d})
-                        .on('click', function(d){ 
+                        .on('click', function(d){ air_variable = d
+                                                  updatePC(width, height, pcSvg2, weatherAndStation_data, [weather_variable , air_variable])
                                         })
             
             airRadio.append('label')
                         .text(function(d) { return d})
             
+            updatePC(width, height, pcSvg2, weatherAndStation_data, [weather_variable , air_variable])
             
             
             
@@ -397,10 +158,14 @@ function updatePC(width, height, dataset, dimensions) {
 </head>
 <body>
     <div id="parallCoordSection">
-    <svg id="parallCoord">
+    <svg id="parallCoord1">
     </svg>
     <div id="pcPanel1"></div>
+    
+    <svg id="parallCoord2">
     <div id="pcPanel2"></div>
+    <div id="pcPanel3"></div>
+    </svg>
     </div>
 </body>
 

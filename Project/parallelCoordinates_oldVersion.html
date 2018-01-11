@@ -95,7 +95,7 @@
     ////////// Preprocessing : Read the dataset, and split the Timestamp into Date and Time
     function addDateAndTime(dataset){
         dataset_new = []
-        d3.select('#parallCoord')
+        d3.select('#parallCoord1')
           .selectAll('g')
           .data(dataset)
           .enter()
@@ -108,7 +108,7 @@
                                         dataset_new.push(d);
                                         return true;})
 
-        d3.select("#parallCoord").selectAll("*").remove();
+        d3.select("#parallCoord1").selectAll("*").remove();
         //console.log(dataset_new)
         return dataset_new
     }
@@ -120,7 +120,7 @@
         var weather_keys = Object.keys(wDataset[0]);
         
         wDataset_new = []
-        d3.select('#parallCoord')
+        d3.select('#parallCoord1')
           .selectAll('g')
           .data(wDataset)
           .enter()
@@ -147,7 +147,7 @@
                                         return true;
                                         } )
 
-        d3.select("#parallCoord").selectAll("*").remove();
+        d3.select("#parallCoord1").selectAll("*").remove();
         return wDataset_new
         
     }
@@ -206,112 +206,97 @@
                         dimensions.splice(v_index, 1)
                     }
                 }
-                console.log(dimensions)
+                //console.log(dimensions)
             }
         
-        
-///////// Creates the graph of parallel coordinates, given a list of dimensions
-        
-function create_parallelCoords_graph(width, height, dataset, dimensions){
-            //Clean-up of previous graph:
-            //d3.select("#parallCoord > *").remove();
-            //d3.select("#parallelCoord").enter().remove();
+///////// Creates and/or updates the graph of parallel coordinates, given a list of dimensions
+function updatePC(width, height, dataset, dimensions) {
     
-            var side_padding = 50
+    console.log("Dimensions:" + dimensions)
     
-            ///////// Create a scale for each dimension.
-            var xScale = d3.scaleOrdinal()
-            //console.log(dimensions)
-            xScale.domain(dimensions); 
-            var interColumnSpace =  width / ( (dimensions.length - 1) ) - side_padding / 2
-            xScale.range(pRange(0 + side_padding, width + interColumnSpace - side_padding, interColumnSpace) );
-            
-            var yScales = {}
-            dimensions.map(function (dim) { 
-                                yScales[dim] = d3.scaleLinear().range([height,0])
-                                                .domain( getExtentOfProperty(dataset, dim) ); 
-                                          return undefined;})
-            
-            //console.log(yScales)
-            ////////////////////
-            
-            line = d3.line()
-            console.log(dimensions)
-            console.log(pcSvg.selectAll(".dimension")
-                        .data(dimensions))
-//            console.log(pcSvg.selectAll(".dimension")
-//                        .data(dimensions)
-//                        .exit())
-    
-            // Add a group element for each dimension.
-            var g = pcSvg.selectAll(".dimension")
-                        .data(dimensions)
-                        .enter()
-                        .append("g")
-                        .attr("class", "dimension")
-                        .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
+    var side_padding = 50
 
-        
-            // Add an axis and title.
-            g.append("g")
-              .attr("class", "axis")
-              .each(function(d) { d3.select(this).call(d3.axisLeft(yScales[d])) ; })
-              .attr("fill", "black")
-              .attr("stroke-width", 1)
-              .attr("transform",  "translate( " + 0 + " , " + 0 + ")")
-                  .append("text")
-                  .style("text-anchor", "middle")
-                  .attr("y", -9)
-                  .style("font-size", "1rem")
-                  .text(function(d) { return d; });
-
-//            // Add and store a brush for each axis.
-//            g.append("g")
-//                .attr("class", "brush")
-//                .each(function(d) {
-//                        d3.select(this).call(d.brush = d3.brushY()
-//                                                        .extent([[-10,0], [10,height]])
-//                                                        .on("start", brushstart)
-//                                                        .on("brush", brush)
-//                                                        .on("end", brush)
-//                                            )
-//                                    })
-//                .selectAll("rect")
-//                .attr("x", -8)
-//                .attr("width", 16);
-//            
-            // Returns the path for a given data point.
-            function pcPath(d) {
-              return line(dimensions.map(function(p) { if (Number.isNaN(yScales[p](d.value[p])) ) 
-                                                        {   console.log(d); console.log(yScales[p](d.value[p]))   } 
-                                                         return [ xScale(p), yScales[p](d.value[p]) ] 
-                                                      } )                         
-                         )
-            }
-
-            pcSvg.selectAll("path")
-                .data(dataset)
-                .enter()
-                .append("path")
-                .attr("class", "day")
-                .attr("stroke", "blue")
-                .attr("stroke-width", 2)
-                .attr("fill", "none")
-                .attr("d", function(d) { return pcPath(d) })
-            
-            
-//            // Handles a brush event, toggling the display of foreground lines.
-//            function brush() {
-//              var actives = dimensions.filter(function(p) { return !y[p].brush.empty(); }),
-//                  extents = actives.map(function(p) { return y[p].brush.extent(); });
-//              foreground.style("display", function(d) {
-//                return actives.every(function(p, i) {
-//                  return extents[i][0] <= d[p] && d[p] <= extents[i][1];
-//                }) ? null : "none";
-//              });
-//            }
+    // Create a scale for each dimension.
+    var xScale = d3.scaleOrdinal()
+    xScale.domain(dimensions); 
+    var interColumnSpace =  width / ( (dimensions.length - 1) ) - (5 / dimensions.length )*side_padding
     
+    //console.log(interColumnSpace)
+    xScale.range(pRange(0 + side_padding, width + interColumnSpace - side_padding, interColumnSpace) );
+
+    var yScales = {}
+    dimensions.map(function (dim) { 
+                        yScales[dim] = d3.scaleLinear().range([height,0])
+                                        .domain( getExtentOfProperty(dataset, dim) ); 
+                                  return undefined;})
+    ///////// Line generator
+    line = d3.line()
+
+    
+    
+  // DATA JOIN
+  // Join new data with old elements, if any.
+  //var text = g.selectAll("text")
+  //   .data(data);
+    var gDims = pcSvg.selectAll(".dimension")
+                 .data(dimensions, function(d) {return d})
+    
+    console.log(gDims)
+
+  // EXIT
+  // Remove old elements as needed.
+  console.log(gDims.exit())
+  gDims.exit().remove();
+
+  // ENTER + UPDATE
+
+    var newDimensions = gDims.enter()
+         .append("g")
+         .attr("class", "dimension")
+    
+    var allDimensions = newDimensions.merge(gDims)
+         .attr("transform", function(d) { return "translate(" + xScale(d) + ")"; })
+    
+    //console.log(newDimensions)
+    //console.log(allDimensions)
+     
+    newDimensions.append('text')
+                 .style("text-anchor", "middle")
+                 .attr("y", -9)
+                 .style("font-size", "1rem")
+                 .text(function(d) { return d; })
+    
+    newDimensions.append('g')
+                 .attr("class", "axis")
+                .each(function(d) { d3.select(this).call(d3.axisLeft(yScales[d])) ; })
+                .attr("fill", "black")
+                .attr("stroke-width", 1)
+    
+    // Returns the path for a given data point.
+    function pcPath(d, dimensions) {
+      return line(dimensions.map(function(p) { if (Number.isNaN(yScales[p](d.value[p])) ) 
+                                                {   console.log(d); console.log(yScales[p](d.value[p]))   } 
+                                                 return [ xScale(p), yScales[p](d.value[p]) ] 
+                                              } )                         
+                 )
+    }
+
+    paths = pcSvg.selectAll(".day")
+        .data(dataset)
+    
+    paths.exit().remove()
+    
+    paths.enter()
+        .append("path")
+        .attr("class", "day")
+        .attr("stroke", "blue")
+        .attr("stroke-width", 2)
+        .attr("fill", "none")
+     .merge(paths)
+        .attr("d", function(d) { return pcPath(d, dimensions) })
+
 }
+
         
         
     function init(){
@@ -337,8 +322,9 @@ function create_parallelCoords_graph(width, height, dataset, dimensions){
             var margin = {top: 30, right: 10, bottom: 10, left: 10};
             var width = 0.6 * window.screen.width - margin.left - margin.right;
             var height = 0.8 * width - margin.top - margin.bottom;
+            console.log("Width : " + width)
             
-            pcSvg = d3.select("#parallCoord")
+            pcSvg = d3.select("#parallCoord1")
                             .attr("width", width + margin.left + margin.right)
                             .attr("height", height + margin.top + margin.bottom)
                             .style("border", "1px solid gray")
@@ -355,12 +341,12 @@ function create_parallelCoords_graph(width, height, dataset, dimensions){
             //console.log(weather_dimensions)
             
             ////////// This function creates a parallel coordinates' graph
-            create_parallelCoords_graph(width, height, weatherDataByDay, weather_dimensions)
+            updatePC(width, height, weatherDataByDay, weather_dimensions)
             
             weatherAndStation_data = joinDatasets(weatherDataByDay, stationDataByDay, "key")
             console.log(weatherAndStation_data)
             
-            weatherBoxes = d3.select('#pcPanel')
+            weatherBoxes = d3.select('#pcPanel1')
                 .selectAll('g')
                 .data(weather_dimensions)
                 .enter()
@@ -372,13 +358,28 @@ function create_parallelCoords_graph(width, height, dataset, dimensions){
                         .attr('checked', 'true')
                         .on('click', function(d){ 
                                         examineCheckbox(d3.select(this).node(), d, weather_dimensions)
-                                        //pcSvg.selectAll(".dimension").data(weather_dimensions).exit().remove();
-                                        d3.selectAll("#parallCoord > *").remove();
-                                        create_parallelCoords_graph(width, height, weatherDataByDay, weather_dimensions.slice())})
-            
+                                        updatePC(width, height, weatherDataByDay, weather_dimensions.slice())})
             weatherBoxes.append('label')
                         .text(function(d) { return d})
 
+            
+            airRadio = d3.select('#pcPanel2')
+                    .selectAll('.airButtonsSpan')
+                    .data(air_dimensions)
+                    .enter()
+                    .append('tspan')
+                    .attr("class", "airButtonsSpan")
+            
+            airRadio.append('input')
+                        .attr('type', 'radio')
+                        .attr('name', "airPollutant")
+                        .attr('value', function(d) {return d})
+                        .on('click', function(d){ 
+                                        })
+            
+            airRadio.append('label')
+                        .text(function(d) { return d})
+            
             
             
             
@@ -396,9 +397,10 @@ function create_parallelCoords_graph(width, height, dataset, dimensions){
 </head>
 <body>
     <div id="parallCoordSection">
-    <svg id="parallCoord">
+    <svg id="parallCoord1">
     </svg>
-    <div id="pcPanel"></div>
+    <div id="pcPanel1"></div>
+    <div id="pcPanel2"></div>
     </div>
 </body>
 
