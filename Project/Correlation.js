@@ -74,20 +74,24 @@ function drawScatterplot(variable1, variable2, width, height, data){
         .attr("cx", xMap)
         .attr("cy", yMap)
         .style("fill", function (d) {
-            return color(cValue(d));
+            return "blue"//color(cValue(d));
         });
 
-    function getPearsonCorrelation(arr1, arr2, avg1, avg2, std1, std2) {
-        var shortestArrayLength = 0;
+}
 
-        if (x.length == y.length) {
-            shortestArrayLength = x.length;
-        } else if (x.length > y.length) {
-            shortestArrayLength = y.length;
-            console.log('x has more items in it, the last ' + (x.length - shortestArrayLength) + ' item(s) will be ignored');
+function getPearsonCorrelation(arr1, arr2, avg1, avg2, std1, std2) {
+        var shortestArrayLength = 0;
+        //console.log("Arr1.length : " + arr1.length)
+        //console.log("Arr2.length : " + arr2.length)
+
+        if (arr1.length == arr2.length) {
+            shortestArrayLength = arr1.length;
+        } else if (arr1.length > arr2.length) {
+            shortestArrayLength = arr2.length;
+            console.log('WARNING : x has more items in it, the last ' + (arr1.length - shortestArrayLength) + ' item(s) will be ignored');
         } else {
-            shortestArrayLength = x.length;
-            console.log('y has more items in it, the last ' + (y.length - shortestArrayLength) + ' item(s) will be ignored');
+            shortestArrayLength = arr1.length;
+            console.log('WARNING : y has more items in it, the last ' + (arr2.length - shortestArrayLength) + ' item(s) will be ignored');
         }
 
         var count = 0,
@@ -104,6 +108,7 @@ function drawScatterplot(variable1, variable2, width, height, data){
            count++;
         }
         var num_avg = sum / count
+        //console.log(num_avg)
 
         return num_avg / (std1*std2);
 
@@ -112,21 +117,38 @@ function drawScatterplot(variable1, variable2, width, height, data){
     function computeArrayCorrelation(data, variable1, variable2){
         var arrayVar1 = [],
             arrayVar2 = [];
-        data.foreach(function(d){
-            arrayVar1.push(d[variable1]);
-            arrayVar2.push(d[variable2]);
+        
+        data.forEach(function(d){
+            arrayVar1.push(parseFloat(d[variable1]));
+            arrayVar2.push(parseFloat(d[variable2]));
             })
-        var stdVar1 = math.std(arrayVar1),
-            stdVar2 = math.std(arrayVar2);
+        
+        arrayVar1_filtered = []
+        arrayVar2_filtered = []
+        
+        for (var i=0; i < arrayVar1.length; i++){
+            elem1 = arrayVar1[i]
+            elem2 = arrayVar2[i]
+            
+            if (Number.isNaN(elem1) || Number.isNaN(elem2)){}
+            else{
+                arrayVar1_filtered.push(elem1)
+                arrayVar2_filtered.push(elem2)
+            }
+            
+        }
+        
+        var stdVar1 = math.std(arrayVar1_filtered);
+        var stdVar2 = math.std(arrayVar2_filtered);
 
-        var avg1 = math.mean(arrayVar1),
-            avg2 = math.mean(arrayVar2);
+        var avg1 = math.mean(arrayVar1_filtered),
+            avg2 = math.mean(arrayVar2_filtered);
+        //console.log(avg1)
+        //console.log(avg2)
 
-        return getPearsonCorrelation(arrayVar1,arrayVar2,avg1,avg2,stdVar1, stdVar2);
+        return getPearsonCorrelation(arrayVar1_filtered,arrayVar2_filtered,avg1,avg2,stdVar1, stdVar2);
 
     }
-
-
     // // draw legend
     // var legend = svg.selectAll(".legend")
     //     .data(color.domain())
@@ -148,4 +170,3 @@ function drawScatterplot(variable1, variable2, width, height, data){
     //     .attr("dy", ".35em")
     //     .style("text-anchor", "end")
     //     .text(function(d) { return d;})
-}

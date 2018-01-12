@@ -4,7 +4,16 @@
 
 function extractDateTime(timestamp){
     var dt = timestamp.split(" ")
-    return dt
+    var date = dt[0]
+    var time = dt[1]
+    //console.log(time)
+    if (time.length==4){
+        time = "0" + time
+    }
+    if (time.length==8){
+        time = time.substring(0, 5)
+    }
+    return [date, time]
 }
 
 //Can read both formats "31-12-2017" and "2/1/18", and turn them into "2017-12-31" 
@@ -19,7 +28,12 @@ function parseDate(dateString){
     //console.log(dateArray)
     var d = dateArray[0]
     var m = dateArray[1]
-    var Y = "20" + dateArray[2]
+    if (dateArray[2].length <= 2){
+        var Y = "20" + dateArray[2]
+    }
+    else{
+        Y = dateArray[2]
+    }
     
     return [Y,m,d].join("-")
 }
@@ -59,6 +73,8 @@ function filterDataset(dataset){
       .enter()
       .append('g')
       .attr('filteringDone', function(d,i){
+                                    dataset[i].Timestamp = parseDate(dataset[i].Date)+";"+dataset[i].Time
+                                
                                     for (var j=0; j < weather_keys.length; j++){
                                         var key = weather_keys[j];
                                         if (key!= "Timestamp" && key != "Date" && key != "Time") {

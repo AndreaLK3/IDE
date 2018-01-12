@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <title>Correlation</title>
     <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script type="text/javascript" src="math.js"></script>
     <script src="Utilities.js"></script>
     <script src="Correlation.js"></script>
-    <script >
-
+    <script>
         d3.select(window).on('load',init)
         
         function drawCorrelationsHistogram(weatherAndStationData){
@@ -40,7 +40,7 @@
                 removeFromArray(air_dimensions, "Date")
                 removeFromArray(air_dimensions, "Timestamp") 
                 
-                console.log(air_dimensions)
+                //1console.log(air_dimensions)
                 
                 d3.csv("WeatherDataset.csv", function(error, raw_weatherdata) {
                     var weatherdata = addDateAndTime(raw_weatherdata)
@@ -51,12 +51,16 @@
                                   .rollup(function(arr){return arr[0]}).entries(stationdata)
                     prejoin_weatherData = d3.nest().key(function(d) {return d.Timestamp})
                                   .rollup(function(arr){return arr[0]}).entries(weatherdata)
+                    
+                    console.log(prejoin_stationData)
+                    console.log(prejoin_weatherData)
+                    
                     joinedDS  = joinDatasets(prejoin_stationData, prejoin_weatherData,"key")
                     weatherAndStation_data = joinedDS.map(function (elem) {return elem.value})
                 
                     console.log(weatherAndStation_data) 
                     
-                    var weather_dimensions = Object.keys(stationdata[0]);
+                    var weather_dimensions = Object.keys(weatherdata[0]);
                     removeFromArray(weather_dimensions, "Time")
                     removeFromArray(weather_dimensions, "Date")
                     removeFromArray(weather_dimensions, "Timestamp") 
@@ -64,10 +68,23 @@
                     console.log(weather_dimensions)
                     
                     
-                    pickDimension1 = "NO2"
+                    pickedDimension = "NO2"
                     
-                    pickDimension2 = "SolarRadiation"
+                    allOtherDims = air_dimensions.concat(weather_dimensions)
+                    removeFromArray(allOtherDims, pickedDimension)
                     
+                    corrs = []
+                    allOtherDims.forEach(function (otherDim) {
+                        //console.log(pickedDimension)
+                        //console.log(otherDim)
+                        corrs.push(
+                            {dimension : otherDim, 
+                             correlationValue: computeArrayCorrelation(weatherAndStation_data, pickedDimension, otherDim)})
+                    } )
+                    console.log(corrs)
+                    
+                    //cc12 = computeArrayCorrelation(weatherAndStation_data, variable1, variable2)
+                    //console.log(cc12)
                 
                 
             
