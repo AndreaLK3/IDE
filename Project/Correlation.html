@@ -33,7 +33,7 @@
                 var stationdata = addDateAndTime(raw_stationdata)
                 //console.log(stationdata)
                 var stationdata = filterDataset(stationdata)
-                console.log(stationdata)
+                //console.log(stationdata)
                 
                 var air_dimensions = Object.keys(stationdata[0]);
                 removeFromArray(air_dimensions, "Time")
@@ -55,6 +55,20 @@
                     weatherAndStation_data = joinedDS.map(function (elem) {return elem.value})
                 
                     console.log(weatherAndStation_data)
+                    
+                    var weather_dimensions = Object.keys(stationdata[0]);
+                    removeFromArray(weather_dimensions, "Time")
+                    removeFromArray(weather_dimensions, "Date")
+                    removeFromArray(weather_dimensions, "Timestamp") 
+                    
+                    console.log(weather_dimensions)
+                    
+                    
+                    pickDimension1 = "NO2"
+                    
+                    pickDimension2 = "SolarRadiation"
+                    
+                
                 
             
                 })
