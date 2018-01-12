@@ -170,5 +170,25 @@ function getExtentOfProperty(arr, property){
     }
 return [min,max]
 }
-        
+
+// function getExtentOfPropertyInRawArray(arr, property){
+//     //console.log(property)
+//     var min = Number.POSITIVE_INFINITY;
+//     var max = Number.NEGATIVE_INFINITY;
+//     for (var i=0; i < arr.length; i++){
+//         //console.log(arr[i])
+//         var x = arr[i][property]
+//         //console.log(x)
+//         if (x != "") {
+//             if (x < min){
+//                 min = x
+//             }
+//             if (x > max){
+//                 max = x
+//             }
+//         }
+//     }
+//     return [min,max]
+// }
+
 
