@@ -9,7 +9,11 @@
     <script >
 
         d3.select(window).on('load',init)
-
+        
+        function drawCorrelationsHistogram(weatherAndStationData){
+            
+            
+        }
 
         function init() {
             var width = 960,
@@ -21,14 +25,51 @@
 
 
             // load data
-            d3.csv("AndersenBoulevard.csv", function (error, data) {
-                console.log(data)
-                drawScatterplot("NO2", "CO",width, height, data)
+            d3.csv("AndersenBoulevard.csv", function (error, raw_stationdata) {
+                
+                drawScatterplot("NO2", "CO",width, height, raw_stationdata)
+                
+                //console.log(raw_stationdata)
+                var stationdata = addDateAndTime(raw_stationdata)
+                //console.log(stationdata)
+                var stationdata = filterDataset(stationdata)
+                console.log(stationdata)
+                
+                var air_dimensions = Object.keys(stationdata[0]);
+                removeFromArray(air_dimensions, "Time")
+                removeFromArray(air_dimensions, "Date")
+                removeFromArray(air_dimensions, "Timestamp")
+                
+                console.log(air_dimensions)
+                
+                d3.csv("WeatherDataset.csv", function(error, raw_weatherdata) {
+                    var weatherdata = addDateAndTime(raw_weatherdata)
+                    var weatherdata = filterDataset(weatherdata)
+                    console.log(weatherdata)
+                    
+                    prejoin_stationData = d3.nest().key(function(d) {return d.Timestamp})
+                                  .rollup(function(arr){return arr[0]}).entries(stationdata)
+                    prejoin_weatherData = d3.nest().key(function(d) {return d.Timestamp})
+                                  .rollup(function(arr){return arr[0]}).entries(weatherdata)
+                    joinedDS  = joinDatasets(prejoin_stationData, prejoin_weatherData,"key")
+                    weatherAndStation_data = joinedDS.map(function (elem) {return elem.value})
+                
+                    console.log(weatherAndStation_data)
+                
+            
+                })
+            
+                    
             })
+            
+            
+            
         };
     </script>
 </head>
 <body>
 
+    
+    <svg id="forCyclesPivot"></svg>
 </body>
 </html>

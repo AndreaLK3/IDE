@@ -28,7 +28,7 @@ function parseDate(dateString){
 ////////// Preprocessing : Read the dataset, and split the Timestamp into Date and Time
 function addDateAndTime(dataset){
     var dataset_new = []
-    d3.select('#parallCoord1')
+    d3.select('#forCyclesPivot')
       .selectAll('g')
       .data(dataset)
       .enter()
@@ -41,19 +41,19 @@ function addDateAndTime(dataset){
                                     dataset_new.push(d);
                                     return true;})
 
-    d3.select("#parallCoord1").selectAll("*").remove();
+    d3.select("#forCyclesPivot").selectAll("*").remove();
     //console.log(dataset_new)
     return dataset_new
 }
 ////////////////////
         
-////////// Preprocessing : While reading the weather dataset,
+////////// Preprocessing : While reading the weather or stations dataset,
 ////////// replace "Ukendt" string values with 0s, and remove the measurements that have all values == 0
 function filterDataset(dataset){
     var weather_keys = Object.keys(dataset[0]);
 
     var dataset_new = []
-    d3.select('#parallCoord1')
+    d3.select('#forCyclesPivot')
       .selectAll('g')
       .data(dataset)
       .enter()
@@ -80,7 +80,7 @@ function filterDataset(dataset){
                                     return true;
                                     } )
 
-    d3.select("#parallCoord1").selectAll("*").remove();
+    d3.select("#forCyclesPivot").selectAll("*").remove();
     return dataset_new
 }
 ////////////////////
@@ -88,7 +88,8 @@ function filterDataset(dataset){
             
 ////////// Join 2 datasets using a specified property as 'key'
 function joinDatasets(ds1, ds2, keyName){
-    joined_ds = ds1
+    var joined_ds = ds1
+    //console.log(ds1)
     joined_ds.forEach( function( ds1Elem) {
         join_elemKey = ds1Elem[keyName]
         corresponding_ds2Elem = ds2.filter(function (ds2Elem){ return ds2Elem[keyName] == join_elemKey })[0]
@@ -196,6 +197,15 @@ function getExtentOfProperty(arr, property){
         }
     }
 return [min,max]
+}
+
+//This function modifies the array passed to it, 
+//eliminating 1 copy of the specified object
+function removeFromArray(arr, obj){
+    var index = arr.indexOf(obj)
+    if (index > -1) {
+        arr.splice(index, 1);
+    }
 }
 
 // function getExtentOfPropertyInRawArray(arr, property){

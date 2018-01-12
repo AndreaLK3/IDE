@@ -75,8 +75,8 @@
             ////////// This function creates a parallel coordinates' graph
             updatePC(width, height, pcSvg1, weatherDataByDay, weather_dimensions)
             
-            weatherAndStation_data = joinDatasets(weatherDataByDay, stationDataByDay, "key")
-            console.log(weatherAndStation_data)
+            weatherAndStationByDay_data = joinDatasets(weatherDataByDay, stationDataByDay, "key")
+            console.log(weatherAndStationByDay_data)
             
             weatherBoxes = d3.select('#pcPanel1')
                 .selectAll('g')
@@ -115,7 +115,7 @@
                         .attr('name', "weatherPollutant")
                         .attr('value', function(d) {return d})
                         .on('click', function(d){ weather_variable = d
-                                                  updatePC(width, height, pcSvg2, weatherAndStation_data, [weather_variable , air_variable])
+                                                  updatePC(width, height, pcSvg2, weatherAndStationByDay_data, [weather_variable , air_variable])
                                         })
             
             weatherRadio.append('label')
@@ -134,13 +134,13 @@
                         .attr('name', "airPollutant")
                         .attr('value', function(d) {return d})
                         .on('click', function(d){ air_variable = d
-                                                  updatePC(width, height, pcSvg2, weatherAndStation_data, [weather_variable , air_variable])
+                                                  updatePC(width, height, pcSvg2, weatherAndStationByDay_data, [weather_variable , air_variable])
                                         })
             
             airRadio.append('label')
                         .text(function(d) { return d})
             
-            updatePC(width, height, pcSvg2, weatherAndStation_data, [weather_variable , air_variable])
+            updatePC(width, height, pcSvg2, weatherAndStationByDay_data, [weather_variable , air_variable])
             
 //            ds1 =parseDate("02/01/18")
 //            console.log(ds1)
