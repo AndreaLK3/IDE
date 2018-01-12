@@ -54,7 +54,7 @@
                     joinedDS  = joinDatasets(prejoin_stationData, prejoin_weatherData,"key")
                     weatherAndStation_data = joinedDS.map(function (elem) {return elem.value})
                 
-                    console.log(weatherAndStation_data)
+                    console.log(weatherAndStation_data) 
                     
                     var weather_dimensions = Object.keys(stationdata[0]);
                     removeFromArray(weather_dimensions, "Time")
