@@ -7,6 +7,23 @@ function extractDateTime(timestamp){
     return dt
 }
 
+//Can read both formats "31-12-2017" and "2/1/18", and turn them into "2017-12-31" 
+function parseDate(dateString){
+    var dateArray = []
+    if (dateString.includes("-")){
+        dateArray = dateString.split("-")
+    }
+    if (dateString.includes("/")){
+        dateArray = dateString.split("/")
+    }    
+    //console.log(dateArray)
+    var d = dateArray[0]
+    var m = dateArray[1]
+    var Y = "20" + dateArray[2]
+    
+    return [Y,m,d].join("-")
+}
+
 
 ////////// Preprocessing : Read the dataset, and split the Timestamp into Date and Time
 function addDateAndTime(dataset){
@@ -107,6 +124,16 @@ function joinDatasets(ds1, ds2, keyName){
         return datasetByDay
     }
 ////////////////////
+
+///////// Filter a dataset with a date interval (min and max). 
+// We expect the dataset to be an array of object with a key:"..dateString.." property 
+function filterDatasetByDay(dataset, minDate, maxDate){
+//    for (var i = 0; i < dataset.length; i++){
+//        
+//    }
+}
+////////////////////
+
 
 
 //2.General
