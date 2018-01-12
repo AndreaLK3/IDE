@@ -77,7 +77,56 @@ function drawScatterplot(variable1, variable2, width, height, data){
             return color(cValue(d));
         });
 
-    function ComputeArrayValue()
+    function getPearsonCorrelation(arr1, arr2, avg1, avg2, std1, std2) {
+        var shortestArrayLength = 0;
+
+        if (x.length == y.length) {
+            shortestArrayLength = x.length;
+        } else if (x.length > y.length) {
+            shortestArrayLength = y.length;
+            console.log('x has more items in it, the last ' + (x.length - shortestArrayLength) + ' item(s) will be ignored');
+        } else {
+            shortestArrayLength = x.length;
+            console.log('y has more items in it, the last ' + (y.length - shortestArrayLength) + ' item(s) will be ignored');
+        }
+
+        var count = 0,
+            sum = 0;
+        for(var i = 0; i < shortestArrayLength; i++){
+            var x = arr1[i],
+                y = arr2[i];
+
+            var f1 = x - avg1,
+                f2 = y - avg2;
+
+           sum = sum + f1*f2 ;
+
+           count++;
+        }
+        var num_avg = sum / count
+
+        return num_avg / (std1*std2);
+
+    }
+
+    function ComputeArrayValue(data, variable1, variable2){
+        var arrayVar1 = [],
+            arrayVar2 = [];
+        data.foreach(function(d){
+            arrayVar1.push(d[variable1]);
+            arrayVar2.push(d[variable2]);
+            })
+        var stdVar1 = math.std(arrayVar1),
+            stdVar2 = math.std(arrayVar2);
+
+        var avg1 = math.mean(arrayVar1),
+            avg2 = math.mean(arrayVar2);
+
+        return getPearsonCorrelation(arrayVar1,arrayVar2,avg1,avg2,stdVar1, stdVar2);
+        
+    }
+
+
     // // draw legend
     // var legend = svg.selectAll(".legend")
     //     .data(color.domain())
