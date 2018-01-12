@@ -82,7 +82,76 @@
                              correlationValue: computeArrayCorrelation(weatherAndStation_data, pickedDimension, otherDim)})
                     } )
                     console.log(corrs)
-                    
+
+                    svg_2 = d3.select("#cHistogram")
+
+                    svg_2.attr("width", width)
+                        .attr("height", height);
+
+                    padding = 40;
+
+                    dimensionNames = corrs.map(function(d){ return d.dimension; })
+                    var x = d3.scaleBand()
+                        .domain(dimensionNames)
+                        .rangeRound([0 + padding, width - padding]);
+
+                    var y = d3.scaleLinear()
+                        .domain([-1, +1])
+                        .range([height - padding , 0 + padding]);
+
+                    var columnOffset = 10;
+                    svg_2.selectAll(".bar")
+                        .data(corrs.map(function(d){
+                            return d.correlationValue;
+                        }))
+                        .enter().append("rect")
+                        .attr("class", "bar")
+                        .attr("x", function(d,i) { return ""+ (columnOffset + x(corrs[i].dimension))+""; })
+                        .attr("y", function(d) {
+                            if (d < 0) {
+                                return y(0)
+                            }
+                            else {
+                                return y(d)
+                            }})
+                        .attr("fill", function (d) {
+                                if (d < 0) {return "orange"}
+                                else {return "lightblue"}
+                            })
+
+                        .attr("width", width / dimensionNames.length - 30)
+                        .attr("height", function(d,i) { return Math.abs(y(d) - y(0))})//height - y(d) - padding; })
+                        .on('click', function(d,i){
+                            drawScatterplot(pickedDimension, corrs[i].dimension, width, height, raw_stationdata)}
+                        )
+
+                    /** Axis **/
+                    svg_2.append("g")
+                        .attr("transform", "translate(0," + (height / 2) + ")")
+                        .call(d3.axisBottom(x));
+
+                    svg_2.append("g")
+                        .attr("transform", "translate(" + padding + ", 0 )")
+                        .call(d3.axisLeft(y));
+
+                    /*** Axis labels and Legend ***/
+                    // text label for the x axis
+                    svg_2.append("text")
+                        .attr("transform", "translate(" + width / 2 + " ," +
+                            (height - padding + 40) + ")")
+                        .style("text-anchor", "middle")
+                        .style("font-size", "1.2rem")
+                        .text("District");
+
+                    // text label for the y axis
+                    svg_2.append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 0 + padding - 60)
+                        .attr("x",0 - (height / 2))
+                        .attr("dy", "1em")
+                        .style("font-size", "1.2rem")
+                        .style("text-anchor", "middle")
+                        .text("Total number of crimes");
                     //cc12 = computeArrayCorrelation(weatherAndStation_data, variable1, variable2)
                     //console.log(cc12)
                 
@@ -102,5 +171,7 @@
 
     
     <svg id="forCyclesPivot"></svg>
+    <svg id="scatterPlot_svg"></svg>
+    <svg id="cHistogram"></svg>
 </body>
 </html>

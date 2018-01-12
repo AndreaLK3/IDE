@@ -2,10 +2,24 @@ function drawScatterplot(variable1, variable2, width, height, data){
 
     var padding = 40;
 
-    var svg = d3.select("body").append("svg")
+    var svg = d3.select("#scatterPlot_svg")
         .attr("width", width)
-        .attr("height", height)
-        .append("g");
+        .attr("height", height);
+
+
+    svg.selectAll(".SPgroup")
+        .remove();
+    var svg_g =    svg.append("g")
+        .attr("class", "SPgroup");
+
+
+    console.log(svg.selectAll("circle"))
+    svg.selectAll("circle")
+        .remove();
+
+    svg.selectAll(".axis")
+        .remove();
+
 
     // change string (from CSV) into number format
     data.forEach(function (d) {
@@ -42,7 +56,7 @@ function drawScatterplot(variable1, variable2, width, height, data){
     yScale.domain(d3.extent(data, function(d) { return d[variable2]}));
 
     // x-axis
-    svg.append("g")
+    svg_g.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + (height - padding) + ")")
         .call(xAxis)
@@ -54,7 +68,7 @@ function drawScatterplot(variable1, variable2, width, height, data){
         .text(variable1);
 
     // y-axis
-    svg.append("g")
+    svg_g.append("g")
         .attr("class", "y axis")
         .attr("transform", "translate(" + (padding) +  ", 0)")
         .call(yAxis)
@@ -65,8 +79,10 @@ function drawScatterplot(variable1, variable2, width, height, data){
         .style("text-anchor", "end")
         .text(variable2);
 
+    console.log(svg_g.selectAll(".dot")
+        .data(data))
     // draw dots
-    svg.selectAll(".dot")
+    svg_g.selectAll(".dot")
         .data(data)
         .enter().append("circle")
         .attr("class", "dot")
@@ -77,6 +93,34 @@ function drawScatterplot(variable1, variable2, width, height, data){
             return "blue"//color(cValue(d));
         });
 
+    svg_g.selectAll(".dot")
+        .data(data)
+        .exit().remove();
+
+    svg_g.selectAll(".dot")
+        .attr("aaa", function (d) {
+            //console.log(this.cx)
+            if (this.getAttribute("cx")=="NaN" || this.getAttribute("cy")=="NaN"){
+                d3.select(this).remove()
+            }
+        })
+}
+
+function filterArrays(arr1,arr2){
+    var arrayVar1_filtered = [],
+        arrayVar2_filtered = [];
+
+    for (var i=0; i < arr1.length; i++){
+        elem1 = arr1[i]
+        elem2 = arr2[i]
+
+        if (Number.isNaN(elem1) || Number.isNaN(elem2)){}
+        else{
+            arrayVar1_filtered.push(elem1)
+            arrayVar2_filtered.push(elem2)
+        }
+    }
+    return [arrayVar1_filtered,arrayVar2_filtered];
 }
 
 function getPearsonCorrelation(arr1, arr2, avg1, avg2, std1, std2) {
@@ -122,21 +166,10 @@ function getPearsonCorrelation(arr1, arr2, avg1, avg2, std1, std2) {
             arrayVar1.push(parseFloat(d[variable1]));
             arrayVar2.push(parseFloat(d[variable2]));
             })
-        
-        arrayVar1_filtered = []
-        arrayVar2_filtered = []
-        
-        for (var i=0; i < arrayVar1.length; i++){
-            elem1 = arrayVar1[i]
-            elem2 = arrayVar2[i]
-            
-            if (Number.isNaN(elem1) || Number.isNaN(elem2)){}
-            else{
-                arrayVar1_filtered.push(elem1)
-                arrayVar2_filtered.push(elem2)
-            }
-            
-        }
+
+        filtered_arrays = filterArrays(arrayVar1,arrayVar2)
+        arrayVar1_filtered = filtered_arrays[0]
+        arrayVar2_filtered = filtered_arrays[1]
         
         var stdVar1 = math.std(arrayVar1_filtered);
         var stdVar2 = math.std(arrayVar2_filtered);
