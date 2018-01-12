@@ -109,7 +109,7 @@ function drawScatterplot(variable1, variable2, width, height, data){
 
     }
 
-    function ComputeArrayValue(data, variable1, variable2){
+    function computeArrayCorrelation(data, variable1, variable2){
         var arrayVar1 = [],
             arrayVar2 = [];
         data.foreach(function(d){
@@ -123,7 +123,7 @@ function drawScatterplot(variable1, variable2, width, height, data){
             avg2 = math.mean(arrayVar2);
 
         return getPearsonCorrelation(arrayVar1,arrayVar2,avg1,avg2,stdVar1, stdVar2);
-        
+
     }
 
 
