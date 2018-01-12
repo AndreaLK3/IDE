@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Correlation</title>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="Utilities.js"></script>
+    <script src="Correlation.js"></script>
+    <script >
+
+        d3.select(window).on('load',init)
+
+
+        function init() {
+            var width = 960,
+                height = 500;
+
+            // setup fill color
+            // var cValue = function(d) { return d.Manufacturer;},
+            color = d3.scaleOrdinal("schemeCategory10");
+
+
+            // load data
+            d3.csv("AndersenBoulevard.csv", function (error, data) {
+                console.log(data)
+                drawScatterplot("NO2", "CO",width, height, data)
+            })
+        };
+    </script>
+</head>
+<body>
+
+</body>
+</html>
