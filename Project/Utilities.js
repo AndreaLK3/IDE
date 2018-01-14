@@ -42,12 +42,7 @@ function parseDate(dateString){
 ////////// Preprocessing : Read the dataset, and split the Timestamp into Date and Time
 function addDateAndTime(dataset){
     var dataset_new = []
-    d3.select('#forCyclesPivot')
-      .selectAll('g')
-      .data(dataset)
-      .enter()
-      .append('g')
-      .attr('preprocessingDone', function(d){
+    dataset.forEach(function(d){
                                     var dateAndTime = extractDateTime(d.Timestamp);
                                     d["Date"] = dateAndTime[0]; 
                                     d["Time"] = dateAndTime[1];
@@ -55,7 +50,6 @@ function addDateAndTime(dataset){
                                     dataset_new.push(d);
                                     return true;})
 
-    d3.select("#forCyclesPivot").selectAll("*").remove();
     //console.log(dataset_new)
     return dataset_new
 }
@@ -67,12 +61,7 @@ function filterDataset(dataset){
     var weather_keys = Object.keys(dataset[0]);
 
     var dataset_new = []
-    d3.select('#forCyclesPivot')
-      .selectAll('g')
-      .data(dataset)
-      .enter()
-      .append('g')
-      .attr('filteringDone', function(d,i){
+    dataset.forEach(function(d,i){
                                     dataset[i].Timestamp = parseDate(dataset[i].Date)+";"+dataset[i].Time
                                 
                                     for (var j=0; j < weather_keys.length; j++){
@@ -95,8 +84,7 @@ function filterDataset(dataset){
                                     }
                                     return true;
                                     } )
-
-    d3.select("#forCyclesPivot").selectAll("*").remove();
+    
     return dataset_new
 }
 ////////////////////

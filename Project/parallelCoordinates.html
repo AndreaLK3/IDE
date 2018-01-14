@@ -26,8 +26,9 @@
     
         d3.csv("AndersenBoulevard.csv", function(error, raw_stationdata) {
             if (error) throw error;  
-            
+            console.log(raw_stationdata)
             stationdata = addDateAndTime(raw_stationdata)
+            console.log(stationdata)
             stationdata = filterDataset(stationdata)
             stationDataByDay = aggregateByDay(stationdata)
             console.log(stationDataByDay)
