@@ -19,19 +19,19 @@ function updatePC(width, height, pcSvg, dataset, dimensions) {
     
     //console.log("Dimensions:" + dimensions)
     
-    var side_padding = 50
+    var padding = 40
 
     // Create a scale for each dimension.
     var xScale = d3.scaleOrdinal()
     xScale.domain(dimensions); 
-    var interColumnSpace =  width / ( (dimensions.length - 1) ) - (5 / dimensions.length )*side_padding
+    var interColumnSpace =  width / ( (dimensions.length - 1) ) - (5 / dimensions.length )*padding
     
     //console.log(interColumnSpace)
-    xScale.range(pRange(0 + side_padding, width + interColumnSpace - side_padding, interColumnSpace) );
+    xScale.range(pRange(0 + padding, width + interColumnSpace - padding, interColumnSpace) );
 
     var yScales = {}
     dimensions.map(function (dim) { 
-                        yScales[dim] = d3.scaleLinear().range([height,0])
+                        yScales[dim] = d3.scaleLinear().range([height - padding,0])
                                         .domain( getExtentOfProperty(dataset, dim) ); 
                                   return undefined;})
     ///////// Line generator
@@ -85,15 +85,22 @@ function updatePC(width, height, pcSvg, dataset, dimensions) {
     var paths = pcSvg.selectAll(".day")
         .data(dataset)
     
-    console.log("Paths:")
-    console.log(paths)
+    //console.log("Paths:")
+    //console.log(paths)
     
     paths.exit().remove()
     
     paths.enter()
         .append("path")
         .attr("class", "day")
-        .attr("stroke", "blue")
+        .attr("stroke", function(){
+            if (dimensions.length == 2) {
+                return "brown"
+            }
+            else {
+                return "blue"
+            }
+    })
         .attr("stroke-width", 2)
         .attr("fill", "none")
      .merge(paths)
