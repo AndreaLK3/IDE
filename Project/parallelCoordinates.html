@@ -175,6 +175,7 @@
             
             
             d3.select('#minDateInput')
+              .attr("onkeydown", "return false")
               .on('change', function(){d3.select('#maxDateInput')
                                          .attr("min", this.value);
                                        pc1_wAndS_data = filterAgDayDataset_byDay(weatherAndStationByDay_data,
@@ -183,6 +184,7 @@
                                        console.log(pc1_wAndS_data) ;
                                        updatePC(width, height, pcSvg1, pc1_wAndS_data, weather_dimensions) ;})
             d3.select('#maxDateInput')
+              .attr("onkeydown", "return false")
               .on('change', function(){d3.select('#minDateInput')
                                          .attr("max", this.value);
                                        pc1_wAndS_data = filterAgDayDataset_byDay(weatherAndStationByDay_data,
