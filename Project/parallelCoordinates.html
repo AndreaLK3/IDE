@@ -60,12 +60,12 @@
     
         d3.csv("AndersenBoulevard.csv", function(error, raw_stationdata) {
             if (error) throw error;  
-            console.log(raw_stationdata)
+            //console.log(raw_stationdata)
             stationdata = addDateAndTime(raw_stationdata)
-            console.log(stationdata)
+            //console.log(stationdata)
             stationdata = filterDataset(stationdata)
             stationDataByDay = aggregateByDay(stationdata)
-            console.log(stationDataByDay)
+            //console.log(stationDataByDay)
             
         d3.csv("WeatherDataset.csv", function(error, raw_weatherdata) {
             if (error) throw error;
@@ -74,8 +74,6 @@
             weatherdata = filterDataset(weatherdata)
             
             weatherDataByDay = aggregateByDay(weatherdata)
-            console.log(weatherDataByDay)
-            
         
             ////////// Specify width, height and margins of the SVG
             var margin = {top: 30, right: 10, bottom: 10, left: 10};
@@ -203,6 +201,11 @@
                                                                                    new Date(this.value)) ;
                                        console.log(pc_wAndS_data) ;
                                        updatePC(width_1, height_1, pcSvg1, pc_wAndS_data, weather_dimensions) ;})
+            
+            
+            //The instrument to select N best/worst days with respect to an air pollutant
+            //In progress
+            pickDays(pc_wAndS_data.slice(), 5, "CO", false)
             
         
             

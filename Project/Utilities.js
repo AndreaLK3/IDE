@@ -207,6 +207,51 @@ function filterRawDatasetByDay(dataset, minDate, maxDate){
 ////////////////////
 
 
+// In a dataset aggregated by day, we extract the N days with the min or max value of the given dimension
+//If pickBest is true, we pick the N best, otherwise the N worst
+function pickDays(dataset, N, dimension, pickBest){
+    
+    //TODO:filter not working
+    dataset.forEach(function(elem) {
+        if (elem.value[dimension] === "undefined" || elem.value[dimension] == "" || Number.isNaN(elem.value[dimension]) ){
+            console.log(elem)
+            var index = dataset.indexOf(elem)
+            if (index > -1) {
+                dataset.splice(index, 1);
+            }
+        }
+    })
+    
+    dataset.sort(function(a,b) {
+        if (a.value[dimension] < b.value[dimension]) {
+            if(pickBest) {return -1} else {return 1}}
+        if (a.value[dimension] < b.value[dimension]) {
+        return 0;}  
+        if (a.value[dimension] > b.value[dimension]) {
+            if (pickBest) {return 1} else {return -1}}
+    })
+        
+    console.log(dataset)
+
+    selected_dataset = dataset.slice(0,N)
+
+    console.log(selected_dataset)
+
+    //reorder by day (descending)
+    selected_dataset.sort(function(a,b) {
+        if (new Date(a.key) > new Date(b.key)){
+            return -1;
+        }
+        if (new Date(a.key) <= new Date(b.key)){
+            return 1;
+        }
+    })
+    
+    console.log(selected_dataset);
+    
+    return selected_dataset
+    
+}
 
 //2.General
 
