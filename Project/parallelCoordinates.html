@@ -13,6 +13,17 @@
             margin: 4px;
         }
         
+        .variablesPanel {
+               max-width: 60vw;
+               margin: 4px;
+               padding: 3px;
+               border: 1px solid gray;}
+        
+        
+        .variablesPanel tspan {margin: 4px;
+               padding: 3px;
+               border: 1px solid gray;}
+        
     </style>
     
     <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -65,34 +76,36 @@
             ////////////////////
             
             var weather_dimensions = Object.keys(weatherDataByDay[0].value);
-            console.log(weather_dimensions)
+            //console.log(weather_dimensions)
             var air_dimensions = Object.keys(stationDataByDay[0].value);
             
-            //var index = weather_dimensions.indexOf("Wind Speed");
+            //var index = weather_dimensions.indexOf("Wind Directions");
             //weather_dimensions.splice(index,1)
             //console.log(air_dimensions)
             //console.log(weather_dimensions)
-            
-            ////////// This function creates a parallel coordinates' graph
-            updatePC(width, height, pcSvg1, weatherDataByDay, weather_dimensions)
-            
             weatherAndStationByDay_data = joinDatasets(weatherDataByDay, stationDataByDay, "key")
-            console.log(weatherAndStationByDay_data)
+            //console.log(weatherAndStationByDay_data)
             
-            weatherBoxes = d3.select('#pcPanel1')
+            // This function creates a parallel coordinates' graph.
+            //We use a copy of the ByDay dataset, so we can apply subselections on it
+            pc1_wAndS_data = weatherAndStationByDay_data.slice()
+            console.log(pc1_wAndS_data)
+            updatePC(width, height, pcSvg1, pc1_wAndS_data, weather_dimensions)
+            
+            pc1Boxes = d3.select('#pcPanel1')
                 .selectAll('g')
                 .data(weather_dimensions)
                 .enter()
                 .append('tspan')
-            weatherBoxes.append('input')
+            pc1Boxes.append('input')
                         .attr('type', 'checkbox')
                         .attr('name', function(d, i){ return "wdim_"+i; })
                         .attr('value', function(d) {return d})
                         .attr('checked', 'true')
                         .on('click', function(d){ 
                                         examineCheckbox(d3.select(this).node(), d, weather_dimensions)
-                                        updatePC(width, height, pcSvg1, weatherDataByDay, weather_dimensions)})
-            weatherBoxes.append('label')
+                                        updatePC(width, height, pcSvg1, pc1_wAndS_data, weather_dimensions)})
+            pc1Boxes.append('label')
                         .text(function(d) { return d})
 
             
@@ -143,12 +156,42 @@
             
             updatePC(width, height, pcSvg2, weatherAndStationByDay_data, [weather_variable , air_variable])
             
-//            ds1 =parseDate("02/01/18")
-//            console.log(ds1)
-//            d = new Date(ds1)
-//            console.log(d)
-//            ds2 =parseDate("01-12-17")
-//            d2 = new Date(ds2)
+            
+            //Can the following part (datepickers) be put in a separate function without breaking its functionality?
+//            function defineDaysRange(weatherDataByDay) {
+//                
+//            }
+            //  Version 1: using Datepickers to limit the day range
+            console.log(weatherDataByDay)
+            console.log(d3.min(weatherDataByDay, function (elem) { return new Date(elem.key)  }))
+            first_weather_day = weatherDataByDay.slice(-1)[0].key
+            last_weather_day = weatherDataByDay[0].key
+            d3.selectAll('#minDateInput, #maxDateInput')
+                .attr("min", first_weather_day)
+                .attr("max", last_weather_day)
+            
+            document.getElementById("minDateInput").value = first_weather_day
+            document.getElementById("maxDateInput").value = last_weather_day
+            
+            
+            d3.select('#minDateInput')
+              .on('change', function(){d3.select('#maxDateInput')
+                                         .attr("min", this.value);
+                                       pc1_wAndS_data = filterAgDayDataset_byDay(weatherAndStationByDay_data,
+                                                                                         new Date(this.value), 
+                                                                                         new Date(document.getElementById("maxDateInput").value) ) 
+                                       console.log(pc1_wAndS_data) ;
+                                       updatePC(width, height, pcSvg1, pc1_wAndS_data, weather_dimensions) ;})
+            d3.select('#maxDateInput')
+              .on('change', function(){d3.select('#minDateInput')
+                                         .attr("max", this.value);
+                                       pc1_wAndS_data = filterAgDayDataset_byDay(weatherAndStationByDay_data,
+                                                                                   new Date(document.getElementById("minDateInput").value),
+                                                                                   new Date(this.value)) ;
+                                       console.log(pc1_wAndS_data) ;
+                                       updatePC(width, height, pcSvg1, pc1_wAndS_data, weather_dimensions) ;})
+            
+        
             
   });
         })
@@ -166,12 +209,16 @@
     <div id="parallCoordSection">
     <svg id="parallCoord1">
     </svg>
-    <div id="pcPanel1"></div>
+    <div id="pcPanel1" class="variablesPanel"></div>
+    <div id="pc1DatePanel">
+        <form>Starting date : <input type="date" id="minDateInput"/></form>
+        <form>Ending date : <input type="date" id="maxDateInput"/></form>
+    </div>
     
     <svg id="parallCoord2">
     </svg>
-    <div id="pcPanel2"></div>
-    <div id="pcPanel3"></div>
+    <div id="pcPanel2" class="variablesPanel"></div>
+    <div id="pcPanel3" class="variablesPanel"></div>
     </div>
 </body>
 

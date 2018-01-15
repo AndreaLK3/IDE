@@ -75,8 +75,8 @@ function updatePC(width, height, pcSvg, dataset, dimensions) {
     
     // Returns the path for a given data point.
     function pcPath(d, dimensions) {
-      return line(dimensions.map(function(p) { if (Number.isNaN(yScales[p](d.value[p])) ) 
-                                                {   console.log(d); console.log(p); console.log(yScales[p](d.value[p]))   } 
+      return line(dimensions.map(function(p) { //if (Number.isNaN(yScales[p](d.value[p])) ) 
+                                                //{   //console.log(d); console.log(p); console.log(yScales[p](d.value[p]))   } 
                                                  return [ xScale(p), yScales[p](d.value[p]) ] 
                                               } )                         
                  )
@@ -84,6 +84,9 @@ function updatePC(width, height, pcSvg, dataset, dimensions) {
 
     var paths = pcSvg.selectAll(".day")
         .data(dataset)
+    
+    console.log("Paths:")
+    console.log(paths)
     
     paths.exit().remove()
     

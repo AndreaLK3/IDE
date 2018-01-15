@@ -27,7 +27,13 @@ function parseDate(dateString){
     }    
     //console.log(dateArray)
     var d = dateArray[0]
+    if (d.length == 1){
+        d = "0" + d
+    }
     var m = dateArray[1]
+        if (m.length == 1){
+        m = "0" + m
+    }
     if (dateArray[2].length <= 2){
         var Y = "20" + dateArray[2]
     }
@@ -55,8 +61,9 @@ function addDateAndTime(dataset){
 }
 ////////////////////
         
-////////// Preprocessing : While reading the weather or stations dataset,
-////////// replace "Ukendt" string values with 0s, and remove the measurements that have all values == 0
+/// Preprocessing : While reading the weather or stations dataset,
+/// replace "Ukendt" string values with 0s, and remove the measurements that have all values == 0
+/// (note: when joining different datasets, we will need to exclude values that exist only in one)
 function filterDataset(dataset){
     var weather_keys = Object.keys(dataset[0]);
 
@@ -82,6 +89,8 @@ function filterDataset(dataset){
                                     if (! allZeros) {
                                         dataset_new.push(d);
                                     }
+                                    dataset[i].Date = parseDate(dataset[i].Date)
+                                    
                                     return true;
                                     } )
     
@@ -130,12 +139,70 @@ function joinDatasets(ds1, ds2, keyName){
     }
 ////////////////////
 
+
 ///////// Filter a dataset with a date interval (min and max). 
-// We expect the dataset to be an array of object with a key:"..dateString.." property 
-function filterDatasetByDay(dataset, minDate, maxDate){
-//    for (var i = 0; i < dataset.length; i++){
-//        
-//    }
+// The dataset is expected to be in aggregated-Day form [{key = "12-31-2017", value=...},{...}]
+function filterAgDayDataset_byDay(dataset, minDate, maxDate){
+    index_start = 0
+    offset_end = 0
+    dataset.forEach(function(d,i){
+        dateObject = new Date(d.key)
+        //console.log(dateObject)
+        if (dateObject < minDate){
+            offset_end++
+        }
+    })
+    dataset.forEach(function(d,i){
+        dateObject = new Date(d.key)
+        //console.log(dateObject)
+        if (dateObject > maxDate){
+            index_start++
+        }
+    })
+
+    //console.log("Start at: " + dataset[dataset.length - offset_end - 1].Date)
+    console.log("Start at: " +dataset[dataset.length - offset_end - 1].key)
+    
+    //console.log("End at: " + dataset[index_start].Date)
+    console.log("End at: " +dataset[index_start].key)
+    
+    //console.log(index_start,  dataset.length - offset_end)
+    return dataset.slice(index_start, dataset.length - offset_end)
+    
+}
+
+
+
+///////// Filter a dataset with a date interval (min and max). 
+// We expect the dataset to be an array of object with a 'Date' key (it's a dateString...) property 
+// The purpose of this function is to filter a raw_dataset (without groupings or nested structures )
+function filterRawDatasetByDay(dataset, minDate, maxDate){
+    index_start = 0
+    offset_end = 0
+    dataset.forEach(function(d,i){
+        dateObject = new Date(d.Date)
+        //console.log(dateObject)
+        if (dateObject < minDate){
+            offset_end++
+        }
+    })
+    dataset.forEach(function(d,i){
+        dateObject = new Date(d.Date)
+        //console.log(dateObject)
+        if (dateObject > maxDate){
+            index_start++
+        }
+    })
+
+    //console.log("Start at: " + dataset[dataset.length - offset_end - 1].Date)
+    console.log("Start at: " +dataset[dataset.length - offset_end - 1].Date)
+    
+    //console.log("End at: " + dataset[index_start].Date)
+    console.log("End at: " +dataset[index_start].Date)
+    
+    //console.log(index_start,  dataset.length - offset_end)
+    return dataset.slice(index_start, dataset.length - offset_end)
+    
 }
 ////////////////////
 
@@ -211,25 +278,5 @@ function removeFromArray(arr, obj){
         arr.splice(index, 1);
     }
 }
-
-// function getExtentOfPropertyInRawArray(arr, property){
-//     //console.log(property)
-//     var min = Number.POSITIVE_INFINITY;
-//     var max = Number.NEGATIVE_INFINITY;
-//     for (var i=0; i < arr.length; i++){
-//         //console.log(arr[i])
-//         var x = arr[i][property]
-//         //console.log(x)
-//         if (x != "") {
-//             if (x < min){
-//                 min = x
-//             }
-//             if (x > max){
-//                 max = x
-//             }
-//         }
-//     }
-//     return [min,max]
-// }
 
 
