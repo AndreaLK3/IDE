@@ -182,6 +182,14 @@ function getPearsonCorrelation(arr1, arr2, avg1, avg2, std1, std2) {
         return getPearsonCorrelation(arrayVar1_filtered,arrayVar2_filtered,avg1,avg2,stdVar1, stdVar2);
 
     }
+
+    function updateAllOtherDims(selectedDimension,dimensionSets){
+
+        return dimensionSets;
+    }
+
+    //console.log(dimensions)
+
     // // draw legend
     // var legend = svg.selectAll(".legend")
     //     .data(color.domain())

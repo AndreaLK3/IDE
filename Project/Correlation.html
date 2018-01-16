@@ -67,7 +67,7 @@
                     
                     console.log(weather_dimensions)
                     
-                    
+                    //update pickedDimension, allOtherDims and corrs.**************
                     pickedDimension = "NO2"
                     
                     allOtherDims = air_dimensions.concat(weather_dimensions)
@@ -90,6 +90,7 @@
 
                     padding = 40;
 
+                    //need corrs and rawdata for a new function**********
                     dimensionNames = corrs.map(function(d){ return d.dimension; })
                     var x = d3.scaleBand()
                         .domain(dimensionNames)
