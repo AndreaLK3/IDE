@@ -27,7 +27,13 @@ function parseDate(dateString){
     }    
     //console.log(dateArray)
     var d = dateArray[0]
+    if (d.length == 1){
+        d = "0" + d
+    }
     var m = dateArray[1]
+        if (m.length == 1){
+        m = "0" + m
+    }
     if (dateArray[2].length <= 2){
         var Y = "20" + dateArray[2]
     }
@@ -42,12 +48,7 @@ function parseDate(dateString){
 ////////// Preprocessing : Read the dataset, and split the Timestamp into Date and Time
 function addDateAndTime(dataset){
     var dataset_new = []
-    d3.select('#forCyclesPivot')
-      .selectAll('g')
-      .data(dataset)
-      .enter()
-      .append('g')
-      .attr('preprocessingDone', function(d){
+    dataset.forEach(function(d){
                                     var dateAndTime = extractDateTime(d.Timestamp);
                                     d["Date"] = dateAndTime[0]; 
                                     d["Time"] = dateAndTime[1];
@@ -55,24 +56,19 @@ function addDateAndTime(dataset){
                                     dataset_new.push(d);
                                     return true;})
 
-    d3.select("#forCyclesPivot").selectAll("*").remove();
     //console.log(dataset_new)
     return dataset_new
 }
 ////////////////////
         
-////////// Preprocessing : While reading the weather or stations dataset,
-////////// replace "Ukendt" string values with 0s, and remove the measurements that have all values == 0
+/// Preprocessing : While reading the weather or stations dataset,
+/// replace "Ukendt" string values with 0s, and remove the measurements that have all values == 0
+/// (note: when joining different datasets, we will need to exclude values that exist only in one)
 function filterDataset(dataset){
     var weather_keys = Object.keys(dataset[0]);
 
     var dataset_new = []
-    d3.select('#forCyclesPivot')
-      .selectAll('g')
-      .data(dataset)
-      .enter()
-      .append('g')
-      .attr('filteringDone', function(d,i){
+    dataset.forEach(function(d,i){
                                     dataset[i].Timestamp = parseDate(dataset[i].Date)+";"+dataset[i].Time
                                 
                                     for (var j=0; j < weather_keys.length; j++){
@@ -93,10 +89,11 @@ function filterDataset(dataset){
                                     if (! allZeros) {
                                         dataset_new.push(d);
                                     }
+                                    dataset[i].Date = parseDate(dataset[i].Date)
+                                    
                                     return true;
                                     } )
-
-    d3.select("#forCyclesPivot").selectAll("*").remove();
+    
     return dataset_new
 }
 ////////////////////
@@ -142,16 +139,119 @@ function joinDatasets(ds1, ds2, keyName){
     }
 ////////////////////
 
+
 ///////// Filter a dataset with a date interval (min and max). 
-// We expect the dataset to be an array of object with a key:"..dateString.." property 
-function filterDatasetByDay(dataset, minDate, maxDate){
-//    for (var i = 0; i < dataset.length; i++){
-//        
-//    }
+// The dataset is expected to be in aggregated-Day form [{key = "12-31-2017", value=...},{...}]
+function filterAgDayDataset_byDay(dataset, minDate, maxDate){
+    index_start = 0
+    offset_end = 0
+    dataset.forEach(function(d,i){
+        dateObject = new Date(d.key)
+        //console.log(dateObject)
+        if (dateObject < minDate){
+            offset_end++
+        }
+    })
+    dataset.forEach(function(d,i){
+        dateObject = new Date(d.key)
+        //console.log(dateObject)
+        if (dateObject > maxDate){
+            index_start++
+        }
+    })
+
+    //console.log("Start at: " + dataset[dataset.length - offset_end - 1].Date)
+    console.log("Start at: " +dataset[dataset.length - offset_end - 1].key)
+    
+    //console.log("End at: " + dataset[index_start].Date)
+    console.log("End at: " +dataset[index_start].key)
+    
+    //console.log(index_start,  dataset.length - offset_end)
+    return dataset.slice(index_start, dataset.length - offset_end)
+    
+}
+
+
+
+///////// Filter a dataset with a date interval (min and max). 
+// We expect the dataset to be an array of object with a 'Date' key (it's a dateString...) property 
+// The purpose of this function is to filter a raw_dataset (without groupings or nested structures )
+function filterRawDatasetByDay(dataset, minDate, maxDate){
+    index_start = 0
+    offset_end = 0
+    dataset.forEach(function(d,i){
+        dateObject = new Date(d.Date)
+        //console.log(dateObject)
+        if (dateObject < minDate){
+            offset_end++
+        }
+    })
+    dataset.forEach(function(d,i){
+        dateObject = new Date(d.Date)
+        //console.log(dateObject)
+        if (dateObject > maxDate){
+            index_start++
+        }
+    })
+
+    //console.log("Start at: " + dataset[dataset.length - offset_end - 1].Date)
+    console.log("Start at: " +dataset[dataset.length - offset_end - 1].Date)
+    
+    //console.log("End at: " + dataset[index_start].Date)
+    console.log("End at: " +dataset[index_start].Date)
+    
+    //console.log(index_start,  dataset.length - offset_end)
+    return dataset.slice(index_start, dataset.length - offset_end)
+    
 }
 ////////////////////
 
 
+// In a dataset aggregated by day, we extract the N days with the min or max value of the given dimension
+//If pickBest is true, we pick the N best, otherwise the N worst
+function pickDays(dataset, N, dimension, pickBest){
+    
+    //TODO:filter not working
+    dataset.forEach(function(elem) {
+        if (elem.value[dimension] === "undefined" || elem.value[dimension] == "" || Number.isNaN(elem.value[dimension]) ){
+            console.log(elem)
+            var index = dataset.indexOf(elem)
+            if (index > -1) {
+                dataset.splice(index, 1);
+            }
+        }
+    })
+    
+    dataset.sort(function(a,b) {
+        if (a.value[dimension] < b.value[dimension]) {
+            if(pickBest) {return -1} else {return 1}}
+        if (a.value[dimension] < b.value[dimension]) {
+        return 0;}  
+        if (a.value[dimension] > b.value[dimension]) {
+            if (pickBest) {return 1} else {return -1}}
+    })
+        
+    console.log(dataset)
+
+    selected_dataset = dataset.slice(0,N)
+
+    console.log(selected_dataset)
+
+    //reorder by day (descending)
+    selected_dataset.sort(function(a,b) {
+        if (new Date(a.key) > new Date(b.key)){
+            return -1;
+        }
+        if (new Date(a.key) <= new Date(b.key)){
+            return 1;
+        }
+    })
+    
+    console.log(selected_dataset);
+    
+    return selected_dataset
+    
+}
 
 //2.General
 
@@ -223,25 +323,5 @@ function removeFromArray(arr, obj){
         arr.splice(index, 1);
     }
 }
-
-// function getExtentOfPropertyInRawArray(arr, property){
-//     //console.log(property)
-//     var min = Number.POSITIVE_INFINITY;
-//     var max = Number.NEGATIVE_INFINITY;
-//     for (var i=0; i < arr.length; i++){
-//         //console.log(arr[i])
-//         var x = arr[i][property]
-//         //console.log(x)
-//         if (x != "") {
-//             if (x < min){
-//                 min = x
-//             }
-//             if (x > max){
-//                 max = x
-//             }
-//         }
-//     }
-//     return [min,max]
-// }
 
 
