@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <!-- <meta name="viewport" content="width=device-width"> -->
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <title>Graph 1: Scatter Plot of Greenhouse Gases</title>
     <style>
@@ -13,7 +13,8 @@
         display: none;
       }
       .tick line {
-        stroke: #C0C0BB;
+       stroke: #C0C0BB;
+       /*fill: none;*/
       }
       .tick text {
         fill: #8E8883;
@@ -22,8 +23,14 @@
       }
       .axis-label {
         fill: #635F5D;
-        font-size: 10pt;
+        font-size: 16pt;
         font-family: sans-serif;
+
+      .legend {
+        text-anchor: middle;
+        font-size: 10px;
+        font-weight: bold;
+      }
       }
     </style>
   </head>
@@ -71,6 +78,7 @@
       const yScale = d3.scaleLinear();
       const zScale = d3.scaleOrdinal(d3.schemeCategory10);
 
+
       const xAxis = d3.axisBottom()
         .scale(xScale)
         .tickPadding(15)
@@ -100,6 +108,8 @@
             return {x: parseTime(d.Date), y: +d[mapping]};
           });
         });
+
+        var legends = width/gasNames.length;
 
         xScale
           .domain(d3.extent(d3.merge(mapping), function(d) { return d.x; }))
@@ -133,7 +143,21 @@
          .attr("cx", function(d) { return xScale(d.x); })
          .attr("cy", function(d) { return yScale(d.y); });
 
+
+        g.append("g")
+         .selectAll("text")
+         .data(gasNames)
+         .enter()
+         .append('text')
+         .attr("class", "legend")
+         .attr("x", function(d, i) { return 0.7*i*legends+ (legends/2); })
+         .attr("y", innerHeight + (margin.bottom/2)+ 5)
+         .style("fill", function(d,i) { 
+              return zScale(d); })
+         .text(function(d,i) { return d; });
         
+       
+
          xAxisG.call(xAxis);
          yAxisG.call(yAxis);
 
