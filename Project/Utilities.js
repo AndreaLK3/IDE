@@ -143,6 +143,7 @@ function joinDatasets(ds1, ds2, keyName){
 ///////// Filter a dataset with a date interval (min and max). 
 // The dataset is expected to be in aggregated-Day form [{key = "12-31-2017", value=...},{...}]
 function filterAgDayDataset_byDay(dataset, minDate, maxDate){
+    console.log(dataset)
     index_start = 0
     offset_end = 0
     dataset.forEach(function(d,i){
@@ -160,13 +161,11 @@ function filterAgDayDataset_byDay(dataset, minDate, maxDate){
         }
     })
 
-    //console.log("Start at: " + dataset[dataset.length - offset_end - 1].Date)
-    console.log("Start at: " +dataset[dataset.length - offset_end - 1].key)
     
-    //console.log("End at: " + dataset[index_start].Date)
-    console.log("End at: " +dataset[index_start].key)
+    console.log("Limit date 1: " +dataset[dataset.length - offset_end - 1].key)
+    console.log("Limit date 2: " +dataset[index_start].key)
+    console.log(dataset.slice(index_start, dataset.length - offset_end))
     
-    //console.log(index_start,  dataset.length - offset_end)
     return dataset.slice(index_start, dataset.length - offset_end)
     
 }
@@ -212,17 +211,19 @@ function filterRawDatasetByDay(dataset, minDate, maxDate){
 function pickDays(dataset, N, dimension, pickBest){
     
     //TODO:filter not working
-    dataset.forEach(function(elem) {
-        if (elem.value[dimension] === "undefined" || elem.value[dimension] == "" || Number.isNaN(elem.value[dimension]) ){
-            console.log(elem)
-            var index = dataset.indexOf(elem)
-            if (index > -1) {
-                dataset.splice(index, 1);
-            }
-        }
-    })
+//    dataset.forEach(function(elem) {
+//        if (elem.value[dimension] === "undefined" || elem.value[dimension] == "" || Number.isNaN(elem.value[dimension]) ){
+//            console.log(elem)
+//            var index = dataset.indexOf(elem)
+//            if (index > -1) {
+//                dataset.splice(index, 1);
+//            }
+//        }
+//    })
     
-    dataset.sort(function(a,b) {
+    dataset_copy = dataset.slice()
+    
+    dataset_copy.sort(function(a,b) {
         if (a.value[dimension] < b.value[dimension]) {
             if(pickBest) {return -1} else {return 1}}
         if (a.value[dimension] < b.value[dimension]) {
@@ -231,11 +232,11 @@ function pickDays(dataset, N, dimension, pickBest){
             if (pickBest) {return 1} else {return -1}}
     })
         
-    console.log(dataset)
+    //console.log(dataset)
 
-    selected_dataset = dataset.slice(0,N)
+    selected_dataset = dataset_copy.slice(0,N)
 
-    console.log(selected_dataset)
+    //console.log(selected_dataset)
 
     //reorder by day (descending)
     selected_dataset.sort(function(a,b) {

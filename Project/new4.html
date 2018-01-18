@@ -27,16 +27,29 @@
       }
       .legend {
         text-anchor: middle;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: bold;
       }
 
-    </style>
-  </head>
-  <body>
-    <svg width="960" height="500"></svg>
-    <script>
+      div.tooltip {
+        position: absolute;
+        text-align: center;
+        width: 80px;
+        height: 55px;
+        padding: 2px;
+        font-size: 12px;
+        font-family: sans-serif;
+        background: lightsteelblue;
+        border: 0px;
+        border-radius: 8px;
+      }
 
+    </style>
+
+        <script>
+        d3.select(window).on('load',init1)
+
+       function init1() {   
       var parseTime = d3.timeParse("%d/%m/%Y");
 
       const xValue = d => d.Date;
@@ -75,8 +88,8 @@
 
       const xScale = d3.scaleTime();
       const yScale = d3.scaleLinear();
-      const zScale = d3.scaleOrdinal(d3.schemeCategory10);
-
+//      const zScale = d3.scaleOrdinal(d3.schemeCategory10);
+      var formatTime = d3.timeFormat("%b %e");
 
       const xAxis = d3.axisBottom()
         .scale(xScale)
@@ -95,6 +108,11 @@
         return d;
       };
 
+      var div = d3.select("body")
+                  .append("div")
+                  .attr("class", "tooltip")
+                  .style("opacity", 0);
+
       d3.csv('newAndersenBoulevard.csv', data => {
 
         var gasNames = d3.keys(data[0])
@@ -104,11 +122,28 @@
 
         var mapping = gasNames.map(function(mapping) {
           return data.map(function(d) {
-            return {x: parseTime(d.Date), y: +d[mapping]};
+            return {key: mapping, time: d.Time, x: parseTime(d.Date), y: +d[mapping]};
           });
         });
-                console.log(mapping);
 
+        var mapping1 = mapping.map(function(unnamedArray) {
+          return {key : unnamedArray[0].key, value: unnamedArray}
+        })
+
+        var pointsDisplayed = [];
+        gasNames.forEach(function(gas) {
+          pointsToAdd = ( mapping1.filter(function(subArray) { if (subArray.key == gas ){return true} else{return false}}) )[0].value
+          pointsDisplayed = pointsDisplayed.concat(pointsToAdd)
+        })
+        //console.log(pointsDisplayed)
+        var zScale  = {};
+        gasNames.forEach(function(gas, i) {
+          zScale[gas] = d3.schemeCategory10[i];
+        })
+        console.log(d3.schemeCategory10)
+        // console.log(mapping);
+        // console.log(mapping1);
+        console.log(zScale)
 
         var legends = width/gasNames.length;
 
@@ -124,6 +159,8 @@
           .range([innerHeight, 0])
           .nice();
 
+        selectedGasNames = gasNames.slice();
+
         // g.selectAll('circle').data(data)
         //   .enter().append('circle')
         //     .attr('cx', d => xScale(xValue(d)))
@@ -131,38 +168,207 @@
         //     .attr('fill-opacity', 0.6)
         //     .attr('r', 3.5)
         //     .style("fill", "blue");
-        
-        g.selectAll(".mapping")
-         .data(mapping)
-         .enter().append("g")
+
+        function updategraph1(selectedGasNames) {
+
+          svg.selectAll('*').remove()
+          console.log("Updating Graph1")
+          var g1 = svg.append('g')
+          .attr('transform', `translate(${margin.left},${margin.top})`)
+
+          const xAxisG1 = g1.append('g')
+          .attr('transform', `translate(0, ${innerHeight})`);
+      const yAxisG1 = g1.append('g');
+
+          var pointsDisplayed = [];
+          selectedGasNames.forEach(function(gas) {
+          pointsToAdd = ( mapping1.filter(function(subArray) { if (subArray.key == gas ){return true} else{return false}}) )[0].value
+          pointsDisplayed = pointsDisplayed.concat(pointsToAdd)
+        })
+
+yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
+          //.domain(d3.extent(data, yValue))
+          .range([innerHeight, 0])
+          .nice();
+
+      xAxisG1.append('text')
+          .attr('class', 'axis-label')
+          .attr('x', innerWidth / 2)
+          .attr('y', 100)
+          .text(xLabel);
+
+      yAxisG1.append('text')
+          .attr('class', 'axis-label')
+          .attr('x', -innerHeight / 2)
+          .attr('y', -60)
+          .attr('transform', `rotate(-90)`)
+          .style('text-anchor', 'middle')
+          .text(yLabel);
+
+           xAxisG1.call(xAxis);
+         yAxisG1.call(yAxis);
+
+         g1.selectAll(".mapping")
+         .data(pointsDisplayed)
+         .enter()
+         .append("circle")
          .attr("class", "mapping")
-         .style("fill", function(d, i) { return zScale(i); })
-         .selectAll("circle")
-         .data(function(d) { return d; })
-         .enter().append("circle")
          .attr("r", 4.5)
          .attr("cx", function(d) { return xScale(d.x); })
-         .attr("cy", function(d) { return yScale(d.y); });
+         .attr("cy", function(d) { return yScale(d.y); })
+         .style("fill", function(d, i) { return zScale[d.key]; })
+         .attr("data-legend", function(d,i) {return i;})
+         .on("mouseover", function(d) {
+              div.transition()
+                 .duration(50)
+                 .style("opacity", .9);
+              div .html(
+                 "Date: " + formatTime(d.x) +
+                "<br/>"  + "Value: " + d.y +
+                "<br/>"  + "Time: " + d.time + 
+                "<br/>"  + "Gas: " + d.key)     
+         .style("left", (d3.event.pageX) + "px")             
+         .style("top", (d3.event.pageY - 28) + "px");
+
+         
+       });
 
 
-        g.append("g")
-         .selectAll("text")
-         .data(gasNames)
-         .enter()
-         .append('text')
-         .attr("class", "legend")
-         .attr("x", function(d, i) { return 0.7*i*legends+ (legends/2); })
-         .attr("y", innerHeight + (margin.bottom/2)+ 5)
-         .style("fill", function(d,i) { 
-              return zScale(d); })
-         .text(function(d,i) { return d; });
+      }
+
+          d3.select("#graph1").append("g")
+          .selectAll(".scatterlegend")
+          .data(selectedGasNames)
+          .enter()
+          .append("input")
+          .attr("type", "button")
+          .attr("class", "scatterlegend")
+          .attr("value", function (d){return d;})
+          .on("click", function(d,i) {
+               selectedGasNames = [d];
+               updategraph1(selectedGasNames)})
+          
         
+        g.selectAll(".mapping")
+         .data(pointsDisplayed)
+         .enter()
+         .append("circle")
+         .attr("class", "mapping")
+         .attr("r", 4.5)
+         .attr("cx", function(d) { return xScale(d.x); })
+         .attr("cy", function(d) { return yScale(d.y); })
+         .style("fill", function(d, i) { return zScale[d.key]; })
+         .attr("data-legend", function(d,i) {return i;})
+         .on("mouseover", function(d) {
+              div.transition()
+                 .duration(50)
+                 .style("opacity", .9);
+              div .html(
+                 "Date: " + formatTime(d.x) +
+                "<br/>"  + "Value: " + d.y +
+                "<br/>"  + "Time: " + d.time + 
+                "<br/>"  + "Gas: " + d.key)     
+         .style("left", (d3.event.pageX) + "px")             
+         .style("top", (d3.event.pageY - 28) + "px");
+       });
+
+      
+         // .append('text')
+         // .attr("class", "legend")
+         // .attr("x", function(d, i) { return 0.7*i*legends+ (legends/2); })
+         // .attr("y", innerHeight + (margin.bottom/2)+ 5)
+         // .style("fill", function(d) { 
+         //      return zScale(d); })
+         // .on("click", function(d) {
+         //    var active   = d.active ? false : true,
+         //    newOpacity = active ? 0 : 1;  
+         //    d3.select("#tag"+d.replace(/\s+/g, '')) 
+         //      .transition().duration(100) 
+         //      .style("opacity", newOpacity);
+         //    d.active = active;})       
+         //.text(function(d) { return d; });
+
+      // var legend = g.selectAll(".legend")
+      //               .data(zScale.domain())
+      //               .enter().append("g")
+      //               .classed("legend", true)
+      //               .attr("transform", function(d, i) {
+      //                   return "translate(0," + i * 20 + ")";
+      //               });
+
+      //  legend.append("rect")
+      //        .attr("x", width + 10)
+      //        .attr("width", 12)
+      //        .attr("height", 12)
+      //        .style("fill", zScale);
        
+      //  legend.on("click", function(type) {
+      //   // dim all of the icons in legend
+      //     d3.selectAll(".legend")
+      //       .style("opacity", 0.1);
+      //   // make the one selected be un-dimmed
+      //     d3.select(this)
+      //       .style("opacity", 1);
+      //   // select all dots and apply 0 opacity (hide)
+      //     d3.selectAll(".dot")
+      //   //  .transition()
+      //   //  .duration(500)
+      //       .style("opacity", 0.0)
+      //   // filter out the ones we want to show and apply properties
+      //       .filter(function(d) {
+      //       return d["first_careunit"] == type;
+      //   })
+      //       .style("opacity", 1) // need this line to unhide dots
+      //       .style("stroke", "black")
+      //   // apply stroke rule
+      //       .style("fill", function(d) {
+      //           if (d.hospital_expire_flag == 1) {
+      //               return this
+      //           } else {
+      //               return "white"
+      //           };
+      //       });
+      //   });
+
+      //   legend.append("text")
+      //         .attr("x", width + 26)
+      //         .attr("dy", ".65em")
+      //         .text(function(d) {
+      //             return d;
+      //         });
+    //d3.select("button.reset").on("click", change)
+    //d3.select("button.changexlos").on("click", updateX)
+
+        // g.append("g")
+        //  .selectAll("text")
+        //  .data(mapping)
+        //  .enter()
+        //  .append('text')
+        //  .attr("class", "legend")
+        //  .attr("x", function(d, i) { return 0.7*i*legends+ (legends/2); })
+        //  .attr("y", innerHeight + (margin.bottom/2)+ 5)
+        //  .style("fill", function(d,i) { 
+        //       return zScale(d.key); })
+        //  .on("click", function(d){  
+        //         var active   = d.active ? false : true,
+        //         newOpacity = active ? 0 : 1;  
+        //         d3.select("#tag"+d.key.replace(/\s+/g, '')) 
+        //             .transition().duration(100) 
+        //             .style("opacity", newOpacity);
+        //         d.active = active;                       
+        //         })        
+        //  .text(function(d,i) { return d.key; });
+
 
          xAxisG.call(xAxis);
          yAxisG.call(yAxis);
 
       });
+}
     </script>
+  </head>
+  <body>
+    <div id=graph1> <svg width="960" height="500"></svg> </div>
+
   </body>
 </html>
