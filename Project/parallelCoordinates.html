@@ -19,15 +19,23 @@
                padding: 3px;
                border: 1px solid gray;
                display: block;}
-        #pcPanel1 {
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            text-align: center;
-        }
         #pcPanel1 tspan{
             display: inline-block;
         }
+        #pcPanel1 {
+            margin: 0 auto;
+            display: none;
+            text-align: center;
+            display: inline-block;
+        }
+        #pcPanel2 {
+            float: left;
+        }
+        #pcPanel3 {
+            float: right;
+        }
+        
+        
         
         
         
@@ -38,13 +46,43 @@
             text-align: center;
             
         }
-        #parallCoord2, .variablesPanel {
-            float: left;
+        
+
+        #daySelectionDiv, #methodDiv {
+            text-align: center;
+            margin:auto;
+        }
+        #methodDiv {
+            margin: 16px 10px;
+            font-size: 1.1rem;
+        }
+        #startEndDays{
+            display: none; /*at the start*/
+            margin: auto;
+            text-align: center;
+        }
+        #bestOrWorstDays {
+            display: inline-block;
+            text-align: center;
+            margin: auto;
+            font-size: 1.1rem;
         }
         
-        
-        #selectStartEndDays, #selectBestOrWorseDays{
+        #submitButton{
             display: inline-block;
+            margin: 4px 8px;
+            padding: 12px 16px;
+            border: 2px black groove;
+            font-weight: bold;
+            background-color: ivory;
+        }
+        #submitButton:hover{
+            border: 2px blue groove;
+            background-color: lightyellow;
+        }
+        #submitButton:active{
+            border: 2px lightblue groove;
+            background-color: green;
         }
         
     </style>
@@ -107,7 +145,7 @@
             //We use a copy of the ByDay dataset, so we can apply subselections on it
             pc_wAndS_data = weatherAndStationByDay_data.slice()
             console.log(pc_wAndS_data)
-            updatePC(width_1, height_1, pcSvg1, pc_wAndS_data, weather_dimensions)
+            updatePC(width_1, height_1, pcSvg1, pc_wAndS_data,weatherAndStationByDay_data, weather_dimensions)
             
             pc1Boxes = d3.select('#pcPanel1')
                 .selectAll('g')
@@ -121,7 +159,7 @@
                         .attr('checked', 'true')
                         .on('click', function(d){ 
                                         examineCheckbox(d3.select(this).node(), d, weather_dimensions)
-                                        updatePC(width_1, height_1, pcSvg1, pc_wAndS_data, weather_dimensions)})
+                                        updatePC(width_1, height_1, pcSvg1, pc_wAndS_data,weatherAndStationByDay_data, weather_dimensions)})
             pc1Boxes.append('label')
                         .text(function(d) { return d})
 
@@ -144,7 +182,7 @@
                         .attr('name', "weatherPollutant")
                         .attr('value', function(d) {return d})
                         .on('click', function(d){ weather_variable = d
-                                                  updatePC(width_2, height_2, pcSvg2, weatherAndStationByDay_data, [weather_variable , air_variable]) })
+                                                  updatePC(width_2, height_2, pcSvg2, pc_wAndS_data,weatherAndStationByDay_data, [weather_variable , air_variable]) })
             
             weatherRadio.append('label')
                         .text(function(d) { return d})
@@ -161,13 +199,13 @@
                         .attr('name', "airPollutant")
                         .attr('value', function(d) {return d})
                         .on('click', function(d){ air_variable = d
-                                                  updatePC(width_2, height_2, pcSvg2, pc_wAndS_data, [weather_variable , air_variable])
+                                                  updatePC(width_2, height_2, pcSvg2, pc_wAndS_data,weatherAndStationByDay_data, [weather_variable , air_variable])
                                         })
             
             airRadio.append('label')
                         .text(function(d) { return d})
             
-            updatePC(width_2, height_2, pcSvg2, pc_wAndS_data, [weather_variable , air_variable])
+            updatePC(width_2, height_2, pcSvg2, pc_wAndS_data, weatherAndStationByDay_data,[weather_variable , air_variable])
             
             
             //  Using HTML5's input-date to limit the day range
@@ -187,32 +225,83 @@
               .attr("onkeydown", "return false")
               .on('change', function(){d3.select('#maxDateInput')
                                          .attr("min", this.value);
-                                       pc_wAndS_data = filterAgDayDataset_byDay(weatherAndStationByDay_data,
-                                                                                         new Date(this.value), 
-                                                                                         new Date(document.getElementById("maxDateInput").value) ) 
-                                       console.log(pc_wAndS_data) ;
-                                       updatePC(width_1, height_1, pcSvg1, pc_wAndS_data, weather_dimensions) ;})
+                                         //filtering moved to the Submit button
+//                                       pc_wAndS_data = filterAgDayDataset_byDay(weatherAndStationByDay_data,
+//                                                                                         new Date(this.value), 
+//                                                                                         new Date(document.getElementById("maxDateInput").value) ) 
+//                                       console.log(pc_wAndS_data) ;
+                                       ;})
             d3.select('#maxDateInput')
               .attr("onkeydown", "return false")
               .on('change', function(){d3.select('#minDateInput')
                                          .attr("max", this.value);
-                                       pc_wAndS_data = filterAgDayDataset_byDay(weatherAndStationByDay_data,
-                                                                                   new Date(document.getElementById("minDateInput").value),
-                                                                                   new Date(this.value)) ;
-                                       console.log(pc_wAndS_data) ;
-                                       updatePC(width_1, height_1, pcSvg1, pc_wAndS_data, weather_dimensions) ;})
+//                                       pc_wAndS_data = filterAgDayDataset_byDay(weatherAndStationByDay_data,
+//                                                                                   new Date(document.getElementById("minDateInput").value),
+//                                                                                   new Date(this.value)) ;
+//                                       console.log(pc_wAndS_data) ;
+                                      })
             
             
             //The instrument to select N best/worst days with respect to an air pollutant
-            //In progress
-            pickDays(pc_wAndS_data.slice(), 5, "CO", false)
             
-        
+            gas_select = d3.select("#selectComparisonVariable")
             
-  });
-        })
+            gas_select.selectAll(".airOption")
+              .data(air_dimensions)
+              .enter()
+              .append("option")
+              .attr("class", "airOption")
+              .attr("value", function(d) {return d})
+              .html(function(d) {return d})
+              
+             
+            d3.select("#submitButton")
+              .on('click', function() {
+                    if (document.getElementById("selectMethod").value == "bestWorst") {
+                        //filter the dataset: the N best/worst days for the specified air pollutant
+                        objective = document.getElementById("selectBestVsWorst").value
+                                      var pickBest;
+                                      if(objective == "best"){pickBest = true}
+                                       else {pickBest = false}
+                                       
+                                       gas = document.getElementById("selectComparisonVariable").value
+                                        N = document.getElementById("howManyDays").value
+                                                     
+                                       pc_wAndS_data = pickDays(weatherAndStationByDay_data, N, gas, pickBest)
+                                       air_variable = gas
+                    }
+                    else{
+                        pc_wAndS_data = filterAgDayDataset_byDay(weatherAndStationByDay_data,
+                                                                     new Date(d3.select("#minDateInput").node().value), 
+                                                                     new Date(d3.select("#maxDateInput").node().value) ) 
+                    }
+                    updatePC(width_1, height_1, pcSvg1, pc_wAndS_data, weatherAndStationByDay_data, weather_dimensions)
+                    updatePC(width_2, height_2, pcSvg2, pc_wAndS_data, weatherAndStationByDay_data, [weather_variable , air_variable])
+                                       
+                    })
+            
+            
+            //The instrument to select the method to display a number of days: date range VS. N best/worst
+            d3.select("#selectMethod")
+              .on("change", function(){
+                                if (this.value == "dateRange"){
+                                    d3.select("#bestOrWorstDays")
+                                      .style("display", "none")
+                                    d3.select("#startEndDays")
+                                      .style("display", "inline-block")
+                                }
+                                if (this.value == "bestWorst"){
+                                    d3.select("#bestOrWorstDays")
+                                      .style("display", "inline-block")
+                                    d3.select("#startEndDays")
+                                      .style("display", "none")
+                                } })
+        document.getElementById("submitButton").click()
+            
+        });//close read csv2
+        })//close read cs1
          
- }
+ }//close init
         
     </script>
     
@@ -220,21 +309,45 @@
 <body>
     <div id="parallCoordSection">
     <h3>Weather factors and air pollutants by day</h3>
-        <p>In the <strong>first graph of this section</strong>, we represent the daily average values of one weather variable and one air pollutant. <br/>
+        <p>The aim of this section is to visualize and understand the conditions of different days. </p>
+        <p>In the <strong>first graph</strong>, we represent the daily average values of one weather variable and one air pollutant. <br/>
         The values are represented as parallel coordinates, as an additional tool to try to understand the degree of correlation between a meteorological variable and air pollution.</p>
-        <p>The aim of this section is to visualize and understand the conditions of different days. <br/>
-        In <strong>second graph of this section</strong>, we get an overview of <em>all</em> the meteorological conditions, in the days we are examining</p>
-        <p><em>How to use : </em> At the start, all days are displayed, cluttering the graph. You can pick a starting and ending date, to examine a limited number of days. <br/>You can also choose the best or worst <em>N</em> days to be displayed.</p>
-    <div class="daySelectionDiv">
+        <p>
+        In the <strong> second graph</strong>, we get an overview of <em>all</em> the meteorological conditions, in the days we are examining</p>
+        <p><em>How to use : </em><br/> 
+        At the start, we display data relative to the 5 worst days for CO. To choose the days to explore, you can use 2 methods: <br/>
+        1. Display the <em>N</em> the best or worst days for a given air pollutant <br/>
+        2. Pick a starting and ending date, to examine a number of consecutive days. <br/>
+</p>
+    <div id="daySelectionDiv">
         <h4>Day Selection</h4>
-        <div id="selectStartEndDays">
-        <form>Starting date : <input type="date" id="minDateInput"/></form>
-        <form>Ending date : <input type="date" id="maxDateInput"/></form>
+        <div id="methodDiv">
+            Method of selection:
+            <select id="selectMethod">
+                <option value="bestWorst"> Select the N best/worst days </option>
+                <option value="dateRange"> Select a starting and ending date </option>
+            </select>
         </div>
-        or 
-        <div id="selectBestOrWorstDays">
+        <div id="startEndDays">
+            <form>Starting date : <input type="date" id="minDateInput"/></form>
+            <form>Ending date : <input type="date" id="maxDateInput"/></form>
         </div>
+        <div id="bestOrWorstDays">
+            <form action="">
+                Select the   
+                <input type="number" id="howManyDays" min="1" max="30"value="5">
+                <select id="selectBestVsWorst">
+                    <option value="worst"> worst </option>
+                    <option value="best"> best </option>
+                </select>
+                days for : 
+                <select id="selectComparisonVariable">
+                </select>
+            <br/>
+            </form>
         </div>
+        <input type="button" id="submitButton" value="Submit">
+    </div>
         
     <div id="parallCoord2Div"  class="parallCoordDiv">
         <h4>Compare the daily values of one weather variable with one air pollutant</h4>

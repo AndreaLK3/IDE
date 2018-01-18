@@ -14,8 +14,9 @@
                 //console.log(dimensions)
             }
         
+
 ///////// Creates and/or updates the graph of parallel coordinates, given a list of dimensions
-function updatePC(width, height, pcSvg, dataset, dimensions) {
+function updatePC(width, height, pcSvg, dataset, entire_dataset, dimensions) {
     
     //console.log("Dimensions:" + dimensions)
     
@@ -32,7 +33,7 @@ function updatePC(width, height, pcSvg, dataset, dimensions) {
     var yScales = {}
     dimensions.map(function (dim) { 
                         yScales[dim] = d3.scaleLinear().range([height - padding,0])
-                                        .domain( getExtentOfProperty(dataset, dim) ); 
+                                        .domain( getExtentOfProperty(entire_dataset, dim) ); 
                                   return undefined;})
     ///////// Line generator
     var line = d3.line()
