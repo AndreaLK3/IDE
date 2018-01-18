@@ -196,6 +196,14 @@
           pointsDisplayed = pointsDisplayed.concat(pointsToAdd)
         })
 
+        pointsDisplayed = pointsDisplayed.filter(function(point) {
+          if(point.y == "" || point === undefined) {
+            return false;
+          }else {
+            return true;
+          }
+        })
+
 yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
           //.domain(d3.extent(data, yValue))
           .range([innerHeight, 0])
@@ -251,9 +259,18 @@ yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
           .enter()
           .append("input")
           .attr("type", "button")
+          .style("background-color", "lightsteelblue")
+          .style("border-color", "black")
           .attr("class", "scatterlegend")
           .attr("value", function (d){return d;})
           .on("click", function(d,i) {
+               d3.selectAll(".scatterlegend")
+                 .style("background-color", "lightsteelblue")
+                 .style("border-color", "black")
+        
+               d3.select(this)
+               .style("background-color", "red")
+               .style("border-color", "black")
                selectedGasNames = [d];
                updategraph1(selectedGasNames)})
           
