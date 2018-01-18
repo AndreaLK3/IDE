@@ -133,7 +133,7 @@
         var pointsDisplayed = [];
         gasNames.forEach(function(gas) {
           pointsToAdd = ( mapping1.filter(function(subArray) { if (subArray.key == gas ){return true} else{return false}}) )[0].value
-          pointsDisplayed.concat(pointsToAdd)
+          pointsDisplayed = pointsDisplayed.concat(pointsToAdd)
         })
         console.log(pointsDisplayed)
 
