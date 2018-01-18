@@ -200,6 +200,9 @@
           pointsDisplayed = pointsDisplayed.concat(pointsToAdd)
         })
 
+           xAxisG1.call(xAxis);
+         yAxisG1.call(yAxis);
+         
          g1.selectAll(".mapping")
          .data(pointsDisplayed)
          .enter()
@@ -222,8 +225,7 @@
          .style("left", (d3.event.pageX) + "px")             
          .style("top", (d3.event.pageY - 28) + "px");
 
-          xAxisG1.call(xAxis);
-         yAxisG1.call(yAxis);
+         
        });
 
 
