@@ -44,6 +44,16 @@
         border-radius: 8px;
       }
 
+      .scatterlegend{
+        display: inline-block;
+        padding: 4px;
+        margin: 6px;
+      }
+
+      #graph1buttons{
+        text-align: center;
+      }
+
     </style>
 
         <script>
@@ -235,7 +245,7 @@ yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
 
       }
 
-          d3.select("#graph1").append("g")
+          d3.select("#graph1buttons").append("g")
           .selectAll(".scatterlegend")
           .data(selectedGasNames)
           .enter()
@@ -366,7 +376,8 @@ yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
     </script>
   </head>
   <body>
+      <div id=graph1buttons> </div>
     <div id=graph1> <svg width="960" height="500"></svg> </div>
-
+  
   </body>
 </html>
