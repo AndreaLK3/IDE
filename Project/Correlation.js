@@ -28,10 +28,8 @@ function drawScatterplot(variable1, variable2, width, height, data) {
     var xValue = function (d) {
         return d[variable1];
     }
-    console.log("Width: " + width)
-    console.log(0 + padding)
-    console.log(width - padding)
-    var xScale = d3.scaleLinear().range([0 + padding, width - padding]),
+
+    var xScale = d3.scaleLinear().range([0 + padding + (0 + padding / 2) , width - padding]),
         xMap = function (d) {
 
             return xScale(d[variable1]);
@@ -56,7 +54,7 @@ function drawScatterplot(variable1, variable2, width, height, data) {
 
     svg_g.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + (height - padding) + ")")
+        .attr("transform", "translate(" + 0 + "," + (height - padding) + ")")
         .call(xAxis)
         .append("text")
         .attr("class", "label")
@@ -67,7 +65,7 @@ function drawScatterplot(variable1, variable2, width, height, data) {
 
     svg_g.append("g")
         .attr("class", "y axis")
-        .attr("transform", "translate(" + (padding) + ", 0)")
+        .attr("transform", "translate(" + (1.5 * padding) + ", 0)")
         .call(yAxis)
         .append("text")
         .attr("class", "label")
@@ -76,8 +74,6 @@ function drawScatterplot(variable1, variable2, width, height, data) {
         .style("text-anchor", "end")
         .text(variable2);
 
-    console.log(svg_g.selectAll(".dot")
-        .data(data))
     svg_g.selectAll(".dot")
         .data(data)
         .enter().append("circle")
@@ -99,6 +95,21 @@ function drawScatterplot(variable1, variable2, width, height, data) {
                 d3.select(this).remove()
             }
         })
+
+    svg_g.append("text")
+        .attr("transform", "translate(" + (width / 2 + 10 + (padding / 2))+ " ," +
+            (height - 1.5 * padding + 50) + ")")
+        .style("text-anchor", "middle")
+        .style("font-size", "rem")
+        .text(variable1);
+
+    svg_g.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0)
+        .attr("x", 0 - (height / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text(variable2);
 }
 
 function createHistogram(width, height, pickedDimension, allDims, raw_stationdata) {
@@ -128,13 +139,14 @@ function createHistogram(width, height, pickedDimension, allDims, raw_stationdat
         .domain([-1, +1])
         .range([height - padding, 0 + padding]);
 
-    var columnOffset = 10;
+    var columnOffset = padding / 2 + 10;
 
     svg_2.selectAll(".bar")
         .data(corrs.map(function (d) {
             return d.correlationValue;
         }))
-        .enter().append("rect")
+        .enter()
+        .append("rect")
         .attr("class", "bar")
         .attr("x", function (d, i) {
             return "" + (columnOffset + x(corrs[i].dimension)) + "";
@@ -180,34 +192,36 @@ function createHistogram(width, height, pickedDimension, allDims, raw_stationdat
             }
             return Math.abs(y(d) - y(0))
         })
+        .attr("title",function(d){
+            return d.toFixed(3);
+        })
         .on('click', function (d, i) {
                 drawScatterplot(pickedDimension, corrs[i].dimension, width, height, raw_stationdata)
             }
-        )
+        );
 
 
     /** Axis **/
     svg_2.append("g")
-        .attr("transform", "translate(0," + (height / 2) + ")")
+        .attr("transform", "translate(" + (0 + padding / 2) + "," + (height / 2) + ")")
         .call(d3.axisBottom(x));
 
     svg_2.append("g")
-        .attr("transform", "translate(" + padding + ", 0 )")
+        .attr("transform", "translate(" + (1.5 * padding) + ", 0 )")
         .call(d3.axisLeft(y));
 
     svg_2.append("text")
-        .attr("transform", "translate(" + (width / 2 + 10)+ " ," +
-            (height - padding + 30) + ")")
+        .attr("transform", "translate(" + (width / 2 + 10 + (padding / 2))+ " ," +
+            (height - 1.5 * padding + 20) + ")")
         .style("text-anchor", "middle")
-        .style("font-size", "1.2rem")
-        .text("Weather Factors");
+        .style("font-size", "rem")
+        .text("Other Pollutants & Weather Factors");
 
     svg_2.append("text")
         .attr("transform", "rotate(-90)")
-        .attr("y", 0 + padding - 60)
+        .attr("y", 0)
         .attr("x", 0 - (height / 2))
         .attr("dy", "1em")
-        .style("font-size", "1.2rem")
         .style("text-anchor", "middle")
         .text("Correlation Coefficient");
 }

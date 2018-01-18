@@ -96,6 +96,8 @@
                         .append('input')
                         .attr('class', 'histogramButton')
                         .attr('type', 'button')
+                        .style("background-color","lightblue")
+                        .style("border-color","blue")
                         .attr('name', function (d) {
                             return d;
                         })
@@ -107,6 +109,12 @@
                         })
                         .attr('border', '1px solid gray')
                         .on("click", function () {
+                            d3.selectAll(".histogramButton")
+                                .style("background-color","lightblue")
+                                .style("border-color","blue")
+                            d3.select(this)
+                                .style("background-color","yellow")
+                                .style("border-color","orange")
                             thisDim = this.getAttribute('value')
                             createHistogram(width, height, thisDim, allDims, raw_stationdata);
                         });
@@ -120,15 +128,17 @@
 </head>
 <body>
 <h2>Correlation between factors impacted on the weather</h2>
-<p>This set of graphs explore the correlation between factors that are related to the environmental conditions of Andersen Boulevard
-    in the city of Copenhagen. We include data from a whole months, retrieving per 30 minutes a day. The whole page includes three major
-    parts, a button panel for all the weather factors, a bar chart showing the correlation coefficient between the selected factor and all
-    the other one, and a scatter plot that plotted out the whole valid data from the data set.</p>
+<p>This set of graphs explore the correlation between air pollutants and weather factors that are related to the environmental conditions
+    of Andersen Boulevard in the city of Copenhagen. We include data from a whole months, retrieving per 30 minutes a day. The whole page includes
+    three major parts, a button panel for all the air pollutants and weather factors, a bar chart showing the correlation coefficient between the
+    selected factor and all the other ones, and a scatter plot that plotted out the whole valid data from the data set with selected factor on x-axis and
+    another response factor on y-axis.</p>
 <h3><em>How To Use:</em></h3>
 <ol><li>Select one factor as an explanatory variable(the one on y-axis in a scatter plot) from the button panel and then the rest of the factors will be
     automatically set as all the response variables(the one on y-axis in a scatter plot) as default.</li>
     <li>The bar chart will show the user the correlation coefficients between the explanatory variable and the response variables.</li>
-    <li>When clicking on the bar, the full scatter plot between those two selected variables will be presented.</li>
+    <li>When clicking on the bar, the full scatter plot between our explanatory variable and picked response variable will be presented.(If the bar is not
+        barely visible, try to click the text on the axis.)</li>
 </ol>
 <svg id="forCyclesPivot"></svg>
 <div id="buttonsPanel"></div>
