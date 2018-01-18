@@ -130,8 +130,16 @@
           return {key : unnamedArray[0].key, value: unnamedArray}
         })
 
-        console.log(mapping);
-        console.log(mapping1);
+        var pointsDisplayed = [];
+        gasNames.forEach(function(gas) {
+          pointsToAdd = ( mapping1.filter(function(subArray) { if (subArray.key == gas ){return true} else{return false}}) )[0].value
+          pointsDisplayed.concat(pointsToAdd)
+        })
+        console.log(pointsDisplayed)
+
+
+        // console.log(mapping);
+        // console.log(mapping1);
 
 
         var legends = width/gasNames.length;
@@ -157,7 +165,7 @@
         //     .style("fill", "blue");
         
         g.selectAll(".mapping")
-         .data(mapping)
+         .data(pointsDisplayed)
          .enter().append("g")
          .attr("class", "mapping")
          .style("fill", function(d, i) { return zScale(i); })
