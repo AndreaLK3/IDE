@@ -171,14 +171,7 @@
 
         selectedGasNames = gasNames.slice();
 
-        // g.selectAll('circle').data(data)
-        //   .enter().append('circle')
-        //     .attr('cx', d => xScale(xValue(d)))
-        //     .attr('cy', d => yScale(yValue(d)))
-        //     .attr('fill-opacity', 0.6)
-        //     .attr('r', 3.5)
-        //     .style("fill", "blue");
-
+      
         function updategraph1(selectedGasNames) {
 
           svg.selectAll('*').remove()
@@ -298,93 +291,7 @@ yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
        });
 
       
-         // .append('text')
-         // .attr("class", "legend")
-         // .attr("x", function(d, i) { return 0.7*i*legends+ (legends/2); })
-         // .attr("y", innerHeight + (margin.bottom/2)+ 5)
-         // .style("fill", function(d) { 
-         //      return zScale(d); })
-         // .on("click", function(d) {
-         //    var active   = d.active ? false : true,
-         //    newOpacity = active ? 0 : 1;  
-         //    d3.select("#tag"+d.replace(/\s+/g, '')) 
-         //      .transition().duration(100) 
-         //      .style("opacity", newOpacity);
-         //    d.active = active;})       
-         //.text(function(d) { return d; });
-
-      // var legend = g.selectAll(".legend")
-      //               .data(zScale.domain())
-      //               .enter().append("g")
-      //               .classed("legend", true)
-      //               .attr("transform", function(d, i) {
-      //                   return "translate(0," + i * 20 + ")";
-      //               });
-
-      //  legend.append("rect")
-      //        .attr("x", width + 10)
-      //        .attr("width", 12)
-      //        .attr("height", 12)
-      //        .style("fill", zScale);
        
-      //  legend.on("click", function(type) {
-      //   // dim all of the icons in legend
-      //     d3.selectAll(".legend")
-      //       .style("opacity", 0.1);
-      //   // make the one selected be un-dimmed
-      //     d3.select(this)
-      //       .style("opacity", 1);
-      //   // select all dots and apply 0 opacity (hide)
-      //     d3.selectAll(".dot")
-      //   //  .transition()
-      //   //  .duration(500)
-      //       .style("opacity", 0.0)
-      //   // filter out the ones we want to show and apply properties
-      //       .filter(function(d) {
-      //       return d["first_careunit"] == type;
-      //   })
-      //       .style("opacity", 1) // need this line to unhide dots
-      //       .style("stroke", "black")
-      //   // apply stroke rule
-      //       .style("fill", function(d) {
-      //           if (d.hospital_expire_flag == 1) {
-      //               return this
-      //           } else {
-      //               return "white"
-      //           };
-      //       });
-      //   });
-
-      //   legend.append("text")
-      //         .attr("x", width + 26)
-      //         .attr("dy", ".65em")
-      //         .text(function(d) {
-      //             return d;
-      //         });
-    //d3.select("button.reset").on("click", change)
-    //d3.select("button.changexlos").on("click", updateX)
-
-        // g.append("g")
-        //  .selectAll("text")
-        //  .data(mapping)
-        //  .enter()
-        //  .append('text')
-        //  .attr("class", "legend")
-        //  .attr("x", function(d, i) { return 0.7*i*legends+ (legends/2); })
-        //  .attr("y", innerHeight + (margin.bottom/2)+ 5)
-        //  .style("fill", function(d,i) { 
-        //       return zScale(d.key); })
-        //  .on("click", function(d){  
-        //         var active   = d.active ? false : true,
-        //         newOpacity = active ? 0 : 1;  
-        //         d3.select("#tag"+d.key.replace(/\s+/g, '')) 
-        //             .transition().duration(100) 
-        //             .style("opacity", newOpacity);
-        //         d.active = active;                       
-        //         })        
-        //  .text(function(d,i) { return d.key; });
-
-
          xAxisG.call(xAxis);
          yAxisG.call(yAxis);
 
