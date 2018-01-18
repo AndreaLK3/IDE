@@ -180,6 +180,17 @@
           .attr('transform', `translate(0, ${innerHeight})`);
       const yAxisG1 = g1.append('g');
 
+          var pointsDisplayed = [];
+          selectedGasNames.forEach(function(gas) {
+          pointsToAdd = ( mapping1.filter(function(subArray) { if (subArray.key == gas ){return true} else{return false}}) )[0].value
+          pointsDisplayed = pointsDisplayed.concat(pointsToAdd)
+        })
+
+yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
+          //.domain(d3.extent(data, yValue))
+          .range([innerHeight, 0])
+          .nice();
+
       xAxisG1.append('text')
           .attr('class', 'axis-label')
           .attr('x', innerWidth / 2)
@@ -194,15 +205,9 @@
           .style('text-anchor', 'middle')
           .text(yLabel);
 
-          var pointsDisplayed = [];
-          selectedGasNames.forEach(function(gas) {
-          pointsToAdd = ( mapping1.filter(function(subArray) { if (subArray.key == gas ){return true} else{return false}}) )[0].value
-          pointsDisplayed = pointsDisplayed.concat(pointsToAdd)
-        })
-
            xAxisG1.call(xAxis);
          yAxisG1.call(yAxis);
-         
+
          g1.selectAll(".mapping")
          .data(pointsDisplayed)
          .enter()
@@ -215,7 +220,7 @@
          .attr("data-legend", function(d,i) {return i;})
          .on("mouseover", function(d) {
               div.transition()
-                 .duration(200)
+                 .duration(50)
                  .style("opacity", .9);
               div .html(
                  "Date: " + formatTime(d.x) +
@@ -256,7 +261,7 @@
          .attr("data-legend", function(d,i) {return i;})
          .on("mouseover", function(d) {
               div.transition()
-                 .duration(200)
+                 .duration(50)
                  .style("opacity", .9);
               div .html(
                  "Date: " + formatTime(d.x) +
