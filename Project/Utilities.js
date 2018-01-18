@@ -339,3 +339,43 @@ function removeFromArrayNoChange(arr, obj){
 }
 
 
+
+//Returns : -1 if time1 < time2, 
+// + 1 if time2 > time1 , 0 if equal
+function orderTimeStrings(time1, time2){
+    hourAndminutes1 = time1.split(":")
+    hourAndminutes2 = time1.split(":")
+    
+    hour1 = parseInt(hourAndminutes1[0])
+    minutes1 = parseInt(hourAndminutes1[1])
+    
+    hour2 = parseInt(hourAndminutes2[0])
+    minutes2 = parseInt(hourAndminutes2[1])
+    
+    if (hour1 < hour2){
+        return -1
+    }
+    if (hour1 > hour2){
+        return 1
+    }
+    if (hour1 == hour2){
+        
+        if (minutes1 < minutes2){
+            return -1
+        }
+        if (minutes1 > minutes2){
+            return 1
+        }
+        else {return 0}
+    }
+    
+    
+}
+    
+    
+    
+    
+    
+    
+}
+

@@ -96,8 +96,8 @@
                         .append('input')
                         .attr('class', 'histogramButton')
                         .attr('type', 'button')
-                        .style("background-color","lightblue")
-                        .style("border-color","blue")
+                        .style("background-color","lightblue") //Phase 1
+                        .style("border-color","blue") //
                         .attr('name', function (d) {
                             return d;
                         })
@@ -110,11 +110,11 @@
                         .attr('border', '1px solid gray')
                         .on("click", function () {
                             d3.selectAll(".histogramButton")
-                                .style("background-color","lightblue")
-                                .style("border-color","blue")
+                                .style("background-color","lightblue") // Phase 2
+                                .style("border-color","blue") //
                             d3.select(this)
-                                .style("background-color","yellow")
-                                .style("border-color","orange")
+                                .style("background-color","yellow") // Phase 3
+                                .style("border-color","orange") //
                             thisDim = this.getAttribute('value')
                             createHistogram(width, height, thisDim, allDims, raw_stationdata);
                         });
