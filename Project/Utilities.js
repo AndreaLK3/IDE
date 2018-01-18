@@ -324,4 +324,17 @@ function removeFromArray(arr, obj){
     }
 }
 
+//This function modifies the array passed to it,
+//eliminating 1 copy of the specified object
+function removeFromArrayNoChange(arr, obj){
+    var index = arr.indexOf(obj)
+    var newArray = arr.slice()
+    if (index > -1) {
+        newArray.splice(index, 1);
+    }
+    //console.log(newArray.length)
+    //console.log(arr)
+    return newArray;
+}
+
 

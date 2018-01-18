@@ -103,15 +103,15 @@
                      .sort();
         //console.log(gasNames);
 
-        // var mapping = gasNames.map(function(mapping) {
-        //   return data.map(function(d) {
-        //     return {key: mapping, x: parseTime(d.Date), y: +d[mapping]};
-        //   });
-        // });
+        var mapping = gasNames.map(function(mapping) {
+          return data.map(function(d) {
+            return {key: mapping, x: parseTime(d.Date), y: +d[mapping]};
+          });
+        });
 
-                var mapping = d3.nest().key(function (d) {return d[0];})
-                                .rollup(function(v) { return {x: parseTime(v.Date), y: +v[gasNames]};})
-                                .entries(data);      
+                // var mapping = d3.nest().key(function (d) {return gasNames;})
+                //                 .rollup(function(v) { return {x: parseTime(v.Date), y: +v[gasNames]};})
+                //                 .entries(data);      
 console.log(mapping);
 
         var legends = width/gasNames.length;

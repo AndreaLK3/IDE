@@ -31,14 +31,13 @@
         font-size: 10px;
         font-weight: bold;
       }
-      }
     </style>
   </head>
   <body>
     <svg width="960" height="500"></svg>
     <script>
 
-    d3.select('window').on('load', init1)
+    d3.select(window).on('load', init1)
 
     function init1(){
 
@@ -110,7 +109,7 @@
                      .sort();
         //console.log(gasNames);
 
-        var mapping = gasNames.map(function(gasName) {
+        var mapping = gasNames.map(function(gasName) {return gasName;}, function(gasName) {
           theValue = []
           data.forEach( function(d){
             if (d.Time.length == 4){
@@ -123,7 +122,8 @@
             }
             theValue.push(new_object)
 
-          })
+           })
+          return { key: gasName, value: theValue;}
         }
         )
 
