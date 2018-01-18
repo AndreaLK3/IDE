@@ -6,6 +6,13 @@
     <title>Graph2 : Parallel coordinates</title>
     <style>
 
+        #parallCoordSection{
+            text-align: center;
+        }
+        #parallDescriptionDiv {
+            text-align: left;
+        }
+        
         
         .variablesPanel {
                text-align: center;
@@ -37,14 +44,15 @@
         
         
         
-        
-        
         .parallCoordDiv {
             border: 4px groove burlywood;
             margin: 0 4px;
             display: inline-block;
             text-align: center;
             
+        }
+        #parallCoord1Div {
+            max-width: 80%;
         }
         
 
@@ -115,11 +123,11 @@
         
             ////////// Specify width, height and margins of the SVG
             var margin = {top: 30, right: 10, bottom: 10, left: 10};
-            var width_1 = 0.6 * window.screen.width - margin.left - margin.right;
+            var width_1 = 0.5 * window.screen.width - margin.left - margin.right;
             var height_1 = 0.8 * width_1 - margin.top - margin.bottom;
             
             var width_2 = 0.35 * window.screen.width - margin.left - margin.right;
-            var height_2 = height_1;
+            var height_2 = width_2;
             
             pcSvg1 = d3.select("#parallCoord1")
                             .attr("width", width_1)
@@ -308,6 +316,7 @@
 </head>
 <body>
     <div id="parallCoordSection">
+    <div id="parallDescriptionDiv">
     <h3>Weather factors and air pollutants by day</h3>
         <p>The aim of this section is to visualize and understand the conditions of different days. </p>
         <p>In the <strong>first graph</strong>, we represent the daily average values of one weather variable and one air pollutant. <br/>
@@ -318,7 +327,8 @@
         At the start, we display data relative to the 5 worst days for CO. To choose the days to explore, you can use 2 methods: <br/>
         1. Display the <em>N</em> the best or worst days for a given air pollutant <br/>
         2. Pick a starting and ending date, to examine a number of consecutive days. <br/>
-</p>
+        </p>
+    </div>
     <div id="daySelectionDiv">
         <h4>Day Selection</h4>
         <div id="methodDiv">
