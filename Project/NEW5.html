@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <!-- <meta name="viewport" content="width=device-width"> -->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <title>Graph 1: Scatter Plot of Greenhouse Gases</title>
+    <style>
+      body {
+        margin: 0px;
+      }
+      .domain {
+        display: none;
+      }
+      .tick line {
+       stroke: #C0C0BB;
+       /*fill: none;*/
+      }
+      .tick text {
+        fill: #8E8883;
+        font-size: 8pt;
+        font-family: sans-serif;
+      }
+      .axis-label {
+        fill: #635F5D;
+        font-size: 16pt;
+        font-family: sans-serif;
+      }
+      .legend {
+        text-anchor: middle;
+        font-size: 10px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <svg width="960" height="500"></svg>
+    <script>
+
+    d3.select(window).on('load', init1)
+
+    function init1(){
+
+      console.log("Started")
+
+
+      var parseTime = d3.timeParse("%d/%m/%Y");
+
+      const xValue = d => d.Date;
+      const xLabel = 'Dates';
+      const yValue = d => d.NOX;
+      const yLabel = 'Gases';
+
+
+      const margin = { left: 120, right: 30, top: 20, bottom: 120 };
+
+      const svg = d3.select('svg');
+      const width = svg.attr('width');
+      const height = svg.attr('height');
+      const innerWidth = width - margin.left - margin.right;
+      const innerHeight = height - margin.top - margin.bottom;
+
+      const g = svg.append('g')
+          .attr('transform', `translate(${margin.left},${margin.top})`);
+      const xAxisG = g.append('g')
+          .attr('transform', `translate(0, ${innerHeight})`);
+      const yAxisG = g.append('g');
+
+      xAxisG.append('text')
+          .attr('class', 'axis-label')
+          .attr('x', innerWidth / 2)
+          .attr('y', 100)
+          .text(xLabel);
+
+      yAxisG.append('text')
+          .attr('class', 'axis-label')
+          .attr('x', -innerHeight / 2)
+          .attr('y', -60)
+          .attr('transform', `rotate(-90)`)
+          .style('text-anchor', 'middle')
+          .text(yLabel);
+
+      const xScale = d3.scaleTime();
+      const yScale = d3.scaleLinear();
+      const zScale = d3.scaleOrdinal(d3.schemeCategory10);
+
+
+      const xAxis = d3.axisBottom()
+        .scale(xScale)
+        .tickPadding(15)
+        .tickSize(-innerHeight);
+
+      const yAxis = d3.axisLeft()
+        .scale(yScale)
+        .ticks(5)
+        .tickPadding(15)
+        .tickSize(-innerWidth);
+
+      const row = d => {
+        d.Date = parseTime(d.Date);
+        d.NOX = +d.NOX;
+        return d;
+      };
+
+      d3.csv('newAndersenBoulevard.csv', data => {
+
+        var gasNames = d3.keys(data[0])
+                     .filter(function(d) { return d !== "Date" && d !== "Time"; })
+                     .sort();
+        //console.log(gasNames);
+
+        var mapping = gasNames.map(function(gasName) {return gasName;}, function(gasName) {
+          theValue = []
+          data.forEach( function(d){
+            if (d.Time.length == 4){
+              d.Time = "0" + d.Time
+            }
+            new_object = {
+              Date : d.Date,
+              Time: d.Time
+,              Measurement: d[gasName]
+            }
+            theValue.push(new_object)
+
+           })
+          return { key: gasName, value: theValue;}
+        }
+        )
+
+        console.log(mapping)
+        //})
+});
+}
+        // var mapping = gasNames.map(function(gasName) {
+        //   return {key: gasName, value: data.map(function(d) {
+        //     return {x: parseTime(d.Date), y: +d[mapping]};
+      //   //   })}
+      //   // })
+      //   // .keys(function(d) {return d;})
+      //   // .entries(data);
+
+      //   var legends = width/gasNames.length;
+
+      //   xScale
+      //     .domain(d3.extent(d3.merge(mapping), function(d) { return d.x; }))
+      //     //.domain(d3.extent(data, xValue))
+      //     .range([0, innerWidth])
+      //     .nice();
+
+      //   yScale
+      //     .domain(d3.extent(d3.merge(mapping), function(d) { return d.y; }))
+      //     //.domain(d3.extent(data, yValue))
+      //     .range([innerHeight, 0])
+      //     .nice();
+
+      //   // g.selectAll('circle').data(data)
+      //   //   .enter().append('circle')
+      //   //     .attr('cx', d => xScale(xValue(d)))
+      //   //     .attr('cy', d => yScale(yValue(d)))
+      //   //     .attr('fill-opacity', 0.6)
+      //   //     .attr('r', 3.5)
+      //   //     .style("fill", "blue");
+      //   console.log(mapping);
+
+      //   g.selectAll(".mapping")
+      //    .data(mapping)
+      //    .enter().append("g")
+      //    .attr("class", "mapping")
+      //    .style("fill", function(d, i) { return zScale(i); })
+      //    .selectAll("circle")
+      //    .data(function(d) { return d; })
+      //    .enter().append("circle")
+      //    .attr("r", 4.5)
+      //    .attr("cx", function(d) { return xScale(d.x); })
+      //    .attr("cy", function(d) { return yScale(d.y); });
+
+
+      //   g.append("g")
+      //    .selectAll("text")
+      //    .data(gasNames)
+      //    .enter()
+      //    .append('text')
+      //    .attr("class", "legend")
+      //    .attr("x", function(d, i) { return 0.7*i*legends+ (legends/2); })
+      //    .attr("y", innerHeight + (margin.bottom/2)+ 5)
+      //    .style("fill", function(d,i) { 
+      //         return zScale(d); })
+      //    .on("click", function(d,i) {
+      //         var active = d.active ? false: true,
+      //         newOpacity = active ? 0 : 1;
+      //         d3.select("#tag" + d.replace(/\s+/g, ''))
+      //           .transition().duration(100)
+      //           .style("opacity", newOpacity); 
+      //         d.active = active; 
+      //    })
+      //    .text(function(d) { return d; });
+        
+       
+
+      //    xAxisG.call(xAxis);
+      //    yAxisG.call(yAxis);
+
+      // });
+    </script>
+  </body>
+</html>

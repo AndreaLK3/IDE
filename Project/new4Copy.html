@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <!-- <meta name="viewport" content="width=device-width"> -->
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <title>Graph 1: Scatter Plot of Greenhouse Gases</title>
     <style>
@@ -24,13 +25,13 @@
         fill: #635F5D;
         font-size: 16pt;
         font-family: sans-serif;
-      }
+
       .legend {
         text-anchor: middle;
         font-size: 10px;
         font-weight: bold;
       }
-
+      }
     </style>
   </head>
   <body>
@@ -104,11 +105,14 @@
 
         var mapping = gasNames.map(function(mapping) {
           return data.map(function(d) {
-            return {x: parseTime(d.Date), y: +d[mapping]};
+            return {key: mapping, x: parseTime(d.Date), y: +d[mapping]};
           });
         });
-                console.log(mapping);
 
+                // var mapping = d3.nest().key(function (d) {return gasNames;})
+                //                 .rollup(function(v) { return {x: parseTime(v.Date), y: +v[gasNames]};})
+                //                 .entries(data);      
+console.log(mapping);
 
         var legends = width/gasNames.length;
 
@@ -124,25 +128,42 @@
           .range([innerHeight, 0])
           .nice();
 
-        // g.selectAll('circle').data(data)
-        //   .enter().append('circle')
-        //     .attr('cx', d => xScale(xValue(d)))
-        //     .attr('cy', d => yScale(yValue(d)))
-        //     .attr('fill-opacity', 0.6)
-        //     .attr('r', 3.5)
-        //     .style("fill", "blue");
-        
-        g.selectAll(".mapping")
-         .data(mapping)
-         .enter().append("g")
-         .attr("class", "mapping")
-         .style("fill", function(d, i) { return zScale(i); })
-         .selectAll("circle")
-         .data(function(d) { return d; })
-         .enter().append("circle")
-         .attr("r", 4.5)
-         .attr("cx", function(d) { return xScale(d.x); })
-         .attr("cy", function(d) { return yScale(d.y); });
+
+         // g.selectAll(".mapping")
+         // .data(mapping)
+         // .enter().append("g")
+         // .attr("class", "mapping")
+         // .selectAll("path")
+         // .data(function(d) { return d; })
+         // .enter().append("path")
+         // .style("stroke", function(d, i) { return zScale(i); })
+         // .attr("d", function(d) { return yScale(d.y); });
+
+
+//         g.selectAll(".mapping")
+//          .data(mapping)
+//          .enter().append("g")
+//          .attr("class", "line")
+// //         .style("fill", function(d, i) { return zScale(i); })
+//          .selectAll("line")
+//          .data(function(d) { return d; })
+//          .enter().append("line")
+//          .attr("stroke-width","2")
+//          .attr("stroke","black")
+//          .attr("x1", function(d,i) {if (i > 0) 
+//                                       {return xScale((d[i-1]).x)+"px";} 
+//                                     else 
+//                                       {return xScale(d.x) +"px"} })
+//          .attr("y1", function(d,i) {if (i > 0) 
+//                                            {return yScale((d[i-1]).y)+"px";} 
+//                                            else 
+//                                            {return yScale(d.y)+"px"} })
+//          .attr("x2", function(d,i) {return xScale(d.x)+"px" })
+//          .attr("y2", function(d,i) {return yScale(d.y)+"px" });
+               
+         // .attr("r", 4.5)
+         // .attr("cx", function(d) { return xScale(d.x); })
+         // .attr("cy", function(d) { return yScale(d.y); });
 
 
         g.append("g")
