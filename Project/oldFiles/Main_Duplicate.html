@@ -2,14 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Weather Factor and Air Pollutants: Impact Analysis</title>
+    <title>Weather Factor and Air Pollutants Impact Analysis</title>
 
     <link rel="stylesheet" type="text/css" href="css/MainStyle.css">
-    <link rel="stylesheet" type="text/css" href="css/Graph1.css">
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script type="text/javascript" src="js/math.js"></script>
     <script src="js/Utilities.js"></script>
-    <script src="js/Graph1.js"></script>
     <script src="js/Correlation.js"></script>
     <script src="js/ParallelCoordinates.js"></script>
 
@@ -18,9 +16,6 @@
         d3.select(window).on('load', init)
 
         function init() {
-            
-            init1(); //draws the first graph; to be found in Graph1.js
-            
             var width = 960,
                 height = 500;
 
@@ -288,7 +283,7 @@
 
 <header id="intro-header" style="background-image: url('img/Cover page picture.jpg')">
     <div class="intropage">
-        <h1 class="text">Weather and Air Pollutants: <br/>Exploring the Impact</h1>
+        <h1 class="text">Air Quality in Copenhagen</h1>
         <p class="byline text">
             ---Interactive Data Exploration Final Project
         </p>
@@ -299,94 +294,27 @@
         </p>
     </div>
 </header>
-    
-    
-<div><h2>Introduction</h2>
-    <p>Increased human activity and burning of fossil fuels have caused increased air pollution. To combat it, greenhouse gases and particulates are recorded daily. However, there are some underlying questions that are rarely asked, such as:<br/>
-    how do the daily weather conditions influence the amount of air pollutants in a city?
-    </p>
-     <p>This website wishes to give the residents of Copenhagen a means to explore the connections between the gases/particulates in the air and the meteorological conditions of the day.<br/>
-     The air pollution data was recorded by the measuring station in Andersen Boulevard. It covers the month from the 9th of December 2017 to 9th of January 2018. <br/>
-    The air pollution and weather datasets are provided by the the Institut for Miljøvidenskab of the Aarhus University (<a href="http://envs2.au.dk/Luftdata/Presentation/table/Copenhagen/HCAB">here</a>)</p>
-    <p>
-    The pollutant gases and particulates are recorded once every 30 minutes, making a total of 48 values per day for each gas/particulate. We present visulizations of some greenhouse gases and particulate matters, and their correlation with the weather conditions and phenomena. The dataset was saved as a CSV file before processing </p></div>
-    <br/> 
-    
-    
-    <h2>Greenhouse Gases and Particulates during the month</h2>
-    <p>5 greenhouse gases and 2 particulate matters were considered. Each contained 1454 data values.<br/>
-    The greenhouse gases are carbon monoxide(CO), nitrogen dioxide(NO2), Nitrogen oxides(NOX), Ozone(O3) and Sulfur dioxide(SO2); the particulate matters are PM10 and PM2.5 .</p>
-    <p>The volume of the data produces a clustered visulaization. So, some buttons have been provided for selection of one specific gas/particulate, with changing scale depending on the value range.<br/>
-    Also, additional information is provided on each data point to highlight the date and time of data collection, the value recorded and gas/particulate type. Simply hover on a point to get its information. </p>
 
-
-<div id=graph1buttons> </div>
-<div id=graph1> 
-    <svg width="960" height="500"></svg> 
-</div>
-    <div id="sliderContainerDiv">
-    <h3>Hours of the day</h3>
-    <p>It is possible to display in the scatterplot only the measurements made during a specific hour of the day (eg: 7:30, 19:00).<br/>
-    To return to the visualization of the entire day, click one of the buttons above that display a specific air pollutant.</p>>
-    <svg width="960" id="sliderContainerSvg"> &nbsp; 
-    </svg>
-</div>
-
-<div id="CorrSection">
-    <h1 align="center">Correlation between air pollutants and weather factors</h1>
-    <h3>Overview of the visualization</h3>
-    <p class="justified">The next 2 graphs explore the mathematical correlation between air pollutants and weather factors.<br/>
-    This section includes
-    three major parts:</p>
-    <ul>
-        <li>A <tspan  class="italic">buttons panel</tspan>, to display the data relative to one specific variable, among all the air pollutants and weather factors</li>
-        <li>A <tspan  class="italic">bar chart</tspan> showing the correlation coefficient between the selected factor and all the other ones</li>
-        <li>A <tspan  class="italic">scatter plot</tspan>, that plots out all the entries from the data set, with the selected factor on x-axis and
-        another response factor on y-axis.</li>
-    </ul>
-    
-
-    <h3>Short explanation on correlation</h3>
-    <p class="justified">In this data visualization, we adopt the idea of Pearson's correlation coefficient. It is the covariance of the two variables divided by
-        the product of their standard deviations. It is also known as the bivariate correlation, a measure of the linear correlation between two variables X and Y.<br/>
-        It has a value between +1 and −1, where 1 is total positive linear correlation, 0 is no linear correlation, and −1 is total negative linear correlation.<br/>
-        Generally,
-        the correlation value will indicate how strong the impact of X on Y (or viceversa), in either a positive or a negative trend.<br/>However, a warning is to be given: correlation does not imply causation (X and Y may both be influenced in the same way by another variable, called the 'lurking' variable) </p>
-    <h3><strong><em>How To Use:</em></strong></h3>
-    <ol><li><tspan  class="italic">Select one factor</tspan> to examine from the button panel.</li>
-        <li>The bar chart will show the user the correlation coefficients between the chosen variable and all the other variables.</li>
-        <li>When <tspan  class="italic">clicking on a bar</tspan>, the full scatter plot of the data entries, comparing our chosen variable with the other variable, will be presented in the second graph. (In the case the bar is only 
-            barely visible, click close to the text on the axis.)</li>
-    </ol>
-    <div id="allMyInteraction">
-    <div id="buttonsPanel"></div>
-    <div id="graphButton"></div>
-    <svg id="cHistogram"></svg>
-    <svg id="scatterPlot_svg"></svg>
-    </div>
-    
-    
 <div id="parallCoordSection">
     <div id="parallDescriptionDiv">
-        <h1 align="center">Exploring the daily values of weather factors and air pollutants</h1>
+        <h1 align="center">Weather factors and air pollutants by day</h1>
         <h3>Overview</h3>
-        <p class="">The aim of this section is to empower the users with a tool to explore the conditions of different days. <br/>
-         The user has the opportunity to select appropriate subsets of the data, in order to make new discoveries and search the connections between weather factors and air pollutants. </p>
-        <p class="">The <strong>first graph</strong> displays the daily average values of one weather variable and one air pollutant.<br/>
-            The values are represented as parallel coordinates, to try to visualize the degree of correlation between a meteorological variable and air pollution.<br/>
-            The <strong> second graph</strong> presents an view of the overall the meteorological conditions, in the days we are examining</p>
+        <p class="justified">The aim of this section is to visualize and understand the conditions of different days. </p>
+        <p class="justified">In the <strong>first graph</strong>, we represent the daily average values of one weather variable and one air pollutant. <br/>
+            The values are represented as parallel coordinates, as an additional tool to try to understand the degree of correlation between a meteorological variable and air pollution.</p>
+        <p>
+            In the <strong> second graph</strong>, we get an overview of <em>all</em> the meteorological conditions, in the days we are examining</p>
         <h3><strong><em>How To Use:</em></strong></h3>
-        <p class>
-            At the start, we display data relative to the 5 worst days for CO. To choose the days to explore, you can use 2 methods: <br/><br/>
-            1. Display the <em>N</em> best or worst days for a given air pollutant <br/>
+        <p class="justified">
+            At the start, we display data relative to the 5 worst days for CO. To choose the days to explore, you can use 2 methods: <br/>
+            1. Display the <em>N</em> the best or worst days for a given air pollutant <br/>
             2. Pick a starting and ending date, to examine a number of consecutive days. <br/>
         </p>
     </div>
-    <p><tspan class="italic">Example of a finding</tspan>: Select the 10 best days for NO2, and you will see that they are correlated with a very low Solar Radiation.</p>
     <div id="daySelectionDiv">
-        <h3>Day Selection</h3>
+        <h4>Day Selection</h4>
         <div id="methodDiv">
-            <h4>Method of selection:</h4>
+            Method of selection:
             <select id="selectMethod">
                 <option value="bestWorst"> Select the N best/worst days </option>
                 <option value="dateRange"> Select a starting and ending date </option>
@@ -427,6 +355,33 @@
     </div>
 </div>
 
+<div id="CorrSection">
+    <h1 align="center">Correlation between air pollutants and weather factors</h1>
+    <h3>Overview of the visualizations</h3>
+    <p class="justified">This set of graphs explore the correlation between air pollutants and weather factors that are related to the environmental conditions
+        of Andersen Boulevard in the city of Copenhagen. We include data from a whole months, retrieving per 30 minutes a day. The whole page includes
+        three major parts, a button panel for all the air pollutants and weather factors, a bar chart showing the correlation coefficient between the
+        selected factor and all the other ones, and a scatter plot that plotted out the whole valid data from the data set with selected factor on x-axis and
+        another response factor on y-axis.</p>
+
+    <h3>Short Introduction of understanding correlation</h3>
+    <p class="justified">In this data visualization, we adopt the idea of Pearson's correlation coefficient. It is the covariance of the two variables divided by
+        the product of their standard deviations. It is also known as the bivariate correlation, a measure of the linear correlation between two variables X and Y.
+        It has a value between +1 and −1, where 1 is total positive linear correlation, 0 is no linear correlation, and −1 is total negative linear correlation.Generally,
+        the correlation will infer how strong the impact between X and Y in an either positive or negative trend.</p>
+    <h3><strong><em>How To Use:</em></strong></h3>
+    <ol><li>Select one factor as an explanatory variable(the one on y-axis in a scatter plot) from the button panel and then the rest of the factors will be
+        automatically set as all the response variables(the one on y-axis in a scatter plot) as default.</li>
+        <li>The bar chart will show the user the correlation coefficients between the explanatory variable and the response variables.</li>
+        <li>When clicking on the bar, the full scatter plot between our explanatory variable and picked response variable will be presented.(If the bar is not
+            barely visible, try to click the text on the axis.)</li>
+    </ol>
+    <div id="allMyInteraction">
+    <div id="buttonsPanel"></div>
+    <div id="graphButton"></div>
+    <svg id="cHistogram"></svg>
+    <svg id="scatterPlot_svg"></svg>
+    </div>
 </div>
 </body>
 </html>

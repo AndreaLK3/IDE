@@ -212,7 +212,7 @@ function createHistogram(width, height, pickedDimension, allDims, raw_stationdat
 
     svg_2.append("text")
         .attr("transform", "translate(" + (width / 2 + 10 + (padding / 2))+ " ," +
-            (height - 1.5 * padding + 20) + ")")
+            (height / 5 - 1.5 * padding + 20) + ")")
         .style("text-anchor", "middle")
         .style("font-size", "rem")
         .text("Other Pollutants & Weather Factors");

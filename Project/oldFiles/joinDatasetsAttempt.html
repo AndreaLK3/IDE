@@ -6,12 +6,11 @@
     <title>Creating joined Dataset</title>
     
 <script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="Utilities.js"></script>
-<script src="ParallelCoordinates.js"></script>
+<script src="js/Utilities.js"></script>
+<script src="js/ParallelCoordinates.js"></script>
 
 <script>
 d3.select(window).on('load', init)
-
     
     function addStationName(raw_station_Dataset, stationName){
         raw_station_Dataset.forEach(function (obj){
@@ -20,7 +19,6 @@ d3.select(window).on('load', init)
         return raw_station_Dataset
         
     }
-    
     
     function joinStationObjects(arrStationObjects, keys){
         joined_object = {}
@@ -90,7 +88,7 @@ d3.select(window).on('load', init)
     
     
 function init(){
-    d3.csv("AndersenBoulevard.csv", function(error, raw_stationdata_AB) {
+    d3.csv("data/AndersenBoulevard.csv", function(error, raw_stationdata_AB) {
         if (error) throw error;  
         stationdata_AB = addDateAndTime(raw_stationdata_AB)
         stationdata_AB = addStationName(stationdata_AB, "AndersenBoulevard")
@@ -104,20 +102,20 @@ function init(){
         
         //console.log(stationdata_AB)
         
-        d3.csv("HCØ.csv", function(error, raw_stationdata_HC) {
+        d3.csv("data/HCØ.csv", function(error, raw_stationdata_HC) {
             if (error) throw error;  
             stationdata_HC = addDateAndTime(raw_stationdata_HC)
             stationdata_HC = addStationName(stationdata_HC, "HCØ")
             //console.log(stationdata_HC)
             
             
-            d3.csv("Hvidovre.csv", function(error, raw_stationdata_HV) {
+            d3.csv("data/Hvidovre.csv", function(error, raw_stationdata_HV) {
                 if (error) throw error;  
                 stationdata_HV = addDateAndTime(raw_stationdata_HV)
                 stationdata_HV = addStationName(stationdata_HV, "Hvidovre")
                 //console.log(stationdata_HV)
                 
-                d3.csv("Jagtvej.csv", function(error, raw_stationdata_J) {
+                d3.csv("data/Jagtvej.csv", function(error, raw_stationdata_J) {
                     if (error) throw error;  
                     stationdata_J = addDateAndTime(raw_stationdata_J)
                     stationdata_J = addStationName(stationdata_J, "Jagtvej")
@@ -130,7 +128,7 @@ function init(){
                     //var jsonObject = JSON.stringify(joinedRawDataset);
                     
                     //console.log(joinedRawDataset)
-                    const items = joinedRawDataset
+                    const items = addDateAndTime(joinedRawDataset)
                     console.log(items)
                     const replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here
                     const header = Object.keys(items[0])
