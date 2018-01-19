@@ -77,9 +77,9 @@
       const innerHeight = height - margin.top - margin.bottom;
 
       const g = svg.append('g')
-          .attr('transform', `translate(${margin.left},${margin.top})`);
+          .attr('transform', 'translate(${margin.left},${margin.top})');
       const xAxisG = g.append('g')
-          .attr('transform', `translate(0, ${innerHeight})`);
+          .attr('transform', 'translate(0, ${innerHeight})');
       const yAxisG = g.append('g');
 
       xAxisG.append('text')
@@ -92,7 +92,7 @@
           .attr('class', 'axis-label')
           .attr('x', -innerHeight / 2)
           .attr('y', -60)
-          .attr('transform', `rotate(-90)`)
+          .attr('transform', 'rotate(-90)')
           .style('text-anchor', 'middle')
           .text(yLabel);
 
@@ -177,10 +177,10 @@
           svg.selectAll('*').remove()
           console.log("Updating Graph1")
           var g1 = svg.append('g')
-          .attr('transform', `translate(${margin.left},${margin.top})`)
+          .attr('transform', 'translate(${margin.left},${margin.top})')
 
           const xAxisG1 = g1.append('g')
-          .attr('transform', `translate(0, ${innerHeight})`);
+          .attr('transform', 'translate(0, ${innerHeight})');
       const yAxisG1 = g1.append('g');
 
           var pointsDisplayed = [];
@@ -212,7 +212,7 @@ yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
           .attr('class', 'axis-label')
           .attr('x', -innerHeight / 2)
           .attr('y', -60)
-          .attr('transform', `rotate(-90)`)
+          .attr('transform', 'rotate(-90)')
           .style('text-anchor', 'middle')
           .text(yLabel);
 
