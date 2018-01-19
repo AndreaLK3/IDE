@@ -288,9 +288,15 @@ yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
                 "<br/>"  + "Gas: " + d.key)     
          .style("left", (d3.event.pageX) + "px")             
          .style("top", (d3.event.pageY - 28) + "px");
+
        });
 
-      
+        g.append("text")
+         .attr("x", (innerWidth / 2))             
+         .attr("y", 0 - (margin.top / 3))
+         .attr("text-anchor", "middle")  
+         .style("font-size", "16px") 
+         .text("Scatter Plot of Greenhouse Gases");      
        
          xAxisG.call(xAxis);
          yAxisG.call(yAxis);
@@ -300,9 +306,10 @@ yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
     </script>
   </head>
   <body>
-    <div id=graph1buttons> </div>
+    
     <div id=graph1> <svg width="960" height="500"></svg> </div>
-
+    <div id=graph1buttons> </div>
+    
   <input id="slider" type="range" min="00:00" max="23:30" value="00:00" step="1"/>
   
   <span id="range">00:00</span>
