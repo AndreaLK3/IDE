@@ -21,6 +21,35 @@
         #cHistogram, #scatterPlot_svg {
             border: 1px solid gray;
         }
+        h1,h2,h3{
+            display: block;
+            margin-top: 0.67em;
+            margin-bottom: 0.67em;
+            margin-left: 0;
+            margin-right: 0;
+            font-family: "Comic Sans MS";
+        }
+
+        p,ol{
+            display: block;
+            font-size: medium;
+            margin-top: 0.67em;
+            margin-bottom: 0.67em;
+            margin-left: 0;
+            margin-right: 0;
+            padding: 15px;
+            font-weight: bold;
+            font-family: "Times New Roman";
+        }
+
+        ol{
+            margin-left: 12px;
+        }
+        .justified{
+            text-align: justify;
+        }
+
+
 
     </style>
     <title>Graph3: Correlation</title>
@@ -36,8 +65,7 @@
             var width = 960,
                 height = 500;
 
-            color = d3.scaleOrdinal("schemeCategory10");
-
+            var color = d3.scaleOrdinal("schemeCategory10");
 
             d3.csv("AndersenBoulevard.csv", function (error, raw_stationdata) {
 
@@ -129,13 +157,19 @@
 
 </head>
 <body>
-<h2>Correlation between factors impacted on the weather</h2>
-<p>This set of graphs explore the correlation between air pollutants and weather factors that are related to the environmental conditions
+<h1 align="center">Correlation between air pollutants and weather factors</h1>
+<h3>Overview of the visualizations</h3>
+<p class="justified">This set of graphs explore the correlation between air pollutants and weather factors that are related to the environmental conditions
     of Andersen Boulevard in the city of Copenhagen. We include data from a whole months, retrieving per 30 minutes a day. The whole page includes
     three major parts, a button panel for all the air pollutants and weather factors, a bar chart showing the correlation coefficient between the
     selected factor and all the other ones, and a scatter plot that plotted out the whole valid data from the data set with selected factor on x-axis and
     another response factor on y-axis.</p>
-<h3><em>How To Use:</em></h3>
+
+<h3>Short Introduction of understanding correlation</h3>
+<p>Pearson's correlation coefficient is the covariance of the two variables divided by the product of their standard deviations. The form of the definition
+    involves a "product moment", that is, the mean (the first moment about the origin) of the product of the mean-adjusted random variables; hence the modifier
+    product-moment in the name.</p>
+<h3><strong><em>How To Use:</em></strong></h3>
 <ol><li>Select one factor as an explanatory variable(the one on y-axis in a scatter plot) from the button panel and then the rest of the factors will be
     automatically set as all the response variables(the one on y-axis in a scatter plot) as default.</li>
     <li>The bar chart will show the user the correlation coefficients between the explanatory variable and the response variables.</li>
