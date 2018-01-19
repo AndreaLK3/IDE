@@ -104,7 +104,7 @@
         
     function init(){
     
-        d3.csv("StationDataset.csv", function(error, raw_stationdata) {
+        d3.csv("StationDataset.csv", function(error, raw_stationdata) { 
             if (error) throw error;  
             //console.log(raw_stationdata)
             stationdata = addDateAndTime(raw_stationdata)
