@@ -344,7 +344,7 @@ function removeFromArrayNoChange(arr, obj){
 // + 1 if time2 > time1 , 0 if equal
 function orderTimeStrings(time1, time2){
     hourAndminutes1 = time1.split(":")
-    hourAndminutes2 = time2.split(":")
+    hourAndminutes2 = time1.split(":")
     
     hour1 = parseInt(hourAndminutes1[0])
     minutes1 = parseInt(hourAndminutes1[1])
@@ -369,6 +369,6 @@ function orderTimeStrings(time1, time2){
         else {return 0}
     }
 }
-    
+
     
 

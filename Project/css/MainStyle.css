@@ -1,0 +1,204 @@
+/*Introduction page*/
+#intro-header {
+    background: center center no-repeat;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+    margin-bottom: 10px;
+    height: 800px;
+}
+
+#intro-header .intropage {
+    background: rgba(0,20,40,0.6);
+    overflow: hidden;
+    height: 100%;
+    max-width: 100%;
+    z-index: 2;
+}
+
+#intro-header .intropage {
+    color: white;
+    text-align: center;
+    padding-top: 0px;
+}
+#intro-header .text{
+    padding-top: 150px;
+}
+#intro-header h1 {
+    font-size: 80px;
+}
+
+#intro-header .byline {
+    font-size: 40px;
+    text-align: right;
+}
+
+#intro-header .webDevelopers {
+    font-size: 25px;
+    font-family: "Brush Script MT";
+    text-align: right;
+}
+
+#intro-header .webDevelopers a {
+    color: lightblue;
+}
+
+/*Main Content style*/
+h1,h2,h3{
+    display: block;
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
+    margin-left: 0;
+    margin-right: 0;
+    font-family: "Comic Sans MS";
+}
+
+p,ol{
+    display: block;
+    font-size: medium;
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 15px;
+    font-weight: bold;
+    font-family: "Times New Roman";
+}
+
+ol{
+    margin-left: 12px;
+}
+
+.justified{
+    text-align: justify;
+}
+.intropage, #CorrSection ,#parallCoordSection{
+    margin: 0 0;
+}
+
+
+/*Correlation style*/
+#buttonsPanel {
+    margin: 0px;
+    padding: 15px;
+    border: 0px solid gray;
+    width: 930px;
+    height: 50px;
+    display: inline-block;
+}
+
+#buttonsPanel input {
+    display: inline-block;
+    margin: 5px;
+    border: 2px blue groove;
+    background-color: lightblue;
+    text-align: center;
+}
+
+#cHistogram, #scatterPlot_svg {
+    border: 1px solid gray;
+}
+
+#allMyInteraction{
+    text-align:center;
+}
+#CorrSection{
+    background: lightyellow;
+    padding-top: 10px;
+}
+
+/*Parallel Coordination style*/
+#parallCoordSection{
+    text-align: center;
+    background: blanchedalmond;
+}
+
+#parallDescriptionDiv {
+    text-align: left;
+}
+
+.variablesPanel {
+    text-align: center;
+    margin: 4px;
+    padding: 3px;
+    border: 1px solid gray;
+    display: inline-block;}
+
+.variablesPanel tspan {
+    margin: 4px 8px;
+    padding: 3px;
+    border: 1px solid gray;
+    display: block;}
+
+#pcPanel1 tspan{
+    display: inline-block;
+}
+
+#pcPanel1 {
+    margin: 0 auto;
+    display: none;
+    text-align: center;
+    display: inline-block;
+}
+
+#pcPanel2 {
+    float: left;
+}
+
+#pcPanel3 {
+    float: right;
+}
+
+.parallCoordDiv {
+    border: 4px groove burlywood;
+    margin: 0;
+    display: inline-block;
+    text-align: center;
+}
+
+#parallCoord1Div {
+    max-width: 80%;
+}
+
+#daySelectionDiv, #methodDiv {
+    text-align: center;
+    margin:auto;
+}
+
+#methodDiv {
+    margin: 16px 10px;
+    font-size: 1.1rem;
+}
+
+#startEndDays{
+    display: none;
+    margin: auto;
+    text-align: center;
+}
+
+#bestOrWorstDays {
+    display: inline-block;
+    text-align: center;
+    margin: auto;
+    font-size: 1.1rem;
+}
+
+#submitButton{
+    display: inline-block;
+    margin: 4px 8px;
+    padding: 12px 16px;
+    border: 2px black groove;
+    font-weight: bold;
+    background-color: ivory;
+}
+
+#submitButton:hover{
+    border: 2px blue groove;
+    background-color: lightyellow;
+}
+
+#submitButton:active{
+    border: 2px lightblue groove;
+    background-color: green;
+}

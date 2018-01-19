@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Weather Factor and Air Pollutants Impact Analysis</title>
+
+    <link rel="stylesheet" type="text/css" href="css/MainStyle.css">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script type="text/javascript" src="js/math.js"></script>
+    <script src="js/Utilities.js"></script>
+    <script src="js/Correlation.js"></script>
+    <script src="js/ParallelCoordinates.js"></script>
+
+
+    <script>
+        d3.select(window).on('load', init)
+
+        function init() {
+            var width = 960,
+                height = 500;
+
+            var color = d3.scaleOrdinal("schemeCategory10");
+
+            d3.csv("data/AndersenBoulevard.csv", function (error, raw_stationdata) {
+                    d3.csv("data/WeatherDataset.csv", function(error, raw_weatherdata) {
+                        if (error) throw error;
+                        var weatherdata = addDateAndTime(raw_weatherdata),
+                            weatherdata = filterDataset(weatherdata),
+                            weatherDataByDay = aggregateByDay(weatherdata),
+                            weather_dimensions = Object.keys(weatherDataByDay[0].value),
+                            stationdata = addDateAndTime(raw_stationdata),
+                            stationdata = filterDataset(stationdata),
+                            stationDataByDay = aggregateByDay(stationdata);
+
+                        var air_dimensions = Object.keys(stationDataByDay[0].value);
+
+                        ////////// Specify width, height and margins of the SVG
+                        var margin = {top: 30, right: 10, bottom: 10, left: 10},
+                            width_1 = 0.5 * window.screen.width - margin.left - margin.right,
+                            height_1 = 0.8 * width_1 - margin.top - margin.bottom,
+                            width_2 = 0.35 * window.screen.width - margin.left - margin.right,
+                            height_2 = width_2;
+
+                        var weather_variable = "Wind Speed",
+                            air_variable = "NO2";
+
+                        pcSvg1 = d3.select("#parallCoord1")
+                            .attr("width", width_1)
+                            .attr("height", height_1)
+                            .style("border", "1px solid gray")
+                            .append("g")
+                            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                        pcSvg2 = d3.select("#parallCoord2")
+                            .attr("width", width_2)
+                            .attr("height", height_2)
+                            .style("border", "1px solid gray")
+                            .append("g")
+                            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                        var weatherAndStationByDay_data = joinDatasets(weatherDataByDay, stationDataByDay, "key");
+
+                        // This function creates a parallel coordinates' graph.
+                        //We use a copy of the ByDay dataset, so we can apply sub-selections on it
+                        var pc_wAndS_data = weatherAndStationByDay_data.slice()
+                        updatePC(width_1, height_1, pcSvg1, pc_wAndS_data,weatherAndStationByDay_data, weather_dimensions)
+
+                        pc1Boxes = d3.select('#pcPanel1')
+                            .selectAll('g')
+                            .data(weather_dimensions)
+                            .enter()
+                            .append('tspan')
+                        pc1Boxes.append('input')
+                            .attr('type', 'checkbox')
+                            .attr('name', function(d, i){ return "wdim_"+i; })
+                            .attr('value', function(d) {return d})
+                            .attr('checked', 'true')
+                            .on('click', function(d){
+                                examineCheckbox(d3.select(this).node(), d, weather_dimensions)
+                                updatePC(width_1, height_1, pcSvg1, pc_wAndS_data,weatherAndStationByDay_data, weather_dimensions)})
+                        pc1Boxes.append('label')
+                            .text(function(d) { return d})
+
+                        /////// The next PC graph allows us to visualize one weather variable and one air pollutant variable.
+                        weatherRadio = d3.select('#pcPanel2')
+                            .selectAll('.weatherButtonsSpan')
+                            .data(weather_dimensions)
+                            .enter()
+                            .append('tspan')
+                            .attr("class", "weatherButtonsSpan")
+
+                        weatherRadio.append('input')
+                            .attr('type', 'radio')
+                            .attr('name', "weatherPollutant")
+                            .attr('value', function(d) {return d})
+                            .on('click', function(d){ weather_variable = d
+                                updatePC(width_2, height_2, pcSvg2, pc_wAndS_data,weatherAndStationByDay_data, [weather_variable , air_variable]) })
+
+                        weatherRadio.append('label')
+                            .text(function(d) { return d})
+
+                        airRadio = d3.select('#pcPanel3')
+                            .selectAll('.airButtonsSpan')
+                            .data(air_dimensions)
+                            .enter()
+                            .append('tspan')
+                            .attr("class", "airButtonsSpan")
+
+                        airRadio.append('input')
+                            .attr('type', 'radio')
+                            .attr('name', "airPollutant")
+                            .attr('value', function(d) {return d})
+                            .on('click', function(d){ air_variable = d
+                                updatePC(width_2, height_2, pcSvg2, pc_wAndS_data,weatherAndStationByDay_data, [weather_variable , air_variable])
+                            })
+
+                        airRadio.append('label')
+                            .text(function(d) { return d})
+
+                        updatePC(width_2, height_2, pcSvg2, pc_wAndS_data, weatherAndStationByDay_data,[weather_variable , air_variable])
+
+                        //  Using HTML5's input-date to limit the day range
+                        first_weather_day = weatherDataByDay.slice(-1)[0].key
+                        last_weather_day = weatherDataByDay[0].key
+                        d3.selectAll('#minDateInput, #maxDateInput')
+                            .attr("min", first_weather_day)
+                            .attr("max", last_weather_day)
+
+                        document.getElementById("minDateInput").value = first_weather_day
+                        document.getElementById("maxDateInput").value = last_weather_day
+
+
+                        d3.select('#minDateInput')
+                            .attr("onkeydown", "return false")
+                            .on('change', function(){d3.select('#maxDateInput')
+                                .attr("min", this.value);
+                                //filtering moved to the Submit button
+                                ;})
+                        d3.select('#maxDateInput')
+                            .attr("onkeydown", "return false")
+                            .on('change', function(){d3.select('#minDateInput')
+                                .attr("max", this.value);
+                            })
+
+                        //The instrument to select N best/worst days with respect to an air pollutant
+                        gas_select = d3.select("#selectComparisonVariable")
+
+                        gas_select.selectAll(".airOption")
+                            .data(air_dimensions)
+                            .enter()
+                            .append("option")
+                            .attr("class", "airOption")
+                            .attr("value", function(d) {return d})
+                            .html(function(d) {return d})
+
+
+                        d3.select("#submitButton")
+                            .on('click', function() {
+                                if (document.getElementById("selectMethod").value == "bestWorst") {
+                                    //filter the dataset: the N best/worst days for the specified air pollutant
+                                    objective = document.getElementById("selectBestVsWorst").value
+                                    var pickBest;
+                                    if(objective == "best"){pickBest = true}
+                                    else {pickBest = false}
+
+                                    gas = document.getElementById("selectComparisonVariable").value
+                                    N = document.getElementById("howManyDays").value
+
+                                    pc_wAndS_data = pickDays(weatherAndStationByDay_data, N, gas, pickBest)
+                                    air_variable = gas
+                                }
+                                else{
+                                    pc_wAndS_data = filterAgDayDataset_byDay(weatherAndStationByDay_data,
+                                        new Date(d3.select("#minDateInput").node().value),
+                                        new Date(d3.select("#maxDateInput").node().value) )
+                                }
+                                updatePC(width_1, height_1, pcSvg1, pc_wAndS_data, weatherAndStationByDay_data, weather_dimensions)
+                                updatePC(width_2, height_2, pcSvg2, pc_wAndS_data, weatherAndStationByDay_data, [weather_variable , air_variable])
+
+                            })
+
+                        //The instrument to select the method to display a number of days: date range VS. N best/worst
+                        d3.select("#selectMethod")
+                            .on("change", function(){
+                                if (this.value == "dateRange"){
+                                    d3.select("#bestOrWorstDays")
+                                        .style("display", "none")
+                                    d3.select("#startEndDays")
+                                        .style("display", "inline-block")
+                                }
+                                if (this.value == "bestWorst"){
+                                    d3.select("#bestOrWorstDays")
+                                        .style("display", "inline-block")
+                                    d3.select("#startEndDays")
+                                        .style("display", "none")
+                                } })
+                        document.getElementById("submitButton").click()
+
+
+
+                        var air_dimensions = Object.keys(stationdata[0]);
+                        removeFromArray(air_dimensions, "Time")
+                        removeFromArray(air_dimensions, "Date")
+                        removeFromArray(air_dimensions, "Timestamp")
+
+                        d3.csv("data/WeatherDataset.csv", function (error, raw_weatherdata) {
+                            var weatherdata = addDateAndTime(raw_weatherdata)
+                            var weatherdata = filterDataset(weatherdata)
+
+                            prejoin_stationData = d3.nest().key(function (d) {
+                                return d.Timestamp
+                            })
+                                .rollup(function (arr) {
+                                    return arr[0]
+                                }).entries(stationdata)
+                            prejoin_weatherData = d3.nest().key(function (d) {
+                                return d.Timestamp
+                            })
+                                .rollup(function (arr) {
+                                    return arr[0]
+                                }).entries(weatherdata)
+
+                            joinedDS = joinDatasets(prejoin_stationData, prejoin_weatherData, "key")
+                            weatherAndStation_data = joinedDS.map(function (elem) {
+                                return elem.value
+                            })
+
+                            var weather_dimensions = Object.keys(weatherdata[0]);
+                            removeFromArray(weather_dimensions, "Time")
+                            removeFromArray(weather_dimensions, "Date")
+                            removeFromArray(weather_dimensions, "Timestamp")
+
+
+                            allDims = air_dimensions.concat(weather_dimensions)
+                            corrs = []
+
+                            svg_2 = d3.select("#cHistogram")
+                            svg_2.attr("width", width)
+                                .attr("height", height);
+
+                            padding = 40;
+                            d3.select("#buttonsPanel")
+                                .selectAll('.histogramButton')
+                                .data(allDims)
+                                .enter()
+                                .append('input')
+                                .attr('class', 'histogramButton')
+                                .attr('type', 'button')
+                                .style("background-color","lightblue")
+                                .style("border-color","blue")
+                                .attr('name', function (d) {
+                                    return d;
+                                })
+                                .attr('id', function (d) {
+                                    return d;
+                                })
+                                .attr('value', function (d) {
+                                    return d;
+                                })
+                                .attr('border', '1px solid gray')
+                                .on("click", function () {
+                                    d3.selectAll(".histogramButton")
+                                        .style("background-color","lightblue")
+                                        .style("border-color","blue")
+                                    d3.select(this)
+                                        .style("background-color","yellow")
+                                        .style("border-color","orange")
+                                    thisDim = this.getAttribute('value')
+                                    createHistogram(width, height, thisDim, allDims, raw_stationdata);
+                                });
+
+                            createHistogram(width, height, "NO2", allDims, raw_stationdata)
+                            drawScatterplot("NO2", "CO", width, height, raw_stationdata)
+                        })
+                    })
+                }
+            )}
+
+    </script>
+
+</head>
+<body>
+
+<header id="intro-header" style="background-image: url('img/Cover page picture.jpg')">
+    <div class="intropage">
+        <h1 class="text">Air Quality in Copenhagen</h1>
+        <p class="byline text">
+            ---Interactive Data Exploration Final Project
+        </p>
+        <p class="webDevelopers text">
+            <em>by <a href="mailto:fml689@alumni.ku.dk">Jianfan Chen</a>
+                &amp; <a href="mailto:pfh574@alumni.ku.dk">Grace Adedolapo Olunlade</a>
+                &amp; <a href="mailto:gzt740@alumni.ku.dk">Andrea Lekkas</a></em>
+        </p>
+    </div>
+</header>
+
+<div id="parallCoordSection">
+    <div id="parallDescriptionDiv">
+        <h1 align="center">Weather factors and air pollutants by day</h1>
+        <h3>Overview</h3>
+        <p class="justified">The aim of this section is to visualize and understand the conditions of different days. </p>
+        <p class="justified">In the <strong>first graph</strong>, we represent the daily average values of one weather variable and one air pollutant. <br/>
+            The values are represented as parallel coordinates, as an additional tool to try to understand the degree of correlation between a meteorological variable and air pollution.</p>
+        <p>
+            In the <strong> second graph</strong>, we get an overview of <em>all</em> the meteorological conditions, in the days we are examining</p>
+        <h3><strong><em>How To Use:</em></strong></h3>
+        <p class="justified">
+            At the start, we display data relative to the 5 worst days for CO. To choose the days to explore, you can use 2 methods: <br/>
+            1. Display the <em>N</em> the best or worst days for a given air pollutant <br/>
+            2. Pick a starting and ending date, to examine a number of consecutive days. <br/>
+        </p>
+    </div>
+    <div id="daySelectionDiv">
+        <h4>Day Selection</h4>
+        <div id="methodDiv">
+            Method of selection:
+            <select id="selectMethod">
+                <option value="bestWorst"> Select the N best/worst days </option>
+                <option value="dateRange"> Select a starting and ending date </option>
+            </select>
+        </div>
+        <div id="startEndDays">
+            <form>Starting date : <input type="date" id="minDateInput"/></form>
+            <form>Ending date : <input type="date" id="maxDateInput"/></form>
+        </div>
+        <div id="bestOrWorstDays">
+            <form action="">
+                Select the
+                <input type="number" id="howManyDays" min="1" max="30"value="5">
+                <select id="selectBestVsWorst">
+                    <option value="worst"> worst </option>
+                    <option value="best"> best </option>
+                </select>
+                days for :
+                <select id="selectComparisonVariable">
+                </select>
+                <br/>
+            </form>
+        </div>
+        <input type="button" id="submitButton" value="Submit">
+    </div>
+
+    <div id="parallCoord2Div"  class="parallCoordDiv">
+        <h4>Compare the daily values of one weather variable with one air pollutant</h4>
+        <div id="pcPanel2" class="variablesPanel"> <h4>Weather variable</h4></div>
+        <svg id="parallCoord2"></svg>
+        <div id="pcPanel3" class="variablesPanel"><h4>Air pollutant</h4></div>
+    </div>
+
+    <div id="parallCoord1Div" class="parallCoordDiv">
+        <h4>Examine the overall meteorological conditions of the selected days</h4>
+        <div id="pcPanel1" class="variablesPanel">Choose the variables to display : </div>
+        <svg id="parallCoord1"></svg>
+    </div>
+</div>
+
+<div id="CorrSection">
+    <h1 align="center">Correlation between air pollutants and weather factors</h1>
+    <h3>Overview of the visualizations</h3>
+    <p class="justified">This set of graphs explore the correlation between air pollutants and weather factors that are related to the environmental conditions
+        of Andersen Boulevard in the city of Copenhagen. We include data from a whole months, retrieving per 30 minutes a day. The whole page includes
+        three major parts, a button panel for all the air pollutants and weather factors, a bar chart showing the correlation coefficient between the
+        selected factor and all the other ones, and a scatter plot that plotted out the whole valid data from the data set with selected factor on x-axis and
+        another response factor on y-axis.</p>
+
+    <h3>Short Introduction of understanding correlation</h3>
+    <p class="justified">In this data visualization, we adopt the idea of Pearson's correlation coefficient. It is the covariance of the two variables divided by
+        the product of their standard deviations. It is also known as the bivariate correlation, a measure of the linear correlation between two variables X and Y.
+        It has a value between +1 and −1, where 1 is total positive linear correlation, 0 is no linear correlation, and −1 is total negative linear correlation.Generally,
+        the correlation will infer how strong the impact between X and Y in an either positive or negative trend.</p>
+    <h3><strong><em>How To Use:</em></strong></h3>
+    <ol><li>Select one factor as an explanatory variable(the one on y-axis in a scatter plot) from the button panel and then the rest of the factors will be
+        automatically set as all the response variables(the one on y-axis in a scatter plot) as default.</li>
+        <li>The bar chart will show the user the correlation coefficients between the explanatory variable and the response variables.</li>
+        <li>When clicking on the bar, the full scatter plot between our explanatory variable and picked response variable will be presented.(If the bar is not
+            barely visible, try to click the text on the axis.)</li>
+    </ol>
+    <div id="allMyInteraction">
+    <div id="buttonsPanel"></div>
+    <div id="graphButton"></div>
+    <svg id="cHistogram"></svg>
+    <svg id="scatterPlot_svg"></svg>
+    </div>
+</div>
+</body>
+</html>
