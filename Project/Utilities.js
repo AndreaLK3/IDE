@@ -335,7 +335,7 @@ function removeFromArrayNoChange(arr, obj){
     }
     //console.log(newArray.length)
     //console.log(arr)
-    return newArray; 
+    return newArray;  
 }
 
 
