@@ -77,9 +77,9 @@
       const innerHeight = height - margin.top - margin.bottom;
 
       const g = svg.append('g')
-          .attr('transform', 'translate(${margin.left},${margin.top})');
+          .attr('transform', `translate(${margin.left},${margin.top})`);
       const xAxisG = g.append('g')
-          .attr('transform', 'translate(0, ${innerHeight})');
+          .attr('transform', `translate(0, ${innerHeight})`);
       const yAxisG = g.append('g');
 
       xAxisG.append('text')
@@ -92,7 +92,7 @@
           .attr('class', 'axis-label')
           .attr('x', -innerHeight / 2)
           .attr('y', -60)
-          .attr('transform', 'rotate(-90)')
+          .attr('transform', `rotate(-90)`)
           .style('text-anchor', 'middle')
           .text(yLabel);
 
@@ -171,16 +171,16 @@
 
         selectedGasNames = gasNames.slice();
 
-
+      
         function updategraph1(selectedGasNames) {
 
           svg.selectAll('*').remove()
           console.log("Updating Graph1")
           var g1 = svg.append('g')
-          .attr('transform', 'translate(${margin.left},${margin.top})')
+          .attr('transform', `translate(${margin.left},${margin.top})`)
 
           const xAxisG1 = g1.append('g')
-          .attr('transform', 'translate(0, ${innerHeight})');
+          .attr('transform', `translate(0, ${innerHeight})`);
       const yAxisG1 = g1.append('g');
 
           var pointsDisplayed = [];
@@ -212,7 +212,7 @@ yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
           .attr('class', 'axis-label')
           .attr('x', -innerHeight / 2)
           .attr('y', -60)
-          .attr('transform', 'rotate(-90)')
+          .attr('transform', `rotate(-90)`)
           .style('text-anchor', 'middle')
           .text(yLabel);
 
@@ -239,6 +239,13 @@ yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
                 "<br/>"  + "Gas: " + d.key)     
          .style("left", (d3.event.pageX) + "px")             
          .style("top", (d3.event.pageY - 28) + "px");
+
+          g1.append("text")
+         .attr("x", (innerWidth / 2))             
+         .attr("y", 0 - (margin.top / 3))
+         .attr("text-anchor", "middle")  
+         .style("font-size", "16px") 
+         .text("Scatter Plot of Greenhouse Gases/Particulates");      
 
          
        });
@@ -296,7 +303,7 @@ yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
          .attr("y", 0 - (margin.top / 3))
          .attr("text-anchor", "middle")  
          .style("font-size", "16px") 
-         .text("Scatter Plot of Greenhouse Gases");      
+         .text("Scatter Plot of Greenhouse Gases/Particulates");      
        
          xAxisG.call(xAxis);
          yAxisG.call(yAxis);
@@ -310,9 +317,9 @@ yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
     <div><h4>Overview</h4>
     Climate change is an important topic that affects everyone. However, there is little understanding of this topic and there is the tendency to mistake climate change with weather. This article attempts to introduce the residents of Copenhagen to climate change. We present visulizations of some greenhouse gases and particulate matters, and the correlation of these gases with weather conditions and phenomenon. <p>The data used was gotten from the Institut for Miljøvidenskab of the Aarhus University and saved it as CSV file for visualization processing. The visualizations below use a month's worth of data from the 9th of December 2017 to 9th of January 2018</p> </div>
     <br/> 
-    <h3> Visualization 1 </h3>
-    The first visualization shows the raw data from the AndersenBoulevard.csv. 5 greenhouse gases and 2 particulate matters, each containing 1454 data values were considered. The greenhouse gases are carbon monoxide(CO), nitrogen dioxide(NO2), Nitrogen oxides(NOX), Ozone(O3) and Sulfur dioxide(SO2); the particulate matters are PM10 and PM25. The volume of the data produces a clustered visulaization. So, some buttons have been provided for selection of specific gas/particulate, with changing axes to depict the value range. Also, additional information is provided on each data point to highlight the date and time of data collection, the value recorded and gas/particulate type.
-    <br/>
+    <div><h3> Visualization 1 </h3>
+    The first visualization shows the raw data from the AndersenBoulevard.csv. 5 greenhouse gases and 2 particulate matters, each containing 1454 data values were considered. The greenhouse gases are carbon monoxide(CO), nitrogen dioxide(NO2), Nitrogen oxides(NOX), Ozone(O3) and Sulfur dioxide(SO2); the particulate matters are PM10 and PM25. The volume of the data produces a clustered visulaization. So, some buttons have been provided for selection of specific gas/particulate, with changing axes to depict the value range. Also, additional information is provided on each data point to highlight the date and time of data collection, the value recorded and gas/particulate type. Simply hover on a point to get its information. </div>
+
 
     <div id=graph1> <svg width="960" height="500"></svg> </div>
     <div id=graph1buttons> </div>
