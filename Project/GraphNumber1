@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <title>Graph 1: Scatter Plot of Greenhouse Gases</title>
+    <style>
+      body {
+        margin: 0px;
+      }
+      .domain {
+        display: none;
+      }
+      .tick line {
+       stroke: #C0C0BB;
+       /*fill: none;*/
+      }
+      .tick text {
+        fill: #8E8883;
+        font-size: 8pt;
+        font-family: sans-serif;
+      }
+      .axis-label {
+        fill: #635F5D;
+        font-size: 16pt;
+        font-family: sans-serif;
+      }
+      .legend {
+        text-anchor: middle;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      div.tooltip {
+        position: absolute;
+        text-align: center;
+        width: 80px;
+        height: 55px;
+        padding: 2px;
+        font-size: 12px;
+        font-family: sans-serif;
+        background: lightsteelblue;
+        border: 0px;
+        border-radius: 8px;
+      }
+
+      .scatterlegend{
+        display: inline-block;
+        padding: 4px;
+        margin: 6px;
+      }
+
+      #graph1buttons{
+        text-align: center;
+      }
+
+      .slidecontainer {
+        width: 70%; 
+      }
+
+.track,
+.track-inset,
+.track-overlay {
+  stroke-linecap: round;
+}
+
+.track {
+  stroke: #000;
+  stroke-opacity: 0.3;
+  stroke-width: 10px;
+}
+
+.track-inset {
+  stroke: #ddd;
+  stroke-width: 8px;
+}
+
+.track-overlay {
+  pointer-events: stroke;
+  stroke-width: 50px;
+  stroke: transparent;
+  cursor: crosshair;
+}
+
+.handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-opacity: 0.5;
+  stroke-width: 1.25px;
+}
+
+    </style>
+
+        <script>
+  
+  
+  </script>
+
+  </head>
+  <body>
+    
+    <div><h4>Overview</h4>
+    Climate change is an important topic that affects everyone. However, there is little understanding of this topic and there is the tendency to mistake climate change with weather. This article attempts to introduce the residents of Copenhagen to climate change. We present visulizations of some greenhouse gases and particulate matters, and the correlation of these gases with weather conditions and phenomenon. <p>The data used was gotten from the Institut for Miljøvidenskab of the Aarhus University and saved it as CSV file for visualization processing. The visualizations below use a month's worth of data from the 9th of December 2017 to 9th of January 2018</p> </div>
+    <br/> 
+    <div><h3> Visualization 1 </h3>
+    The first visualization shows the raw data from the AndersenBoulevard.csv. 5 greenhouse gases and 2 particulate matters, each containing 1454 data values were considered. The greenhouse gases are carbon monoxide(CO), nitrogen dioxide(NO2), Nitrogen oxides(NOX), Ozone(O3) and Sulfur dioxide(SO2); the particulate matters are PM10 and PM25. The volume of the data produces a clustered visulaization. So, some buttons have been provided for selection of specific gas/particulate, with changing axes to depict the value range. Also, additional information is provided on each data point to highlight the date and time of data collection, the value recorded and gas/particulate type. Simply hover on a point to get its information. </div>
+
+
+    <div id=graph1> <svg width="960" height="500"></svg> </div>
+    <div id=graph1buttons> </div>
+    
+<div class="slidecontainer">
+ 
+</div>
+
+
+
+ <!--  <input id="slider" type="range" min="00:00" max="23:30" value="00:00" step="1"/>
+  
+  <span id="range">00:00</span> -->
+  </body>
+</html>
