@@ -100,11 +100,11 @@
     <script src="ParallelCoordinates.js"></script>
     
     <script>
-    d3.select(window).on('load', init)
+    d3.select(window).on('load', init) 
         
     function init(){
     
-        d3.csv("AndersenBoulevard.csv", function(error, raw_stationdata) {
+        d3.csv("StationDataset.csv", function(error, raw_stationdata) { 
             if (error) throw error;  
             //console.log(raw_stationdata)
             stationdata = addDateAndTime(raw_stationdata)

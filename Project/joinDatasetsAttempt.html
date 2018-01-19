@@ -1,1 +1,167 @@
- 
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Creating joined Dataset</title>
+    
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="Utilities.js"></script>
+<script src="ParallelCoordinates.js"></script>
+
+<script>
+d3.select(window).on('load', init)
+
+    
+    function addStationName(raw_station_Dataset, stationName){
+        raw_station_Dataset.forEach(function (obj){
+            obj[stationName] = stationName
+        })
+        return raw_station_Dataset
+        
+    }
+    
+    
+    function joinStationObjects(arrStationObjects, keys){
+        joined_object = {}
+        keys.forEach(function (key){
+            arrayOfValues = []
+            the_timestamp = arrStationObjects[0].Timestamp 
+            for (var i=0; i < arrStationObjects.length; i++){
+                arrStationObject = arrStationObjects[i]
+                val = arrStationObject[key]
+                if (!(val === undefined) && !(val == "")){
+                    arrayOfValues.push(val)
+                }
+            }
+            value_avg = d3.mean(arrayOfValues)
+            joined_object[key] = value_avg
+        })
+        joined_object.Timestamp = the_timestamp
+        return joined_object
+    }
+    
+    
+    
+    function createNewRawDataset(dataByMoment, keys){
+        newRawDataset = []
+        
+    for (var dayNumber = 0; dayNumber < dataByMoment.length ; dayNumber++){
+        dayObject = dataByMoment[dayNumber]
+        
+        for (var timeIndex = 0; timeIndex < dayObject.value.length; timeIndex++){
+            timeObject = dayObject.value[timeIndex]
+            //console.log(timeObject)
+            aggregate_object = joinStationObjects(timeObject.value, keys)
+            newRawDataset.push(aggregate_object)
+        }
+    }
+        console.log(newRawDataset)
+        return newRawDataset;
+    }
+    
+    function joinDifferentStations(arrayOfStationDatasets, keys){
+        totalData = []
+        arrayOfStationDatasets.forEach(function (arr){
+            totalData = totalData.concat(arr)
+        })
+        //console.log(totalData)
+        
+        totalData.forEach(function (elem){
+            elem.Date = parseDate(elem.Date)
+        })
+        console.log(totalData)
+        
+        dataByMoment = d3.nest()
+            .key(function(d) { return d.Date; })
+            .rollup(function(arr) { 
+                return d3.nest().key(function(d) { return d.Time; })
+                                .rollup(function(arr2) { 
+                                    return arr2})
+                                .entries(arr)})
+            .entries(totalData)
+        
+        
+        console.log(dataByMoment)
+        
+        return createNewRawDataset(dataByMoment, keys)
+        
+    }
+    
+    
+function init(){
+    d3.csv("AndersenBoulevard.csv", function(error, raw_stationdata_AB) {
+        if (error) throw error;  
+        stationdata_AB = addDateAndTime(raw_stationdata_AB)
+        stationdata_AB = addStationName(stationdata_AB, "AndersenBoulevard")
+        
+        keys = Object.keys(stationdata_AB[0])
+        removeFromArray(keys, "Date")
+        removeFromArray(keys, "Time")
+        removeFromArray(keys, "Timestamp")
+        removeFromArray(keys, "AndersenBoulevard")
+        console.log(keys)
+        
+        //console.log(stationdata_AB)
+        
+        d3.csv("HCØ.csv", function(error, raw_stationdata_HC) {
+            if (error) throw error;  
+            stationdata_HC = addDateAndTime(raw_stationdata_HC)
+            stationdata_HC = addStationName(stationdata_HC, "HCØ")
+            //console.log(stationdata_HC)
+            
+            
+            d3.csv("Hvidovre.csv", function(error, raw_stationdata_HV) {
+                if (error) throw error;  
+                stationdata_HV = addDateAndTime(raw_stationdata_HV)
+                stationdata_HV = addStationName(stationdata_HV, "Hvidovre")
+                //console.log(stationdata_HV)
+                
+                d3.csv("Jagtvej.csv", function(error, raw_stationdata_J) {
+                    if (error) throw error;  
+                    stationdata_J = addDateAndTime(raw_stationdata_J)
+                    stationdata_J = addStationName(stationdata_J, "Jagtvej")
+                    //console.log(stationdata_J)
+                    
+                    stationsArray = [stationdata_AB, stationdata_HC, stationdata_HV, stationdata_J]
+                    joinedRawDataset = joinDifferentStations(stationsArray, keys)
+
+                    // Convert Object to JSON
+                    //var jsonObject = JSON.stringify(joinedRawDataset);
+                    
+                    //console.log(joinedRawDataset)
+                    const items = joinedRawDataset
+                    console.log(items)
+                    const replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here
+                    const header = Object.keys(items[0])
+                    let csv = items.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
+                    csv.unshift(header.join(','))
+                    csv = csv.join('\r\n')
+                    console.log(csv)
+                    
+                })
+            })
+    
+        })
+    
+    })
+    
+}
+
+</script>
+</head>
+
+<body>
+
+</body>
+    
+
+
+
+
+
+
+
+
+</html>
+    
