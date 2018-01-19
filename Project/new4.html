@@ -54,6 +54,41 @@
         text-align: center;
       }
 
+      .slidecontainer {
+        width: 70%; 
+      }
+
+.track,
+.track-inset,
+.track-overlay {
+  stroke-linecap: round;
+}
+
+.track {
+  stroke: #000;
+  stroke-opacity: 0.3;
+  stroke-width: 10px;
+}
+
+.track-inset {
+  stroke: #ddd;
+  stroke-width: 8px;
+}
+
+.track-overlay {
+  pointer-events: stroke;
+  stroke-width: 50px;
+  stroke: transparent;
+  cursor: crosshair;
+}
+
+.handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-opacity: 0.5;
+  stroke-width: 1.25px;
+}
+
     </style>
 
         <script>
@@ -81,6 +116,21 @@
       const xAxisG = g.append('g')
           .attr('transform', `translate(0, ${innerHeight})`);
       const yAxisG = g.append('g');
+
+var sliderX = d3.scaleLinear()
+    .domain([0, 180])
+    .range([0, innerWidth])
+    .clamp(true);
+
+
+      // var sliderSvg = d3.select(".slidecontainer")
+      //                 .append("svg")
+      //                 .attr("width", 50);
+      var slider = svg.append("g")
+                      .attr("class", "slider")
+                      .attr("transform", "translate(" + margin.left + "," + innerHeight/2 + ")");
+
+
 
       xAxisG.append('text')
           .attr('class', 'axis-label')
@@ -170,6 +220,46 @@
           .nice();
 
         selectedGasNames = gasNames.slice();
+
+        slider.append("line")
+            .attr("class", "track")
+            .attr("x1", sliderX.range()[0])
+            .attr("x2", sliderX.range()[1])
+            .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+            .attr("class", "track-inset")
+            .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+            .attr("class", "track-overlay")
+            .call(d3.drag()
+            .on("start.interrupt", function() { slider.interrupt(); })
+            .on("start drag", function() { hue(sliderX.invert(d3.event.x)); }));
+
+      slider.insert("g", ".track-overlay")
+            .attr("class", "ticks")
+            .attr("transform", "translate(0," + 18 + ")")
+           // .attr("y", innerHeight -5)
+            .selectAll("text")
+            .data(sliderX.ticks(10))
+            .enter().append("text")
+            .attr("x", sliderX)
+            .attr("text-anchor", "middle")
+            .text(function(d) { return d + "°"; });
+
+     var handle = slider.insert("circle", ".track-overlay")
+    .attr("class", "handle")
+    .attr("r", 9);
+
+slider.transition() // Gratuitous intro!
+    .duration(750)
+    .tween("hue", function() {
+      var i = d3.interpolate(0, 70);
+      return function(t) { hue(i(t)); };
+    });
+
+function hue(h) {
+  handle.attr("cx", sliderX(h));
+  svg.style("background-color", d3.hsl(h, 0.8, 0.8));
+}
+
 
       
         function updategraph1(selectedGasNames) {
@@ -311,6 +401,7 @@ yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
       });
 }
     </script>
+
   </head>
   <body>
     
@@ -324,8 +415,14 @@ yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
     <div id=graph1> <svg width="960" height="500"></svg> </div>
     <div id=graph1buttons> </div>
     
-  <input id="slider" type="range" min="00:00" max="23:30" value="00:00" step="1"/>
+<div class="slidecontainer">
+ 
+</div>
+
+
+
+ <!--  <input id="slider" type="range" min="00:00" max="23:30" value="00:00" step="1"/>
   
-  <span id="range">00:00</span>
+  <span id="range">00:00</span> -->
   </body>
 </html>
