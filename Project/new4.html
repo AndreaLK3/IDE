@@ -300,8 +300,11 @@ yScale.domain(d3.extent(pointsDisplayed, function(d) { return d.y; }))
     </script>
   </head>
   <body>
-      <div id=graph1buttons> </div>
+    <div id=graph1buttons> </div>
     <div id=graph1> <svg width="960" height="500"></svg> </div>
+
+  <input id="slider" type="range" min="00:00" max="23:30" value="00:00" step="1"/>
   
+  <span id="range">00:00</span>
   </body>
 </html>
