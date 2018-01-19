@@ -368,14 +368,7 @@ function orderTimeStrings(time1, time2){
         }
         else {return 0}
     }
-    
-    
 }
     
     
-    
-    
-    
-    
-}
 
