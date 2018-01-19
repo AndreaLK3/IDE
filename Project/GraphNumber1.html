@@ -88,6 +88,10 @@
   stroke-opacity: 0.5;
   stroke-width: 1.25px;
 }
+        
+    #sliderContainerDiv {
+        text-align: center
+    }
 
 </style>
 
@@ -149,7 +153,7 @@ function init1() {
     xAxisG.append('text')
       .attr('class', 'axis-label')
       .attr('x', innerWidth / 2)
-      .attr('y', 100)
+      .attr('y', 50)
       .text(xLabel);
 
     yAxisG.append('text')
@@ -220,10 +224,6 @@ function init1() {
     var g1 = svg.append('g')
                 .attr('transform', `translate(${margin.left},${margin.top})`)
 
-    const xAxisG1 = g1.append('g')
-                    .attr('transform', `translate(0, ${innerHeight})`);
-    const yAxisG1 = g1.append('g');
-
     var pointsDisplayed = [];
     selectedGasNames.forEach(function(gas) {
         pointsToAdd = ( mapping1.filter(function(subArray) { if (subArray.key == gas ){return true} else{return false}}) )[0].value
@@ -243,10 +243,15 @@ function init1() {
         .range([innerHeight, 0])
         .nice();
 
+    
+    const xAxisG1 = g1.append('g')
+                    .attr('transform', `translate(0, ${innerHeight})`);
+    const yAxisG1 = g1.append('g');
+              
     xAxisG1.append('text')
         .attr('class', 'axis-label')
         .attr('x', innerWidth / 2)
-        .attr('y', 100)
+        .attr('y', 50)
         .text(xLabel);
 
     yAxisG1.append('text')
@@ -281,12 +286,12 @@ function init1() {
                             .style("left", (d3.event.pageX) + "px")             
                             .style("top", (d3.event.pageY - 28) + "px");
 
-                        g1.append("text")
-                            .attr("x", (innerWidth / 2))             
-                            .attr("y", 0 - (margin.top / 3))
-                            .attr("text-anchor", "middle")  
-                            .style("font-size", "16px") 
-                            .text("Scatter Plot of Greenhouse Gases/Particulates");   
+//                        g1.append("text")
+//                            .attr("x", (innerWidth / 2))             
+//                            .attr("y", 0 - (margin.top / 3))
+//                            .attr("text-anchor", "middle")  
+//                            .style("font-size", "16px") 
+//                            .text("Scatter Plot of Greenhouse Gases/Particulates");   
 
         })
     
@@ -340,12 +345,12 @@ function init1() {
 
        });
 
-        g.append("text")
-         .attr("x", (innerWidth / 2))             
-         .attr("y", 0 - (margin.top / 3))
-         .attr("text-anchor", "middle")  
-         .style("font-size", "16px") 
-         .text("Scatter Plot of Greenhouse Gases/Particulates");      
+//        g.append("text")
+//         .attr("x", (innerWidth / 2))             
+//         .attr("y", 0 - (margin.top / 3))
+//         .attr("text-anchor", "middle")  
+//         .style("font-size", "16px") 
+//         .text("Scatter Plot of Greenhouse Gases/Particulates");      
        
          xAxisG.call(xAxis);
          yAxisG.call(yAxis);
@@ -376,63 +381,7 @@ function init1() {
     }
         
     var sliderSvg = d3.select("#sliderContainerSvg")
-//
-//    var slider = sliderSvg.append("g")
-//                      .attr("class", "slider")
-//                      .attr("transform", "translate(" + margin.left + "," + 50 + ")");
-//        
-//    var sliderXscale = d3.scaleLinear()
-//                        .domain([0, 47])
-//                        .range([0, innerWidth])
-//                        .clamp(true);
-//
-//          
-//    var selectedHour = null;
-//        
-//    slider.append("line")
-//        .attr("class", "track")
-//        .attr("x1", sliderXscale.range()[0])
-//        .attr("x2", sliderXscale.range()[1])
-//        .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
-//        .attr("class", "track-inset")
-//        .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
-//        .attr("class", "track-overlay")
-//        .call(d3.drag()
-//        .on("start.interrupt", function() { slider.interrupt(); })
-//        .on("start drag", function() { hue(x.invert(d3.event.x)); })
-//        .on("end", function(evt, value) { 
-//                        slideNumber = parseInt( Math.round(sliderXscale.invert(d3.event.x),2) ) 
-//                        slideHour = convertNumberToHour(slideNumber, 0,0) 
-//                        console.log(slideHour) 
-//                        d3.select("#displayedHour")
-//                            .text(slideHour) }) )
-//
-//    console.log( sliderXscale.ticks(24).map(function(n) {return convertNumberToHour(n,0,0)}) )      
-//                
-//        
-//    slider.insert("g", ".track-overlay")
-//            .attr("class", "ticks")
-//            .attr("transform", "translate(0," + 18 + ")")
-//           // .attr("y", innerHeight -5)
-//            .selectAll("text")
-//            .data( sliderXscale.ticks(30).map(function(n) {return convertNumberToHour(n,0,0)})  )
-//            .enter().append("text")
-//            .attr("x", function(d,i){ return i * (innerWidth / 24)})
-//            .attr("text-anchor", "middle")
-//            .text(function(d,i) { return d.slice(0,2) });
-//    
-//    var handle = slider.insert("circle", ".track-overlay")
-//        .attr("class", "handle")
-//        .attr("r", 9);
-//
-//
-//slider.transition() // Gratuitous intro!
-//    .duration(750)
-//    .tween("hue", function() {
-//      var i = d3.interpolate(0, 70);
-//      return function(t) { hue(i(t)); };
-//    });
-        
+
     var sliderXscale = d3.scaleLinear()
                         .domain([0, 47])
                         .range([0, innerWidth])
@@ -458,7 +407,8 @@ function init1() {
                         slideHour = convertNumberToHour(slideNumber, 0,0) 
                         console.log(slideHour) 
                         d3.select("#displayedHour")
-                            .text(slideHour) }));
+                            .text(slideHour)
+                        timeSlider(slideHour)}));
 
     slider.insert("g", ".track-overlay")
             .attr("class", "ticks")
@@ -489,58 +439,76 @@ function timeSlider(specifiedTime) {
           svg.selectAll('*').remove()
           console.log("Updating Graph1")
           var g2 = svg.append('g')
-          .attr('transform', `translate(${margin.left},${margin.top})`)
-
-          const xAxisG2 = g1.append('g')
+                        .attr('transform', `translate(${margin.left},${margin.top})`)
+    
+          const xAxisG2 = g2.append('g')
           .attr('transform', `translate(0, ${innerHeight})`);
      
-      const yAxisG2 = g1.append('g');
+          const yAxisG2 = g2.append('g');
+    
+                  
+        xAxisG2.append('text')
+            .attr('class', 'axis-label')
+            .attr('x', innerWidth / 2)
+            .attr('y', 50)
+            .text(xLabel);
+
+        yAxisG2.append('text')
+            .attr('class', 'axis-label')
+            .attr('x', -innerHeight / 2)
+            .attr('y', -60)
+            .attr('transform', `rotate(-90)`)
+            .style('text-anchor', 'middle')
+            .text(yLabel);
+
+        xAxisG2.call(xAxis);
+        yAxisG2.call(yAxis);
 
           var pointsDisplayed = [];
           selectedGasNames.forEach(function(gas) {
-          pointsToAdd = ( mapping1.filter(function(subArray) { if (subArray.key == gas ){return true} else{return false}}) )[0].value
-          pointsDisplayed = pointsDisplayed.concat(pointsToAdd)
+              pointsToAdd = ( mapping1.filter(function(subArray) { if (subArray.key == gas ){return true} else{return false}}) )[0].value
+              pointsDisplayed = pointsDisplayed.concat(pointsToAdd)
         })
 
-pointsDisplayed = pointsDisplayed.filter(function(point) {
-  if(point.time <= specifiedTime) {
-  return true;
-  }else {
-  return false;
-  }
-})
+        pointsDisplayed = pointsDisplayed.filter(function(point) {
+          if(point.time == specifiedTime) {
+          return true;
+          }else {
+          return false;
+          }
+        })
 
 
-g.selectAll(".mapping")
-         .data(pointsDisplayed)
-         .enter()
-         .append("circle")
-         .attr("class", "mapping")
-         .attr("r", 4.5)
-         .attr("cx", function(d) { return xScale(d.x); })
-         .attr("cy", function(d) { return yScale(d.y); })
-         .style("fill", function(d, i) { return zScale[d.key]; })
-         .on("mouseover", function(d) {
-              div.transition()
-                 .duration(50)
-                 .style("opacity", .9);
-              div .html(
-                 "Date: " + formatTime(d.x) +
-                "<br/>"  + "Value: " + d.y +
-                "<br/>"  + "Time: " + d.time + 
-                "<br/>"  + "Gas: " + d.key)     
-         .style("left", (d3.event.pageX) + "px")             
-         .style("top", (d3.event.pageY - 28) + "px");
+        g2.selectAll(".mapping")
+                 .data(pointsDisplayed)
+                 .enter()
+                 .append("circle")
+                 .attr("class", "mapping")
+                 .attr("r", 4.5)
+                 .attr("cx", function(d) { return xScale(d.x); })
+                 .attr("cy", function(d) { return yScale(d.y); })
+                 .style("fill", function(d, i) { return zScale[d.key]; })
+                 .on("mouseover", function(d) {
+                      div.transition()
+                         .duration(50)
+                         .style("opacity", .9);
+                      div .html(
+                         "Date: " + formatTime(d.x) +
+                        "<br/>"  + "Value: " + d.y +
+                        "<br/>"  + "Time: " + d.time + 
+                        "<br/>"  + "Gas: " + d.key)     
+                 .style("left", (d3.event.pageX) + "px")             
+                 .style("top", (d3.event.pageY - 28) + "px");
 
-          g1.append("text")
-         .attr("x", (innerWidth / 2))             
-         .attr("y", 0 - (margin.top / 3))
-         .attr("text-anchor", "middle")  
-         .style("font-size", "16px") 
-         .text("Scatter Plot of Greenhouse Gases/Particulates");      
+          g2.append("text")
+                 .attr("x", (innerWidth / 2))             
+                 .attr("y", 0 - (margin.top / 3))
+                 .attr("text-anchor", "middle")  
+                 .style("font-size", "16px") 
+                 .text("Scatter Plot of Greenhouse Gases/Particulates");      
 
 
-}
+} )
 
 }
     
@@ -560,12 +528,17 @@ g.selectAll(".mapping")
      <div><h3> Visualization 1 </h3>
     The first visualization shows the raw data from the AndersenBoulevard.csv. 5 greenhouse gases and 2 particulate matters, each containing 1454 data values were considered. The greenhouse gases are carbon monoxide(CO), nitrogen dioxide(NO2), Nitrogen oxides(NOX), Ozone(O3) and Sulfur dioxide(SO2); the particulate matters are PM10 and PM25. The volume of the data produces a clustered visulaization. So, some buttons have been provided for selection of specific gas/particulate, with changing axes to depict the value range. Also, additional information is provided on each data point to highlight the date and time of data collection, the value recorded and gas/particulate type. Simply hover on a point to get its information. </div>
 
-
-<div id=graph1> <svg width="960" height="500"></svg> </div>
-    <div id=graph1buttons> </div>
-    
+<h3>Scatter Plot of Greenhouse Gases/Particulates</h3>
+<div id=graph1buttons> </div>
+<div id=graph1> 
+    <svg width="960" height="500"></svg> 
+</div>
+    <div id="sliderContainerDiv">
+    <h3>Hours of the day</h3>
+    <p>It is possible to display in the scatterplot only the measurements made during a specific hour of the day (eg: 7:30, 19:00).<br/>
+    To return to the visualization of the entire day, click one of the buttons to visualize a specific air pollutant above.</p>>
     <svg width="960" id="sliderContainerSvg"> &nbsp; 
     </svg>
-    <tspan> Displayed hour : </tspan> <tspan id="displayedHour"> </tspan>
+    </div>
   </body>
 </html>
