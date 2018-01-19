@@ -483,11 +483,69 @@ function dragHandle(h) {
   handle.attr("cx", sliderXscale(h));
   //svg.style("background-color", d3.hsl(h, 0.8, 0.8));
 }
-    
+
+function timeSlider(specifiedTime) {
+
+          svg.selectAll('*').remove()
+          console.log("Updating Graph1")
+          var g2 = svg.append('g')
+          .attr('transform', `translate(${margin.left},${margin.top})`)
+
+          const xAxisG2 = g1.append('g')
+          .attr('transform', `translate(0, ${innerHeight})`);
+     
+      const yAxisG2 = g1.append('g');
+
+          var pointsDisplayed = [];
+          selectedGasNames.forEach(function(gas) {
+          pointsToAdd = ( mapping1.filter(function(subArray) { if (subArray.key == gas ){return true} else{return false}}) )[0].value
+          pointsDisplayed = pointsDisplayed.concat(pointsToAdd)
+        })
+
+pointsDisplayed = pointsDisplayed.filter(function(point) {
+  if(point.time <= specifiedTime) {
+  return true;
+  }else {
+  return false;
+  }
 })
+
+
+g.selectAll(".mapping")
+         .data(pointsDisplayed)
+         .enter()
+         .append("circle")
+         .attr("class", "mapping")
+         .attr("r", 4.5)
+         .attr("cx", function(d) { return xScale(d.x); })
+         .attr("cy", function(d) { return yScale(d.y); })
+         .style("fill", function(d, i) { return zScale[d.key]; })
+         .on("mouseover", function(d) {
+              div.transition()
+                 .duration(50)
+                 .style("opacity", .9);
+              div .html(
+                 "Date: " + formatTime(d.x) +
+                "<br/>"  + "Value: " + d.y +
+                "<br/>"  + "Time: " + d.time + 
+                "<br/>"  + "Gas: " + d.key)     
+         .style("left", (d3.event.pageX) + "px")             
+         .style("top", (d3.event.pageY - 28) + "px");
+
+          g1.append("text")
+         .attr("x", (innerWidth / 2))             
+         .attr("y", 0 - (margin.top / 3))
+         .attr("text-anchor", "middle")  
+         .style("font-size", "16px") 
+         .text("Scatter Plot of Greenhouse Gases/Particulates");      
+
+
 }
 
+}
     
+})
+}    
     
   
 </script>
